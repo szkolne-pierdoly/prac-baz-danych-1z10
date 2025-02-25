@@ -7,7 +7,6 @@ namespace Backend.Controllers;
 public class ApiController : ControllerBase
 {
     [HttpGet]
-    [Route("get")]
     public IActionResult Get()
     {
         return Ok("Hello World");
