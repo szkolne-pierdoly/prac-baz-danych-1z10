@@ -6,11 +6,11 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-string host = Environment.GetEnvironmentVariable("POSTGRES_HOST");
-string port = Environment.GetEnvironmentVariable("POSTGRES_PORT");
-string database = Environment.GetEnvironmentVariable("POSTGRES_DB");
-string username = Environment.GetEnvironmentVariable("POSTGRES_USER");
-string password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
+string host = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "localhost";
+string port = Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? "5432";
+string database = Environment.GetEnvironmentVariable("POSTGRES_DB") ?? "mydb";
+string username = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "postgres";
+string password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "password";
 
 string connectionString = $"Host={host};Port={port};Database={database};Username={username};Password={password}";
 
