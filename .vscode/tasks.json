@@ -2,7 +2,16 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "watch",
+            "label": "🛢️ Start Database - Docker",
+            "type": "shell",
+            "command": "docker-compose up -d db",
+            "options": {
+                "cwd": "${workspaceFolder}/Backend"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "⚙️ Start Backend - Watch",
             "command": "dotnet",
             "type": "process",
             "args": [
@@ -12,21 +21,48 @@
                 "${workspaceFolder}/Backend/Backend.csproj"
             ],
             "problemMatcher": "$msCompile",
-            "group": {
-                "kind": "build",
-                "isDefault": true,
-            },
             "dependsOn": [
-                "Run Docker Compose DB"
+                "🐳 Start Database - Docker Compose"
             ]
         },
         {
-            "label": "Run Docker Compose DB",
+            "label": "💻 Start Frontend - Dev",
+            "type": "npm",
+            "script": "dev",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/Frontend"
+            },
+        },
+        {
+            "label": "🚀 Run All",
+            "dependsOn": [
+                "🐳 Start Database - Docker",
+                "⚙️ Start Backend - Watch",
+                "💻 Start Frontend - Dev"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "⏹️ Stop All",
             "type": "shell",
-            "command": "docker-compose up -d db",
+            "command": "docker-compose down",
             "options": {
                 "cwd": "${workspaceFolder}/Backend"
             },
+            "problemMatcher": []
+        },
+        {
+            "label": "🔄 Restart All",
+            "dependsOn": [
+                "🐳 Stop All - Docker",
+                "🚀 Run All"
+            ],
+            "group": "build",
             "problemMatcher": []
         }
     ]
