@@ -14,8 +14,20 @@
             "problemMatcher": "$msCompile",
             "group": {
                 "kind": "build",
-                "isDefault": true
-            }
+                "isDefault": true,
+            },
+            "dependsOn": [
+                "Run Docker Compose DB"
+            ]
+        },
+        {
+            "label": "Run Docker Compose DB",
+            "type": "shell",
+            "command": "docker-compose up -d db",
+            "options": {
+                "cwd": "${workspaceFolder}/Backend"
+            },
+            "problemMatcher": []
         }
     ]
 }
