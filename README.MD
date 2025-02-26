@@ -3,7 +3,7 @@
 
 *Autor: Nikodem Okroj*
 
-#Project structure schema:
+### Project structure schema:
 ```
 rootdir
 ├── backend/
