@@ -11,19 +11,12 @@
             "problemMatcher": []
         },
         {
-            "label": "⚙️ Start Backend - Watch",
+            "label": "⚙️ Backend Watch",
+            "type": "shell",
             "command": "dotnet",
-            "type": "process",
-            "args": [
-                "watch",
-                "run",
-                "--project",
-                "${workspaceFolder}/Backend/Backend.csproj"
-            ],
+            "args": ["watch", "run", "--project", "${workspaceFolder}/Backend/Backend.csproj"],
             "problemMatcher": "$msCompile",
-            "dependsOn": [
-                "🐳 Start Database - Docker Compose"
-            ]
+            "isBackground": true
         },
         {
             "label": "💻 Start Frontend - Dev",
@@ -37,22 +30,13 @@
         {
             "label": "🚀 Run All",
             "dependsOn": [
-                "🐳 Start Database - Docker",
-                "⚙️ Start Backend - Watch",
+                "🛢️ Start Database - Docker",
+                "⚙️ Backend Watch",
                 "💻 Start Frontend - Dev"
             ],
             "group": {
                 "kind": "build",
                 "isDefault": true
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "⏹️ Stop All",
-            "type": "shell",
-            "command": "docker-compose down",
-            "options": {
-                "cwd": "${workspaceFolder}/Backend"
             },
             "problemMatcher": []
         },
