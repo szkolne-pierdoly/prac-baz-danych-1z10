@@ -48,6 +48,36 @@
             ],
             "group": "build",
             "problemMatcher": []
+        },
+        {
+            "label": "🎨 Format Code",
+            "type": "npm",
+            "script": "format",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/Frontend"
+            }
+        },
+        {
+            "label": "🔍 Lint Code",
+            "type": "npm",
+            "script": "lint",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/Frontend"
+            }
+        },
+        {
+            "label": "✨ Format & Lint",
+            "dependsOn": [
+                "🎨 Format Code",
+                "🔍 Lint Code"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": []
         }
     ]
 }
