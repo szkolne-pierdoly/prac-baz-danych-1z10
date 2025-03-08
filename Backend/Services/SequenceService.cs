@@ -23,7 +23,7 @@ public class SequenceService : ISequenceService
                     new Question {
                         Content = q.Content,
                         Hint = q.Hint1,
-                        hint2 = q.Hint2,
+                        Hint2 = q.Hint2,
                         CorrectAnswer = q.CorrectAnswer
                     }).ToList()
             };

@@ -17,12 +17,12 @@ public class QuestionService : IQuestionService
     public async Task<BaseResult> CreateQuestion(CreateQuestionRequest request)
     {
         try 
-        {
+        { 
           var question = new Question
         {
             Content = request.Content,
-            Hint = request.Hint1,
-            hint2 = request.Hint2,
+            Hint = request.Hint,
+            Hint2 = request.Hint2,
             CorrectAnswer = request.CorrectAnswer,
         };
 
