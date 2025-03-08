@@ -19,19 +19,36 @@
             "isBackground": true
         },
         {
+            "label": "🔨 Build Solution",
+            "type": "shell",
+            "command": "dotnet",
+            "args": ["build", "${workspaceFolder}"],
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "💻 Start Frontend - Dev",
             "type": "npm",
             "script": "dev",
             "problemMatcher": [],
             "options": {
                 "cwd": "${workspaceFolder}/Frontend"
+            }
+        },
+        {
+            "label": "🐳 Stop All - Docker",
+            "type": "shell",
+            "command": "docker-compose down",
+            "options": {
+                "cwd": "${workspaceFolder}/Backend"
             },
+            "problemMatcher": []
         },
         {
             "label": "🚀 Run All",
             "dependsOn": [
                 "🛢️ Start Database - Docker",
                 "⚙️ Backend Watch",
+                "🔨 Build Solution",
                 "💻 Start Frontend - Dev"
             ],
             "group": {
