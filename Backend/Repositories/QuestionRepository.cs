@@ -1,6 +1,7 @@
 using Backend.Data;
 using Backend.Data.Models;
 using Backend.Interface.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Repositories;
 
@@ -22,5 +23,10 @@ public class QuestionRepository : IQuestionRepository
     {
         await _context.Questions.AddAsync(question);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Question>> GetAllQuestions()
+    {
+        return await _context.Questions.ToListAsync();
     }
 }

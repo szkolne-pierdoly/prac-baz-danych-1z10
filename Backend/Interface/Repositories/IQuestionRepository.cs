@@ -7,4 +7,5 @@ public interface IQuestionRepository
 {
     Task CreateQuestion(Question question);
     Task<Question?> GetQuestionById(int id);
+    Task<IEnumerable<Question>> GetAllQuestions();
 }
