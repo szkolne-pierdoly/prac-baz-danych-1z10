@@ -29,4 +29,20 @@ public class QuestionRepository : IQuestionRepository
     {
         return await _context.Questions.ToListAsync();
     }
+
+    public async Task UpdateQuestion(Question question)
+    {
+        _context.Entry(question).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteQuestion(int id)
+    {
+        var question = await GetQuestionById(id);
+        if (question != null)
+        {
+            _context.Questions.Remove(question);
+            await _context.SaveChangesAsync();
+        }
+    }
 }
