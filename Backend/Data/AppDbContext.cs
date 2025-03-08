@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using System;
+using Backend.Data.Models;
 
 namespace Backend.Data;
 
@@ -25,5 +25,49 @@ public class AppDbContext : DbContext
         }
     }
 
-    // TODO: Add DbSets for your entities here
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<Sequence> Sequences { get; set; }
+    public DbSet<Player> Players { get; set; }
+    public DbSet<Game> Games { get; set; }
+    public DbSet<Answer> Answers { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Question>().HasKey(q => q.Id);
+        modelBuilder.Entity<Sequence>().HasKey(s => s.Id);
+        modelBuilder.Entity<Player>().HasKey(p => p.Id);
+        modelBuilder.Entity<Game>().HasKey(g => g.Id);
+        modelBuilder.Entity<Answer>().HasKey(a => a.Id);
+
+        modelBuilder.Entity<Sequence>()
+            .HasMany(s => s.Questions)
+            .WithMany();
+
+        modelBuilder.Entity<Game>()
+            .HasOne(g => g.Sequence)
+            .WithMany(s => s.Games)
+            .HasForeignKey(g => g.SequenceId);
+
+        modelBuilder.Entity<Answer>()
+            .HasOne(a => a.question)
+            .WithMany()
+            .HasForeignKey(a => a.QuestionId);
+
+        modelBuilder.Entity<Player>()
+            .HasMany(p => p.Games)
+            .WithOne(g => g.Player)
+            .HasForeignKey(g => g.PlayerId);
+
+        modelBuilder.Entity<Game>()
+            .HasOne(g => g.Sequence)
+            .WithMany(s => s.Games)
+            .HasForeignKey(g => g.SequenceId);
+
+        modelBuilder.Entity<Answer>()
+            .HasOne(a => a.question)
+            .WithMany()
+            .HasForeignKey(a => a.QuestionId);
+            
+            
+    }
 }
