@@ -66,5 +66,91 @@ public class QuestionService : IQuestionService
             };
         }
     } 
+
+    public async Task<BaseResult> UpdateQuestion(UpdateQuestionRequest request, int id)
+    {
+        try
+        {
+            if (request.Content == null && request.Hint == null && request.Hint2 == null && request.CorrectAnswer == null)
+            {
+                return new BaseResult {
+                  IsSuccess = false,
+                  Status = "ERROR",
+                  Message = "No fields to update"
+                };
+            }
+
+            var question = await _questionRepository.GetQuestionById(id);
+
+            if (question == null)
+            {
+                return new BaseResult {
+                  IsSuccess = false,
+                  Status = "ERROR",
+                  Message = "Question not found"
+                };
+            } else if (question.Content == request.Content && question.Hint == request.Hint && question.Hint2 == request.Hint2 && question.CorrectAnswer == request.CorrectAnswer)
+            {
+                return new BaseResult {
+                  IsSuccess = false,
+                  Status = "ERROR",
+                  Message = "Already up to date."
+                };
+            }
+            question.Content = request.Content ?? question.Content;
+            question.Hint = request.Hint ?? question.Hint;
+            question.Hint2 = request.Hint2 ?? question.Hint2;
+            question.CorrectAnswer = request.CorrectAnswer ?? question.CorrectAnswer;
+
+            await _questionRepository.UpdateQuestion(question);
+
+            return new BaseResult {
+              IsSuccess = true,
+              Status = "SUCCESS",
+              Message = "Question updated successfully"
+            };
+        } 
+        catch (Exception ex)
+        {
+            return new BaseResult {
+              IsSuccess = false,
+              Status = "ERROR",
+              Message = ex.Message
+            };
+        }
+    }
+
+    public async Task<BaseResult> DeleteQuestion(int id)
+    {
+        try
+        {
+            var question = await _questionRepository.GetQuestionById(id);
+
+            if (question == null)
+            {
+                return new BaseResult {
+                  IsSuccess = false,
+                  Status = "ERROR",
+                  Message = "Question not found"
+                };
+            }
+
+            await _questionRepository.DeleteQuestion(id);
+
+            return new BaseResult {
+              IsSuccess = true,
+              Status = "SUCCESS",
+              Message = "Question deleted successfully"
+            };
+        }
+        catch (Exception ex)
+        {
+            return new BaseResult {
+              IsSuccess = false,
+              Status = "ERROR",
+              Message = ex.Message
+            };
+        }
+    }
 }
 
