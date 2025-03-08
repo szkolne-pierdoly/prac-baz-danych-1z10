@@ -21,4 +21,11 @@ public class QuestionController : ControllerBase
       await _questionService.CreateQuestion(request);
       return Ok();
     }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllQuestions()
+    {
+      var result = await _questionService.GetAllQuestions();
+      return Ok(result);
+    }
 }
