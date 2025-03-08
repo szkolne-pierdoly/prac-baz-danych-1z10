@@ -1,8 +1,10 @@
 "use client";
 
 import { Card, CardBody, Divider } from "@heroui/react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center">
       <h1 className="text-center text-6xl mb-4">Panel operatora</h1>
@@ -16,7 +18,11 @@ export default function Home() {
             </div>
           </div>
           <div className="flex flex-row items-center justify-center mt-4 w-full max-w-4xl gap-4">
-            <Card className="w-full max-w-[25%] min-w-[100px]" isPressable>
+            <Card
+              className="w-full max-w-[25%] min-w-[100px]"
+              isPressable
+              onPress={() => router.push("/db/questions")}
+            >
               <CardBody>
                 <div className="text-2xl font-bold">Pytania: 17</div>
               </CardBody>
