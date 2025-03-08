@@ -1,11 +1,20 @@
 using Microsoft.EntityFrameworkCore;
 using Backend.Data;
+using Backend.Interface.Repositories;
+using Backend.Repositories;
+using Backend.Interface.Services;
+using Backend.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
+builder.Services.AddScoped<ISequenceRepository, SequenceRepository>();
+builder.Services.AddScoped<ISequenceService, SequenceService>();
+builder.Services.AddScoped<IQuestionService, QuestionService>();
 
 string host = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "localhost";
 string port = Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? "5432";

@@ -19,12 +19,18 @@ public class SequenceService : ISequenceService
             var newSequence = new Sequence
             {
                 Name = request.Name,
-                Questions = request.Questions.Select(q => new Question { Content = q.Content, Hint = q.Hint1, hint2 = q.Hint2, CorrectAnswer = q.CorrectAnswer }).ToList()
+                Questions = request.Questions.Select(q =>
+                    new Question {
+                        Content = q.Content,
+                        Hint = q.Hint1,
+                        hint2 = q.Hint2,
+                        CorrectAnswer = q.CorrectAnswer
+                    }).ToList()
             };
             await _sequenceRepository.CreateSequence(newSequence);
-            return new BaseResult { IsSuccess = true, Status = "Sequence created successfully" };
+            return new BaseResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequence created successfully" };
         } catch (Exception ex) {
-            return new BaseResult { IsSuccess = false, Status = "Failed to create sequence", Message = ex.Message };
+            return new BaseResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
         }
     }
 }
