@@ -24,11 +24,26 @@ import {
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 export default function QuestionsPage() {
-  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
-  const [isSavingUpdate, setIsSavingUpdate] = useState(false);
-  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [showAddQuestion, setShowAddQuestion] = useState(false);
+
+  const [isSavingUpdate, setIsSavingUpdate] = useState(false);
+  const [isDeletingQuestion, setIsDeletingQuestion] = useState(false);
+  const [isAddingQuestion, setIsAddingQuestion] = useState(false);
+
+  const [addQuestionError, setAddQuestionError] = useState<boolean>(false);
+
+  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
+
+  const [addQuestionContent, setAddQuestionContent] = useState<string | null>(
+    null,
+  );
+  const [addQuestionHint, setAddQuestionHint] = useState<string | null>(null);
+  const [addQuestionHint2, setAddQuestionHint2] = useState<string | null>(null);
+  const [addQuestionCorrectAnswer, setAddQuestionCorrectAnswer] = useState<
+    string | null
+  >(null);
 
   const router = useRouter();
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -95,12 +110,59 @@ export default function QuestionsPage() {
       });
   };
 
+  const handleAddQuestion = () => {
+    if (
+      addQuestionContent === null ||
+      addQuestionHint === null ||
+      addQuestionCorrectAnswer === null ||
+      addQuestionContent === "" ||
+      addQuestionHint === "" ||
+      addQuestionCorrectAnswer === ""
+    ) {
+      setAddQuestionError(true);
+      return;
+    } else {
+      setAddQuestionError(false);
+    }
+    setIsAddingQuestion(true);
+    fetch(`${apiUrl}/api/questions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        content: addQuestionContent,
+        hint: addQuestionHint,
+        hint2: addQuestionHint2,
+        correctAnswer: addQuestionCorrectAnswer,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}, url: ${apiUrl}`);
+        }
+        return res.json();
+      })
+      .catch((error) => {
+        console.error("Fetch error:", error);
+      })
+      .finally(() => {
+        handleLoadQuestions();
+        setIsAddingQuestion(false);
+        setAddQuestionContent(null);
+        setAddQuestionHint(null);
+        setAddQuestionHint2(null);
+        setAddQuestionCorrectAnswer(null);
+        setShowAddQuestion(false);
+      });
+  };
+
   useEffect(() => {
     handleLoadQuestions();
   }, []);
 
   const handleDeleteQuestion = () => {
-    setIsDeleteLoading(true);
+    setIsDeletingQuestion(true);
     fetch(`${apiUrl}/api/questions/${editingQuestion?.id}`, {
       method: "DELETE",
     })
@@ -117,7 +179,7 @@ export default function QuestionsPage() {
         handleLoadQuestions();
         setEditingQuestion(null);
         setShowConfirmDelete(false);
-        setIsDeleteLoading(false);
+        setIsDeletingQuestion(false);
       });
   };
 
@@ -137,7 +199,11 @@ export default function QuestionsPage() {
             <div className="text-2xl font-bold">Pytania</div>
           </div>
           <div className="flex flex-row items-center justify-center gap-2">
-            <Button variant="flat" color="primary">
+            <Button
+              variant="flat"
+              color="primary"
+              onPress={() => setShowAddQuestion(true)}
+            >
               Dodaj pytanie
             </Button>
           </div>
@@ -265,7 +331,7 @@ export default function QuestionsPage() {
                     variant="flat"
                     color="danger"
                     onPress={handleDeleteQuestion}
-                    isLoading={isDeleteLoading}
+                    isLoading={isDeletingQuestion}
                   >
                     Usuń
                   </Button>
@@ -288,6 +354,65 @@ export default function QuestionsPage() {
                 Usuń pytanie
               </Link>
             )}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      <Modal
+        isOpen={showAddQuestion}
+        onClose={() => setShowAddQuestion(false)}
+        isDismissable={false}
+      >
+        <ModalContent>
+          <ModalHeader>Dodaj pytanie</ModalHeader>
+          <Divider />
+          <ModalBody className="mt-2">
+            {addQuestionError && (
+              <div className="flex flex-col items-center justify-center gap-2 text-red-500">
+                <div>Wypełnij wszystkie pola wymanage pola</div>
+              </div>
+            )}
+            <Input
+              label="Treść pytania"
+              value={addQuestionContent || ""}
+              onChange={(e) => setAddQuestionContent(e.target.value)}
+              isRequired
+            />
+            <Input
+              label="Podpowiedź"
+              value={addQuestionHint || ""}
+              onChange={(e) => setAddQuestionHint(e.target.value)}
+              isRequired
+            />
+            <Input
+              label="Podpowiedź 2"
+              value={addQuestionHint2 || ""}
+              onChange={(e) => setAddQuestionHint2(e.target.value)}
+            />
+            <Input
+              label="Poprawna odpowiedź"
+              value={addQuestionCorrectAnswer || ""}
+              onChange={(e) => setAddQuestionCorrectAnswer(e.target.value)}
+              isRequired
+            />
+          </ModalBody>
+          <ModalFooter className="flex flex-row items-center">
+            <Button
+              variant="flat"
+              color="default"
+              onPress={() => setShowAddQuestion(false)}
+              className="w-full"
+            >
+              Anuluj
+            </Button>
+            <Button
+              variant="flat"
+              color="primary"
+              className="w-full"
+              onPress={handleAddQuestion}
+              isLoading={isAddingQuestion}
+            >
+              Dodaj
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
