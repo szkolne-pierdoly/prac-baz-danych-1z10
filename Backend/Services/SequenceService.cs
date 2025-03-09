@@ -21,10 +21,12 @@ public class SequenceService : ISequenceService
     {
         try {
             var questions = new List<Question>();
-            foreach (var questionId in request.QuestionIds) {
-                var question = await _questionRepository.GetQuestionById(questionId);
-                if (question != null) {
-                    questions.Add(question);
+            if (request.QuestionIds != null) {
+                foreach (var questionId in request.QuestionIds) {
+                    var question = await _questionRepository.GetQuestionById(questionId);
+                    if (question != null) {
+                        questions.Add(question);
+                    }
                 }
             }
             var newSequence = new Sequence
