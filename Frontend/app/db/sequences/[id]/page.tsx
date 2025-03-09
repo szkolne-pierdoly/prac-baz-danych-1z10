@@ -1,9 +1,16 @@
-"use client";
+import SequenceClientPage from "./SequencePage";
 
-import React from "react";
+export default async function SequencePage({
+  params,
+}: {
+  params: Promise<{ id: number }>;
+}) {
+  const { id } = await params;
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-export default function SequencePage({ params }: { params: { id: string } }) {
-  const { id } = React.use(params);
+  const response = await fetch(`${apiUrl}/api/sequences/${id}`);
+  const data = await response.json();
+  const sequence = data.sequence;
 
-  return <div>SequencePage {id}</div>;
+  return <SequenceClientPage sequence={sequence} />;
 }
