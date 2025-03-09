@@ -19,6 +19,7 @@ const eslintConfig = [
     rules: {
       "prettier/prettier": "error",
     },
+    ignores: ["node_modules/"],
   },
 ];
 
