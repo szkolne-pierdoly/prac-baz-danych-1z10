@@ -16,7 +16,6 @@ import {
 } from "@heroui/react";
 import React, { useState } from "react";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
-import { Question } from "@/app/models/Question";
 
 export default function SequenceClientPage({
   sequence,
@@ -26,8 +25,47 @@ export default function SequenceClientPage({
   const [isEditing, setIsEditing] = useState(false);
   const [editingSequenceName, setEditingSequenceName] = useState(sequence.name);
   const [editingSequenceQuestionsId, setEditingSequenceQuestionsId] = useState(
-    sequence.questions.map((question) => question.id)
+    sequence.questions.map((question) => question.id),
   );
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    setEditingSequenceName(sequence.name);
+    setEditingSequenceQuestionsId(
+      sequence.questions.map((question) => question.id),
+    );
+  };
+
+  const handleSave = () => {
+    setIsEditing(false);
+  };
+
+  const handleDelete = () => {
+    const itemsToDelete = Array.from(selectedQuestions ?? []).map((item) =>
+      parseInt(item as string, 10),
+    );
+    console.log(itemsToDelete);
+    setEditingSequenceQuestionsId(
+      editingSequenceQuestionsId?.filter((id) => !itemsToDelete.includes(id)),
+    );
+    console.log(editingSequenceQuestionsId);
+  };
+
+  const handleRecover = () => {
+    const selectedIdsToAdd = Array.from(selectedQuestions ?? []).map((item) =>
+      parseInt(item as string, 10),
+    );
+    const updatedEditingSequenceQuestionsId = [
+      ...(editingSequenceQuestionsId || []),
+    ];
+    selectedIdsToAdd.forEach((idToAdd) => {
+      if (!updatedEditingSequenceQuestionsId.includes(idToAdd)) {
+        updatedEditingSequenceQuestionsId.push(idToAdd);
+      }
+    });
+    setEditingSequenceQuestionsId(updatedEditingSequenceQuestionsId);
+  };
+
   const [selectedQuestions, setSelectedQuestions] = useState<
     "all" | Iterable<React.Key> | undefined
   >(undefined);
@@ -51,14 +89,12 @@ export default function SequenceClientPage({
               </div>
             )}
           </div>
-          <Button
-            variant="faded"
-            color="primary"
-            onPress={() => setIsEditing(!isEditing)}
-          >
-            <PencilIcon size={16} />
-            Edytuj
-          </Button>
+          {!isEditing && (
+            <Button variant="faded" color="primary" onPress={handleEdit}>
+              <PencilIcon size={16} />
+              Edytuj
+            </Button>
+          )}
         </CardBody>
         <Divider />
         <CardBody className="flex flex-col gap-2">
@@ -68,6 +104,7 @@ export default function SequenceClientPage({
             selectionMode={isEditing ? "multiple" : "none"}
             selectedKeys={selectedQuestions}
             onSelectionChange={setSelectedQuestions}
+            className="rounded-lg overflow-hidden"
           >
             <TableHeader>
               <TableColumn>ID</TableColumn>
@@ -78,7 +115,14 @@ export default function SequenceClientPage({
             </TableHeader>
             <TableBody>
               {sequence.questions.map((question) => (
-                <TableRow key={question.id}>
+                <TableRow
+                  key={question.id}
+                  className={
+                    !editingSequenceQuestionsId?.includes(question.id)
+                      ? "bg-red-700 bg-opacity-10 text-red-500"
+                      : ""
+                  }
+                >
                   <TableCell>{question.id}</TableCell>
                   <TableCell>{question.content}</TableCell>
                   <TableCell>{question.hint}</TableCell>
@@ -90,8 +134,19 @@ export default function SequenceClientPage({
           </Table>
           {isEditing && (
             <div className="flex flex-row gap-2">
-              {Array.from(selectedQuestions ?? []).length > 0 && (
-                <Button variant="flat" color="danger">
+              {Array.from(selectedQuestions ?? []).length > 0 &&
+              Array.from(selectedQuestions ?? []).every(
+                (selectedQuestionId) =>
+                  !editingSequenceQuestionsId?.includes(
+                    parseInt(selectedQuestionId as string, 10),
+                  ),
+              ) ? (
+                <Button variant="flat" color="primary" onPress={handleRecover}>
+                  <PlusIcon size={16} />
+                  Przywróć pytania
+                </Button>
+              ) : (
+                <Button variant="flat" color="danger" onPress={handleDelete}>
                   <TrashIcon size={16} />
                   Usuń pytania
                 </Button>
@@ -104,6 +159,23 @@ export default function SequenceClientPage({
           )}
         </CardBody>
       </Card>
+      {isEditing && (
+        <Card className="w-full">
+          <CardBody className="flex flex-row gap-2">
+            <Button variant="flat" color="default" className="w-1/3">
+              Anuluj
+            </Button>
+            <Button
+              variant="flat"
+              color="primary"
+              className="w-full"
+              onPress={handleSave}
+            >
+              Zapisz zmiany
+            </Button>
+          </CardBody>
+        </Card>
+      )}
     </div>
   );
 }
