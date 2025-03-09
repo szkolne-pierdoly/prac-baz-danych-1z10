@@ -22,9 +22,8 @@ import {
   Divider,
   Link,
 } from "@heroui/react";
-import HomeIcon from "@/app/assets/icons/HomeIcon";
 import CreateQuestion from "@/app/components/createQuestion";
-
+import { HomeIcon } from "lucide-react";
 export default function QuestionsPage() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showAddQuestion, setShowAddQuestion] = useState(false);

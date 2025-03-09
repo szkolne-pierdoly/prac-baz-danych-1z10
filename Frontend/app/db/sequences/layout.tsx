@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import HomeIcon from "@/app/assets/icons/HomeIcon";
+import { HomeIcon } from "lucide-react";
 import { Card, CardBody } from "@heroui/react";
 import { Button } from "@heroui/react";
 import { useState, useEffect } from "react";
