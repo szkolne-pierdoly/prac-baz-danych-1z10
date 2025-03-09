@@ -27,7 +27,7 @@ public class SequenceRepository : ISequenceRepository
 
     public async Task<IEnumerable<Sequence>> GetAllSequences()
     {
-        return await _context.Sequences.ToListAsync();
+        return await _context.Sequences.Include(s => s.Questions).ToListAsync();
     }
 
     public async Task UpdateSequence(Sequence sequence)
