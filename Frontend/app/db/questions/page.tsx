@@ -272,7 +272,7 @@ export default function QuestionsPage() {
               <>
                 <Input
                   label="ID"
-                  value={editingQuestion.id.toString()}
+                  value={editingQuestion.id.toString() ?? "0"}
                   onChange={(e) =>
                     setEditingQuestion({
                       ...editingQuestion,
@@ -284,7 +284,7 @@ export default function QuestionsPage() {
                 <Input
                   label="Treść pytania"
                   isRequired
-                  value={editingQuestion.content}
+                  value={editingQuestion.content ?? ""}
                   onChange={(e) =>
                     setEditingQuestion({
                       ...editingQuestion,
@@ -295,7 +295,7 @@ export default function QuestionsPage() {
                 <Input
                   label="Podpowiedź"
                   isRequired
-                  value={editingQuestion.hint}
+                  value={editingQuestion.hint ?? ""}
                   onChange={(e) =>
                     setEditingQuestion({
                       ...editingQuestion,
@@ -306,7 +306,7 @@ export default function QuestionsPage() {
                 <Input
                   label="Podpowiedź 2"
                   isRequired
-                  value={editingQuestion.hint2}
+                  value={editingQuestion.hint2 ?? ""}
                   onChange={(e) =>
                     setEditingQuestion({
                       ...editingQuestion,
@@ -317,7 +317,7 @@ export default function QuestionsPage() {
                 <Input
                   label="Poprawna odpowiedź"
                   isRequired
-                  value={editingQuestion.correctAnswer}
+                  value={editingQuestion.correctAnswer ?? ""}
                   onChange={(e) =>
                     setEditingQuestion({
                       ...editingQuestion,
