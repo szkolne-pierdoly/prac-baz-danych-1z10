@@ -52,6 +52,24 @@ public class SequenceController : ControllerBase
       }
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetSequence(int id)
+    {
+      var result = await _sequenceService.GetSequence(id);
+
+      if (result.IsSuccess && result.Sequence != null) {
+        return Ok(new {
+            Status = result.Status,
+            Message = result.Message ?? "Sequence fetched successfully",
+            Sequence = result.Sequence
+        });
+      } else {
+        return StatusCode(result.HttpStatusCode ?? 500, new {
+            Status = result.Status,
+            Message = result.Message ?? "Something went wrong, please try again later."
+        });
+      }
+    }
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateSequence([FromBody] UpdateSequenceRequest request, int id)
     {

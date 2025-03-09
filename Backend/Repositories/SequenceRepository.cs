@@ -14,15 +14,15 @@ public class SequenceRepository : ISequenceRepository
         _context = context;
     }
 
-    public async Task<Sequence?> GetSequenceById(int id)
-    {
-        return await _context.Sequences.FindAsync(id);
-    }
-
     public async Task CreateSequence(Sequence sequence)
     {
         await _context.Sequences.AddAsync(sequence);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<Sequence?> GetSequenceById(int id)
+    {
+        return await _context.Sequences.Include(s => s.Questions).FirstOrDefaultAsync(s => s.Id == id);
     }
 
     public async Task<IEnumerable<Sequence>> GetAllSequences()

@@ -51,6 +51,16 @@ public class SequenceService : ISequenceService
         }
     }
 
+    public async Task<GetSequenceResult> GetSequence(int id)
+    {
+        try {
+            var sequence = await _sequenceRepository.GetSequenceById(id);
+            return new GetSequenceResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequence retrieved successfully", Sequence = sequence };
+        } catch (Exception ex) {
+            return new GetSequenceResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
+        }
+    }
+
     public async Task<BaseResult> UpdateSequence(UpdateSequenceRequest request, int id)
     {
         try {
