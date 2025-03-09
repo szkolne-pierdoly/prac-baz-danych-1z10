@@ -49,17 +49,42 @@ export default function QuestionsPage() {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const handleSaveUpdate = () => {
+    if (!editingQuestion) {
+      setEditingQuestion(null);
+      return;
+    }
+
+    const { content, hint, hint2, correctAnswer, id } = editingQuestion;
+
+    if (!content || !hint || !correctAnswer) {
+      console.error("Content, hint, and correct answer are required.");
+      return;
+    }
+
+    const originalQuestion = questions.find((q) => q.id === id);
+
+    if (
+      originalQuestion?.content === content &&
+      originalQuestion?.hint === hint &&
+      originalQuestion?.hint2 === hint2 &&
+      originalQuestion?.correctAnswer === correctAnswer
+    ) {
+      setEditingQuestion(null);
+      return;
+    }
+
     setIsSavingUpdate(true);
-    fetch(`${apiUrl}/api/questions/${editingQuestion?.id}`, {
+
+    fetch(`${apiUrl}/api/questions/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        content: editingQuestion?.content,
-        hint: editingQuestion?.hint,
-        hint2: editingQuestion?.hint2,
-        correctAnswer: editingQuestion?.correctAnswer,
+        content,
+        hint,
+        hint2,
+        correctAnswer,
       }),
     })
       .then((res) => {
