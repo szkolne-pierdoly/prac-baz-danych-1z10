@@ -19,12 +19,15 @@ import {
   TableHeader,
   TableRow,
   Divider,
+  Link,
 } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 export default function QuestionsPage() {
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [isSavingUpdate, setIsSavingUpdate] = useState(false);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
 
   const router = useRouter();
@@ -58,16 +61,13 @@ export default function QuestionsPage() {
       .catch((error) => {
         console.error("Fetch error:", error);
       })
-      .then(() => {
+      .finally(() => {
         setIsSavingUpdate(false);
         setEditingQuestion(null);
-      })
-      .catch(() => {
-        setIsSavingUpdate(false);
       });
   };
 
-  useEffect(() => {
+  const handleLoadQuestions = () => {
     fetch(`${apiUrl}/api/questions`)
       .then((res) => {
         if (!res.ok) {
@@ -93,7 +93,33 @@ export default function QuestionsPage() {
       .catch((error) => {
         console.error("Fetch error:", error);
       });
+  };
+
+  useEffect(() => {
+    handleLoadQuestions();
   }, []);
+
+  const handleDeleteQuestion = () => {
+    setIsDeleteLoading(true);
+    fetch(`${apiUrl}/api/questions/${editingQuestion?.id}`, {
+      method: "DELETE",
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}, url: ${apiUrl}`);
+        }
+        return res.json();
+      })
+      .catch((error) => {
+        console.error("Fetch error:", error);
+      })
+      .finally(() => {
+        handleLoadQuestions();
+        setEditingQuestion(null);
+        setShowConfirmDelete(false);
+        setIsDeleteLoading(false);
+      });
+  };
 
   return (
     <div className="flex flex-col items-center justify-start h-screen py-4 gap-4 px-2">
@@ -228,6 +254,40 @@ export default function QuestionsPage() {
             >
               Zapisz
             </Button>
+          </ModalFooter>
+          <Divider />
+          <ModalFooter className="flex flex-row items-center justify-center">
+            {showConfirmDelete ? (
+              <div className="flex flex-col items-center justify-center gap-2">
+                <div>Napewno chcesz usunąć to pytanie?</div>
+                <div className="flex flex-row items-center justify-center gap-2">
+                  <Button
+                    variant="flat"
+                    color="danger"
+                    onPress={handleDeleteQuestion}
+                    isLoading={isDeleteLoading}
+                  >
+                    Usuń
+                  </Button>
+                  <Button
+                    variant="flat"
+                    color="default"
+                    onPress={() => setShowConfirmDelete(false)}
+                  >
+                    Anuluj
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Link
+                color="danger"
+                onPress={() => {
+                  setShowConfirmDelete(true);
+                }}
+              >
+                Usuń pytanie
+              </Link>
+            )}
           </ModalFooter>
         </ModalContent>
       </Modal>
