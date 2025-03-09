@@ -1,6 +1,7 @@
 using Backend.Data; 
 using Backend.Data.Models;
 using Backend.Interface.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Backend.Repositories;
 
@@ -22,5 +23,26 @@ public class SequenceRepository : ISequenceRepository
     {
         await _context.Sequences.AddAsync(sequence);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Sequence>> GetAllSequences()
+    {
+        return await _context.Sequences.ToListAsync();
+    }
+
+    public async Task UpdateSequence(Sequence sequence)
+    {
+        _context.Sequences.Update(sequence);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteSequence(int id)
+    {
+        var sequence = await GetSequenceById(id);
+        if (sequence != null)
+        {
+            _context.Sequences.Remove(sequence);
+            await _context.SaveChangesAsync();
+        }
     }
 }

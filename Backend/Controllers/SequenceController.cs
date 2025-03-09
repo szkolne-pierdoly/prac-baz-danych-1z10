@@ -1,4 +1,4 @@
-using Backend.Contracts.Request;
+using Backend.Models.Contracts.Request;
 using Backend.Interface.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +18,73 @@ public class SequenceController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateSequence([FromBody] CreateSequenceRequest request)
     {
-      await _sequenceService.CreateSequence(request);
-      return Ok();
+      var result = await _sequenceService.CreateSequence(request);
+      
+      if (result.IsSuccess) {
+        return Ok(new {
+            result.Status,
+            Message = result.Message ?? "Sequence has been successfully added to database"
+        });
+      } else {
+        return StatusCode(result.HttpStatusCode ?? 500, new {
+            result.Status,
+            Message = result.Message?? "Something went wrong, please try again later."
+        });
+      }
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetAllSequences()
+    {
+      var result = await _sequenceService.GetAllSequences();
+      
+      if (result.IsSuccess) {
+        return Ok(new {
+            Status = result.Status,
+            Message = result.Message ?? "Sequences fetched successfully",
+            Sequences = result.Sequences
+        });
+      } else {
+        return StatusCode(result.HttpStatusCode ?? 500, new {
+            Status = result.Status,
+            Message = result.Message ?? "Something went wrong, please try again later."
+        });
+      }
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateSequence([FromBody] UpdateSequenceRequest request, int id)
+    {
+      var result = await _sequenceService.UpdateSequence(request, id);
+
+      if (result.IsSuccess) {
+        return Ok(new {
+            Status = result.Status,
+            Message = result.Message ?? "Sequence updated successfully"
+        });
+      } else {
+        return StatusCode(result.HttpStatusCode ?? 500, new {
+            Status = result.Status,
+            Message = result.Message ?? "Something went wrong, please try again later."
+        });
+      }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteSequence(int id)
+    {
+      var result = await _sequenceService.DeleteSequence(id);
+
+      if (result.IsSuccess) {
+        return Ok(new {
+            Status = result.Status,
+            Message = result.Message ?? "Sequence deleted successfully"
+        });
+      } else {
+        return StatusCode(result.HttpStatusCode ?? 500, new {
+            Status = result.Status,
+            Message = result.Message ?? "Something went wrong, please try again later."
+        });
+      }
     }
 }
