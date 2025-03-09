@@ -5,8 +5,12 @@ import { useRouter } from "next/navigation";
 import HomeIcon from "../../assets/icons/HomeIcon";
 import { Sequence } from "../../models/Sequence";
 import { useState, useEffect } from "react";
+import CreateSequence from "@/app/components/createSequence";
 
 export default function SequencesPage() {
+  // const [showCreateSequenceModal, setShowCreateSequenceModal] = useState(false);
+  const [showCreateSequenceModal, setShowCreateSequenceModal] = useState(true);
+
   const [sequences, setSequences] = useState<Sequence[]>([]);
 
   const router = useRouter();
@@ -47,14 +51,14 @@ export default function SequencesPage() {
             <Button
               variant="flat"
               color="primary"
-              onPress={() => console.log("TODO: add add sequence method")}
+              onPress={() => setShowCreateSequenceModal(true)}
             >
               Dodaj sekwencję
             </Button>
           </div>
         </CardBody>
       </Card>
-      <div className="w-full flex flex-col items-start justify-start max-w-4xl">
+      <div className="w-full flex flex-col items-start justify-start max-w-4xl gap-2">
         {sequences.map((sequence) => (
           <Card
             className="w-full flex flex-row items-start justify-start max-w-4xl"
@@ -75,6 +79,10 @@ export default function SequencesPage() {
           </Card>
         ))}
       </div>
+      <CreateSequence
+        isOpen={showCreateSequenceModal}
+        onClose={() => setShowCreateSequenceModal(false)}
+      />
     </div>
   );
 }
