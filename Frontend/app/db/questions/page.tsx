@@ -1,5 +1,6 @@
 "use client";
 
+import HomeIcon from "../../assets/icons/HomeIcon";
 import { Question } from "../../models/Question";
 import {
   Button,
@@ -20,11 +21,13 @@ import {
   Divider,
 } from "@heroui/react";
 import { useEffect, useState } from "react";
-
+import { useRouter } from "next/navigation";
 export default function QuestionsPage() {
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [isSavingUpdate, setIsSavingUpdate] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
+
+  const router = useRouter();
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   const handleSaveUpdate = () => {
@@ -90,13 +93,23 @@ export default function QuestionsPage() {
       .catch((error) => {
         console.error("Fetch error:", error);
       });
-  });
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-start h-screen py-4 gap-4 px-2">
       <Card className="w-full flex flex-row items-start justify-start max-w-5xl">
         <CardBody className="flex flex-row items-center justify-between gap-2">
-          <div className="text-2xl font-bold">Pytania</div>
+          <div className="flex flex-row items-center justify-center gap-2">
+            <Button
+              variant="flat"
+              color="default"
+              onPress={() => router.push("/")}
+              isIconOnly
+            >
+              <HomeIcon />
+            </Button>
+            <div className="text-2xl font-bold">Pytania</div>
+          </div>
           <div className="flex flex-row items-center justify-center gap-2">
             <Button variant="flat" color="primary">
               Dodaj pytanie
@@ -140,6 +153,17 @@ export default function QuestionsPage() {
           <ModalBody className="mt-2">
             {editingQuestion?.content && (
               <>
+                <Input
+                  label="ID"
+                  value={editingQuestion.id.toString()}
+                  onChange={(e) =>
+                    setEditingQuestion({
+                      ...editingQuestion,
+                      id: parseInt(e.target.value),
+                    })
+                  }
+                  isDisabled
+                />
                 <Input
                   label="Treść pytania"
                   isRequired
