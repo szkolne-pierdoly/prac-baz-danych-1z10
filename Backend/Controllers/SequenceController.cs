@@ -23,7 +23,8 @@ public class SequenceController : ControllerBase
       if (result.IsSuccess) {
         return Ok(new {
             result.Status,
-            Message = result.Message ?? "Sequence has been successfully added to database"
+            Message = result.Message ?? "Sequence has been successfully added to database",
+            Sequence = result.Sequence
         });
       } else {
         return StatusCode(result.HttpStatusCode ?? 500, new {
@@ -78,7 +79,8 @@ public class SequenceController : ControllerBase
       if (result.IsSuccess) {
         return Ok(new {
             Status = result.Status,
-            Message = result.Message ?? "Sequence updated successfully"
+            Message = result.Message ?? "Sequence updated successfully",
+            Sequence = result.Sequence
         });
       } else {
         return StatusCode(result.HttpStatusCode ?? 500, new {

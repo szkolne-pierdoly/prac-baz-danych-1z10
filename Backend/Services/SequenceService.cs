@@ -3,6 +3,7 @@ using Backend.Data.Models;
 using Backend.Interface.Services;
 using Backend.Interface.Repositories;
 using Backend.Models.ServiceResults.SequenceService;
+using Backend.Models.ServiceResults.QuestionService;
 
 namespace Backend.Services;
 
@@ -17,7 +18,7 @@ public class SequenceService : ISequenceService
         _questionRepository = questionRepository;
     }
 
-    public async Task<BaseResult> CreateSequence(CreateSequenceRequest request)
+    public async Task<CreateSequenceResult> CreateSequence(CreateSequenceRequest request)
     {
         try {
             var questions = new List<Question>();
@@ -35,9 +36,9 @@ public class SequenceService : ISequenceService
                 Questions = questions
             };
             await _sequenceRepository.CreateSequence(newSequence);
-            return new BaseResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequence created successfully" };
+            return new CreateSequenceResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequence created successfully", Sequence = newSequence };
         } catch (Exception ex) {
-            return new BaseResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
+            return new CreateSequenceResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
         }
     }
 
@@ -61,12 +62,16 @@ public class SequenceService : ISequenceService
         }
     }
 
-    public async Task<BaseResult> UpdateSequence(UpdateSequenceRequest request, int id)
+    public async Task<UpdateSequenceResult> UpdateSequence(UpdateSequenceRequest request, int id)
     {
         try {
             var sequence = await _sequenceRepository.GetSequenceById(id);
             if (sequence == null) {
-                return new BaseResult { IsSuccess = false, Status = "ERROR", Message = "Sequence not found" };
+                return new UpdateSequenceResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Sequence not found"
+                };
             }
             sequence.Name = request.Name;
             var questions = new List<Question>();
@@ -78,9 +83,18 @@ public class SequenceService : ISequenceService
             }
             sequence.Questions = questions;
             await _sequenceRepository.UpdateSequence(sequence);
-            return new BaseResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequence updated successfully" };
+            return new UpdateSequenceResult {
+                IsSuccess = true,
+                Status = "SUCCESS",
+                Message = "Sequence updated successfully",
+                Sequence = sequence
+            };
         } catch (Exception ex) {
-            return new BaseResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
+            return new UpdateSequenceResult {
+                IsSuccess = false,
+                Status = "ERROR",
+                Message = ex.Message
+            };
         }
     }
 

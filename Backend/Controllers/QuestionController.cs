@@ -23,7 +23,8 @@ public class QuestionController : ControllerBase
       if (result.IsSuccess) {
         return Ok(new {
             result.Status,
-            Message = result.Message ?? "Question has been successfully added to database"
+            Message = result.Message ?? "Question has been successfully added to database",
+            Question = result.Question
         });
       } else {
         return StatusCode(result.HttpStatusCode ?? 500, new {
@@ -60,7 +61,8 @@ public class QuestionController : ControllerBase
       if (result.IsSuccess) {
         return Ok(new {
             Status = result.Status,
-            Message = result.Message ?? "Question updated successfully"
+            Message = result.Message ?? "Question updated successfully",
+            Question = result.Question
         });
       } else {
         return StatusCode(result.HttpStatusCode ?? 500, new {

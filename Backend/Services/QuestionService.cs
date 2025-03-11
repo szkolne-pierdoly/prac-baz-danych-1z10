@@ -14,7 +14,7 @@ public class QuestionService : IQuestionService
         _questionRepository = questionRepository;
     }
     
-    public async Task<BaseResult> CreateQuestion(CreateQuestionRequest request)
+    public async Task<CreateQuestionResult> CreateQuestion(CreateQuestionRequest request)
     {
         try 
         { 
@@ -28,15 +28,16 @@ public class QuestionService : IQuestionService
 
         await _questionRepository.CreateQuestion(question);
 
-            return new BaseResult {
+            return new CreateQuestionResult {
               IsSuccess = true,
               Status = "SUCCESS",
-              Message = "Question created successfully"
+              Message = "Question created successfully",
+              Question = question
             };
         }
         catch (Exception ex)
         {
-            return new BaseResult {
+            return new CreateQuestionResult {
               IsSuccess = false,
               Status = "ERROR",
               Message = ex.Message
@@ -67,13 +68,13 @@ public class QuestionService : IQuestionService
         }
     } 
 
-    public async Task<BaseResult> UpdateQuestion(UpdateQuestionRequest request, int id)
+    public async Task<UpdateQuestionResult> UpdateQuestion(UpdateQuestionRequest request, int id)
     {
         try
         {
             if (request.Content == null && request.Hint == null && request.Hint2 == null && request.CorrectAnswer == null)
             {
-                return new BaseResult {
+                return new UpdateQuestionResult {
                   IsSuccess = false,
                   Status = "ERROR",
                   Message = "No fields to update"
@@ -84,14 +85,14 @@ public class QuestionService : IQuestionService
 
             if (question == null)
             {
-                return new BaseResult {
+                return new UpdateQuestionResult { 
                   IsSuccess = false,
                   Status = "ERROR",
                   Message = "Question not found"
                 };
             } else if (question.Content == request.Content && question.Hint == request.Hint && question.Hint2 == request.Hint2 && question.CorrectAnswer == request.CorrectAnswer)
             {
-                return new BaseResult {
+                return new UpdateQuestionResult {
                   IsSuccess = false,
                   Status = "ERROR",
                   Message = "Already up to date."
@@ -104,15 +105,16 @@ public class QuestionService : IQuestionService
 
             await _questionRepository.UpdateQuestion(question);
 
-            return new BaseResult {
+            return new UpdateQuestionResult {
               IsSuccess = true,
               Status = "SUCCESS",
-              Message = "Question updated successfully"
+              Message = "Question updated successfully",
+              Question = question
             };
         } 
         catch (Exception ex)
         {
-            return new BaseResult {
+            return new UpdateQuestionResult {
               IsSuccess = false,
               Status = "ERROR",
               Message = ex.Message
