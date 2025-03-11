@@ -50,6 +50,11 @@ export default function SequencesPage() {
           </CardBody>
         </Card>
       ))}
+      {sequences.length === 0 && (
+        <div className="text-center text-gray-300 text-4xl mt-12 font-bold items-center justify-center w-full">
+          Brak sekwencji.
+        </div>
+      )}
     </div>
   );
 }

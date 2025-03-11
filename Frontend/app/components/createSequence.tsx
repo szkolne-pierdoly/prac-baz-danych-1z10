@@ -11,7 +11,7 @@ import {
   ModalFooter,
 } from "@heroui/react";
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 export default function CreateSequence({
   isOpen,
   onClose,
@@ -23,6 +23,7 @@ export default function CreateSequence({
   const [emptyError, setEmptyError] = useState(false);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const router = useRouter();
 
   const handleAddSequence = () => {
     if (sequenceName === "") {
@@ -41,7 +42,7 @@ export default function CreateSequence({
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
-        onClose();
+        router.push(`/db/sequences/${data.id}`);
       })
       .catch((err) => console.error("Error adding sequence:", err));
   };
