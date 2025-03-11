@@ -13,17 +13,9 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Divider,
-  Link,
   Spinner,
 } from "@heroui/react";
-import CreateQuestion from "@/app/components/createQuestion";
+import CreateQuestion from "@/app/components/createQuestionModal";
 import { HomeIcon } from "lucide-react";
 import {
   getQuestions,
@@ -31,9 +23,9 @@ import {
   updateQuestion,
   deleteQuestion,
 } from "@/app/actions/question";
+import EditQuestionModal from "@/app/components/editQuestionModal";
 
 export default function QuestionsPage() {
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showAddQuestion, setShowAddQuestion] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
 
@@ -44,8 +36,6 @@ export default function QuestionsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
 
   const router = useRouter();
-
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
   useEffect(() => {
     handleFetchQuestions();
@@ -60,14 +50,13 @@ export default function QuestionsPage() {
     setShowLoading(false);
   };
 
-  const handleUpdateQuestion = async () => {
-    if (!editingQuestion) return;
+  const handleUpdateQuestion = async (updatedQuestion: Question) => {
     setIsSavingUpdate(true);
-    const result = await updateQuestion(editingQuestion);
+    const result = await updateQuestion(updatedQuestion);
     if (result.isSuccess) {
       setQuestions(
         questions.map((q) =>
-          q.id === editingQuestion?.id ? (result.question ?? q) : q,
+          q.id === updatedQuestion?.id ? (result.question ?? q) : q,
         ),
       );
     }
@@ -79,12 +68,9 @@ export default function QuestionsPage() {
     setIsDeletingQuestion(true);
     const result = await deleteQuestion(id);
     if (result.isSuccess) {
-      setQuestions(
-        questions.filter((question) => question.id !== editingQuestion?.id),
-      );
+      setQuestions(questions.filter((question) => question.id !== id));
     }
     setIsDeletingQuestion(false);
-    setShowConfirmDelete(false);
     setEditingQuestion(null);
   };
 
@@ -139,132 +125,15 @@ export default function QuestionsPage() {
           </TableBody>
         </Table>
       </div>
-      <Modal
+      <EditQuestionModal
         isOpen={editingQuestion !== null}
         onClose={() => setEditingQuestion(null)}
-        isDismissable={false}
-      >
-        <ModalContent>
-          <ModalHeader>Edytuj pytanie</ModalHeader>
-          <Divider />
-          <ModalBody className="mt-2">
-            {editingQuestion?.content && (
-              <>
-                <Input
-                  label="ID"
-                  value={editingQuestion.id.toString() ?? "0"}
-                  onChange={(e) =>
-                    setEditingQuestion({
-                      ...editingQuestion,
-                      id: parseInt(e.target.value),
-                    })
-                  }
-                  isDisabled
-                />
-                <Input
-                  label="Treść pytania"
-                  isRequired
-                  value={editingQuestion.content ?? ""}
-                  onChange={(e) =>
-                    setEditingQuestion({
-                      ...editingQuestion,
-                      content: e.target.value,
-                    })
-                  }
-                />
-                <Input
-                  label="Podpowiedź"
-                  isRequired
-                  value={editingQuestion.hint ?? ""}
-                  onChange={(e) =>
-                    setEditingQuestion({
-                      ...editingQuestion,
-                      hint: e.target.value,
-                    })
-                  }
-                />
-                <Input
-                  label="Podpowiedź 2"
-                  isRequired
-                  value={editingQuestion.hint2 ?? ""}
-                  onChange={(e) =>
-                    setEditingQuestion({
-                      ...editingQuestion,
-                      hint2: e.target.value,
-                    })
-                  }
-                />
-                <Input
-                  label="Poprawna odpowiedź"
-                  isRequired
-                  value={editingQuestion.correctAnswer ?? ""}
-                  onChange={(e) =>
-                    setEditingQuestion({
-                      ...editingQuestion,
-                      correctAnswer: e.target.value,
-                    })
-                  }
-                />
-              </>
-            )}
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="flat"
-              color="default"
-              onPress={() => setEditingQuestion(null)}
-            >
-              Anuluj
-            </Button>
-            <Button
-              variant="flat"
-              color="primary"
-              className="w-full"
-              onPress={handleUpdateQuestion}
-              isLoading={isSavingUpdate}
-              isDisabled={isSavingUpdate}
-            >
-              Zapisz
-            </Button>
-          </ModalFooter>
-          <Divider />
-          <ModalFooter className="flex flex-row items-center justify-center">
-            {showConfirmDelete ? (
-              <div className="flex flex-col items-center justify-center gap-2">
-                <div>Napewno chcesz usunąć to pytanie?</div>
-                <div className="flex flex-row items-center justify-center gap-2">
-                  <Button
-                    variant="flat"
-                    color="danger"
-                    onPress={() =>
-                      handleDeleteQuestion(editingQuestion?.id ?? -1)
-                    }
-                    isLoading={isDeletingQuestion}
-                  >
-                    Usuń
-                  </Button>
-                  <Button
-                    variant="flat"
-                    color="default"
-                    onPress={() => setShowConfirmDelete(false)}
-                  >
-                    Anuluj
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <Link
-                color="danger"
-                onPress={() => {
-                  setShowConfirmDelete(true);
-                }}
-              >
-                Usuń pytanie
-              </Link>
-            )}
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+        question={editingQuestion}
+        onUpdate={handleUpdateQuestion}
+        onDelete={handleDeleteQuestion}
+        isSaving={isSavingUpdate}
+        isDeleting={isDeletingQuestion}
+      />
       <CreateQuestion
         isOpen={showAddQuestion}
         onClose={() => setShowAddQuestion(false)}

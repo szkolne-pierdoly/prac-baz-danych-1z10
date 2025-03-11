@@ -12,7 +12,7 @@ import {
 } from "@heroui/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-export default function CreateSequence({
+export default function CreateSequenceModal({
   isOpen,
   onClose,
 }: {

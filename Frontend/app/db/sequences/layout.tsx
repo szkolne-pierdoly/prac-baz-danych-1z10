@@ -5,7 +5,7 @@ import { HomeIcon } from "lucide-react";
 import { Card, CardBody } from "@heroui/react";
 import { Button } from "@heroui/react";
 import { useState, useEffect } from "react";
-import CreateSequence from "@/app/components/createSequence";
+import CreateSequence from "@/app/components/createSequenceModal";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();

@@ -20,10 +20,12 @@ import {
   ModalBody,
 } from "@heroui/react";
 import React, { useEffect, useState } from "react";
-import { PencilIcon, PlusIcon, TrashIcon, XIcon } from "lucide-react";
+import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { Question } from "@/app/models/Question";
 import AddQuestionModal from "./AddQuestionModal";
 import { useRouter } from "next/navigation";
+import { Key } from "@react-types/shared";
+
 export default function SequenceClientPage({
   sequence,
 }: {
@@ -37,7 +39,6 @@ export default function SequenceClientPage({
   const [editingSequenceQuestionsId, setEditingSequenceQuestionsId] = useState(
     sequence.questions.map((question) => question.id),
   );
-  const [error, setError] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -172,7 +173,7 @@ export default function SequenceClientPage({
   };
 
   const [selectedQuestions, setSelectedQuestions] = useState<
-    "all" | Iterable<React.Key> | undefined
+    "all" | Iterable<Key> | undefined
   >(undefined);
 
   return (
