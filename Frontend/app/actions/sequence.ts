@@ -1,6 +1,15 @@
 "use server";
 
-export async function createSequence(name: string, questionIds: number[]) {
+import { Sequence } from "../models/Sequence";
+
+export async function createSequence(
+  name: string,
+  questionIds: number[],
+): Promise<{
+  isSuccess: boolean;
+  message: string;
+  sequence?: Sequence;
+}> {
   const body = JSON.stringify({
     name: name,
     questionIds: questionIds,
@@ -27,7 +36,11 @@ export async function createSequence(name: string, questionIds: number[]) {
   };
 }
 
-export async function getAllSequences() {
+export async function getAllSequences(): Promise<{
+  isSuccess: boolean;
+  message: string;
+  sequences?: Sequence[];
+}> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sequences`, {
     method: "GET",
     headers: {
@@ -48,7 +61,11 @@ export async function getAllSequences() {
   };
 }
 
-export async function getSequence(id: number) {
+export async function getSequence(id: number): Promise<{
+  isSuccess: boolean;
+  message: string;
+  sequence?: Sequence;
+}> {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/sequences/${id}`,
     {
@@ -76,7 +93,11 @@ export async function updateSequence(
   id: number,
   name: string,
   questionIds: number[],
-) {
+): Promise<{
+  isSuccess: boolean;
+  message: string;
+  sequence?: Sequence;
+}> {
   const body = JSON.stringify({
     name: name,
     questionIds: questionIds,
@@ -109,7 +130,10 @@ export async function updateSequence(
   };
 }
 
-export async function deleteSequence(id: number) {
+export async function deleteSequence(id: number): Promise<{
+  isSuccess: boolean;
+  message: string;
+}> {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/sequences/${id}`,
     {
