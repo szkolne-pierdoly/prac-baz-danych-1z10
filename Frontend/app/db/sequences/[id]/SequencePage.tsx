@@ -25,38 +25,58 @@ import { Question } from "@/app/models/Question";
 import AddQuestionModal from "../../../components/AddQuestionModal";
 import { useRouter } from "next/navigation";
 import { Key } from "@react-types/shared";
-
+import {
+  deleteSequence,
+  updateSequence,
+  getSequence as getSequenceAction,
+} from "@/app/actions/sequence";
+import LoadingDialog from "@/app/components/LoadingDialog";
 export default function SequenceClientPage({
-  sequence,
+  sequenceId,
 }: {
-  sequence: Sequence;
+  sequenceId: number;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isAddQuestionModalOpen, setIsAddQuestionModalOpen] = useState(false);
   const [isDeleteSequenceModalOpen, setIsDeleteSequenceModalOpen] =
     useState(false);
-  const [editingSequenceName, setEditingSequenceName] = useState(sequence.name);
-  const [editingSequenceQuestionsId, setEditingSequenceQuestionsId] = useState(
-    sequence.questions.map((question) => question.id),
-  );
 
-  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const [editingSequenceName, setEditingSequenceName] = useState("");
+  const [editingSequenceQuestionsId, setEditingSequenceQuestionsId] = useState<
+    number[]
+  >([]);
+
+  const [sequence, setSequence] = useState<Sequence | null>(null);
 
   const [questions, setQuestions] = useState<
     { question: Question; isDeleted: boolean; isAdded: boolean }[]
   >([]);
 
+  const router = useRouter();
+
   useEffect(() => {
-    setQuestions(
-      sequence.questions.map((question) => ({
-        question: question,
-        isDeleted: false,
-        isAdded: false,
-      })),
-    );
-  }, [sequence]);
+    getSequence();
+  }, []);
+
+  const getSequence = async () => {
+    if (sequenceId) {
+      setIsLoading(true);
+      const result = await getSequenceAction(sequenceId);
+      if (result.isSuccess) {
+        setSequence(result.sequence ?? null);
+        setQuestions(
+          result.sequence?.questions.map((question) => ({
+            question: question,
+            isDeleted: false,
+            isAdded: false,
+          })) ?? [],
+        );
+      }
+      setIsLoading(false);
+    }
+  };
 
   const handleSaveUpdate = async (): Promise<string> => {
     if (
@@ -66,72 +86,93 @@ export default function SequenceClientPage({
     ) {
       return "EMPTY";
     }
-    try {
-      const res = await fetch(`${apiUrl}/api/sequences/${sequence.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: editingSequenceName,
-          questionIds: questions
-            .filter((question) => !question.isDeleted)
-            .map((question) => question.question.id),
-        }),
-      });
-      if (!res.ok) {
-        res.json().then((data) => console.log(data));
-        return "ERROR";
+    if (sequence) {
+      setIsLoading(true);
+      const result = await updateSequence(
+        sequence.id,
+        editingSequenceName,
+        editingSequenceQuestionsId,
+      );
+      if (result.isSuccess) {
+        setIsEditing(false);
+        setIsLoading(false);
+        return "SUCCESS";
       }
-      setIsEditing(false);
-      return "SUCCESS";
-    } catch (error) {
-      console.error("Fetch error:", error);
-      return "ERROR";
+      setIsLoading(false);
     }
+    setIsLoading(false);
+    return "ERROR";
   };
 
   const handleEdit = () => {
-    setIsEditing(true);
-    setEditingSequenceName(sequence.name);
-    setEditingSequenceQuestionsId(
-      sequence.questions.map((question) => question.id),
-    );
+    if (sequence) {
+      setIsEditing(true);
+      setEditingSequenceName(sequence.name);
+      setEditingSequenceQuestionsId(
+        sequence.questions.map((question) => question.id),
+      );
+    }
   };
 
   const handleCancelEdit = () => {
-    setIsEditing(false);
-    setEditingSequenceName(sequence.name);
-    setEditingSequenceQuestionsId(
-      sequence.questions.map((question) => question.id),
-    );
-    setQuestions(
-      sequence.questions.map((question) => ({
-        question: question,
-        isDeleted: false,
-        isAdded: false,
-      })),
-    );
-    setSelectedQuestions(undefined);
+    if (sequence) {
+      setIsEditing(false);
+      setEditingSequenceName(sequence.name);
+      setEditingSequenceQuestionsId(
+        sequence.questions.map((question) => question.id),
+      );
+      setQuestions(
+        sequence.questions.map((question) => ({
+          question: question,
+          isDeleted: false,
+          isAdded: false,
+        })),
+      );
+      setSelectedQuestions(undefined);
+    }
   };
 
   const handleAddQuestions = (questions: Question[]) => {
     setQuestions((prevQuestions) => {
-      const existingQuestionIds = prevQuestions.map((q) => q.question.id);
-      const newQuestionsToAdd = questions.filter(
-        (q) => !existingQuestionIds.includes(q.id),
-      );
-      const newQuestionObjects = newQuestionsToAdd.map((q) => ({
-        question: q,
-        isDeleted: false,
-        isAdded: true,
-      }));
-      return [...prevQuestions, ...newQuestionObjects];
+      const existingQuestionIdMap = new Map<number, number>();
+      prevQuestions.forEach((q, index) => {
+        existingQuestionIdMap.set(q.question.id, index);
+      });
+      const newQuestionObjects: {
+        question: Question;
+        isDeleted: boolean;
+        isAdded: boolean;
+      }[] = [];
+
+      const updatedPrevQuestions = [...prevQuestions]; // Create a copy to avoid direct mutation
+
+      questions.forEach((q) => {
+        if (existingQuestionIdMap.has(q.id)) {
+          const index = existingQuestionIdMap.get(q.id) as number;
+          if (updatedPrevQuestions[index].isDeleted) {
+            updatedPrevQuestions[index] = {
+              ...updatedPrevQuestions[index],
+              isDeleted: false,
+              isAdded: false,
+            };
+          }
+        } else {
+          newQuestionObjects.push({
+            question: q,
+            isDeleted: false,
+            isAdded: false,
+          });
+        }
+      });
+      return [...updatedPrevQuestions, ...newQuestionObjects];
     });
+    setIsLoading(true);
     setEditingSequenceQuestionsId([
       ...editingSequenceQuestionsId,
       ...questions.map((question) => question.id),
     ]);
+    setIsAddQuestionModalOpen(false);
+    setIsLoading(false);
   };
 
   const handleDelete = () => {
@@ -145,16 +186,13 @@ export default function SequenceClientPage({
     );
   };
 
-  const handleDeleteSequence = () => {
-    fetch(`${apiUrl}/api/sequences/${sequence.id}`, {
-      method: "DELETE",
-    }).then((res) => {
-      if (!res.ok) {
-        res.json().then((data) => console.log(data));
-      } else {
+  const handleDeleteSequence = async () => {
+    if (sequence) {
+      const result = await deleteSequence(sequence.id);
+      if (result.isSuccess) {
         router.push("/db/sequences");
       }
-    });
+    }
   };
 
   const handleRecover = () => {
@@ -191,7 +229,7 @@ export default function SequenceClientPage({
               />
             ) : (
               <div className="text-2xl font-bold">
-                Sekwencja: {sequence.name}
+                Sekwencja: {sequence?.name}
               </div>
             )}
           </div>
@@ -332,6 +370,7 @@ export default function SequenceClientPage({
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <LoadingDialog isLoading={isLoading} />
     </div>
   );
 }
