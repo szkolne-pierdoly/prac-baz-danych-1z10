@@ -21,12 +21,21 @@ import {
   Input,
   Divider,
   Link,
+  Spinner,
 } from "@heroui/react";
 import CreateQuestion from "@/app/components/createQuestion";
 import { HomeIcon } from "lucide-react";
+import {
+  getQuestions,
+  createQuestion,
+  updateQuestion,
+  deleteQuestion,
+} from "@/app/actions/question";
+
 export default function QuestionsPage() {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [showAddQuestion, setShowAddQuestion] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
 
   const [isSavingUpdate, setIsSavingUpdate] = useState(false);
   const [isDeletingQuestion, setIsDeletingQuestion] = useState(false);
@@ -38,67 +47,45 @@ export default function QuestionsPage() {
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-  const handleSaveUpdate = () => {
-    if (!editingQuestion) {
-      setEditingQuestion(null);
-      return;
-    }
-
-    // existing code...
-  }
-
-  const handleLoadQuestions = () => {
-    fetch(`${apiUrl}/api/questions`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}, url: ${apiUrl}`);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        if (data && data.questions) {
-          setQuestions(
-            data.questions.map((question: Question) => ({
-              id: question.id,
-              content: question.content,
-              hint: question.hint,
-              hint2: question.hint2,
-              correctAnswer: question.correctAnswer,
-            })),
-          );
-        } else {
-          console.error("Invalid data structure:", data);
-        }
-      })
-      .catch((error) => {
-        console.error("Fetch error:", error);
-      });
-  };
-
   useEffect(() => {
-    handleLoadQuestions();
+    handleFetchQuestions();
   }, []);
 
-  const handleDeleteQuestion = () => {
+  const handleFetchQuestions = async () => {
+    setShowLoading(true);
+    const result = await getQuestions();
+    if (result.isSuccess) {
+      setQuestions(result.questions ?? []);
+    }
+    setShowLoading(false);
+  };
+
+  const handleUpdateQuestion = async () => {
+    if (!editingQuestion) return;
+    setIsSavingUpdate(true);
+    const result = await updateQuestion(editingQuestion);
+    if (result.isSuccess) {
+      setQuestions(
+        questions.map((q) =>
+          q.id === editingQuestion?.id ? (result.question ?? q) : q,
+        ),
+      );
+    }
+    setIsSavingUpdate(false);
+    setEditingQuestion(null);
+  };
+
+  const handleDeleteQuestion = async (id: number) => {
     setIsDeletingQuestion(true);
-    fetch(`${apiUrl}/api/questions/${editingQuestion?.id}`, {
-      method: "DELETE",
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}, url: ${apiUrl}`);
-        }
-        return res.json();
-      })
-      .catch((error) => {
-        console.error("Fetch error:", error);
-      })
-      .finally(() => {
-        handleLoadQuestions();
-        setEditingQuestion(null);
-        setShowConfirmDelete(false);
-        setIsDeletingQuestion(false);
-      });
+    const result = await deleteQuestion(id);
+    if (result.isSuccess) {
+      setQuestions(
+        questions.filter((question) => question.id !== editingQuestion?.id),
+      );
+    }
+    setIsDeletingQuestion(false);
+    setShowConfirmDelete(false);
+    setEditingQuestion(null);
   };
 
   return (
@@ -145,7 +132,7 @@ export default function QuestionsPage() {
                 <TableCell>{question.id}</TableCell>
                 <TableCell>{question.content}</TableCell>
                 <TableCell>{question.hint}</TableCell>
-                <TableCell>{question.hint2}</TableCell>
+                <TableCell>{question.hint2 ?? "-"}</TableCell>
                 <TableCell>{question.correctAnswer}</TableCell>
               </TableRow>
             ))}
@@ -233,8 +220,9 @@ export default function QuestionsPage() {
               variant="flat"
               color="primary"
               className="w-full"
-              onPress={handleSaveUpdate}
+              onPress={handleUpdateQuestion}
               isLoading={isSavingUpdate}
+              isDisabled={isSavingUpdate}
             >
               Zapisz
             </Button>
@@ -248,7 +236,9 @@ export default function QuestionsPage() {
                   <Button
                     variant="flat"
                     color="danger"
-                    onPress={handleDeleteQuestion}
+                    onPress={() =>
+                      handleDeleteQuestion(editingQuestion?.id ?? -1)
+                    }
                     isLoading={isDeletingQuestion}
                   >
                     Usuń
@@ -278,9 +268,14 @@ export default function QuestionsPage() {
       <CreateQuestion
         isOpen={showAddQuestion}
         onClose={() => setShowAddQuestion(false)}
-        apiUrl={apiUrl}
-        handleLoadQuestions={handleLoadQuestions}
+        handleCreateQuestion={createQuestion}
+        handleLoadQuestion={handleFetchQuestions}
       />
+      {showLoading && (
+        <div className="fixed w-screen h-screen flex flex-col items-center justify-center bg-black/50 top-0 left-0">
+          <Spinner />
+        </div>
+      )}
     </div>
   );
-} 
+}

@@ -31,8 +31,8 @@ export default function SequenceClientPage({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isAddQuestionModalOpen, setIsAddQuestionModalOpen] = useState(false);
-  const [isDeleteSequenceModalOpen, setIsDeleteSequenceModalOpen] = useState(false);
-
+  const [isDeleteSequenceModalOpen, setIsDeleteSequenceModalOpen] =
+    useState(false);
   const [editingSequenceName, setEditingSequenceName] = useState(sequence.name);
   const [editingSequenceQuestionsId, setEditingSequenceQuestionsId] = useState(
     sequence.questions.map((question) => question.id),
@@ -82,6 +82,7 @@ export default function SequenceClientPage({
         res.json().then((data) => console.log(data));
         return "ERROR";
       }
+      setIsEditing(false);
       return "SUCCESS";
     } catch (error) {
       console.error("Fetch error:", error);

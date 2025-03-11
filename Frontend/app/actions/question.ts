@@ -2,7 +2,11 @@
 
 import { Question } from "../models/Question";
 
-export async function getQuestions() {
+export async function getQuestions(): Promise<{
+  isSuccess: boolean;
+  message: string;
+  questions?: Question[];
+}> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/questions`, {
     method: "GET",
     headers: {
@@ -23,10 +27,26 @@ export async function getQuestions() {
   };
 }
 
-export async function createQuestion(question: Question) {
+export async function createQuestion(
+  name: string,
+  hint: string,
+  answer: string,
+  hint2?: string,
+): Promise<{
+  isSuccess: boolean;
+  message: string;
+  question?: Question;
+}> {
+  const body = JSON.stringify({
+    content: name,
+    hint: hint,
+    hint2: hint2,
+    correctAnswer: answer,
+  });
+
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/questions`, {
     method: "POST",
-    body: JSON.stringify(question),
+    body: body,
     headers: {
       "Content-Type": "application/json",
     },
@@ -45,7 +65,11 @@ export async function createQuestion(question: Question) {
   };
 }
 
-export async function updateQuestion(question: Question) {
+export async function updateQuestion(question: Question): Promise<{
+  isSuccess: boolean;
+  message: string;
+  question?: Question;
+}> {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/questions/${question.id}`,
     {
@@ -69,7 +93,10 @@ export async function updateQuestion(question: Question) {
     question: data.question,
   };
 }
-export async function deleteQuestion(id: number) {
+export async function deleteQuestion(id: number): Promise<{
+  isSuccess: boolean;
+  message: string;
+}> {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/questions/${id}`,
     {

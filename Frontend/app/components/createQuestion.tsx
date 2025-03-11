@@ -11,17 +11,23 @@ import {
   ModalFooter,
 } from "@heroui/react";
 import { useState } from "react";
+import { getQuestions } from "../actions/question";
 
 export default function CreateQuestion({
   isOpen,
   onClose,
-  apiUrl,
-  handleLoadQuestions,
+  handleCreateQuestion,
+  handleLoadQuestion,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  apiUrl: string;
-  handleLoadQuestions: () => void;
+  handleCreateQuestion: (
+    name: string,
+    hint: string,
+    answer: string,
+    hint2?: string,
+  ) => Promise<{ isSuccess: boolean; message: string }>;
+  handleLoadQuestion: () => Promise<void>;
 }) {
   const [addQuestionError, setAddQuestionError] = useState<boolean>(false);
   const [isAddingQuestion, setIsAddingQuestion] = useState<boolean>(false);
@@ -48,36 +54,23 @@ export default function CreateQuestion({
     } else {
       setAddQuestionError(false);
     }
+
     setIsAddingQuestion(true);
-    fetch(`${apiUrl}/api/questions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        content: addQuestionContent,
-        hint: addQuestionHint,
-        hint2: addQuestionHint2,
-        correctAnswer: addQuestionCorrectAnswer,
-      }),
-    })
+    handleCreateQuestion(
+      addQuestionContent,
+      addQuestionHint,
+      addQuestionCorrectAnswer,
+      addQuestionHint2 ?? undefined,
+    )
       .then((res) => {
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}, url: ${apiUrl}`);
+        if (res.isSuccess) {
+          handleLoadQuestion();
+          onClose();
         }
-        return res.json();
-      })
-      .catch((error) => {
-        console.error("Fetch error:", error);
       })
       .finally(() => {
-        handleLoadQuestions();
         setIsAddingQuestion(false);
-        setAddQuestionContent(null);
-        setAddQuestionHint(null);
-        setAddQuestionHint2(null);
-        setAddQuestionCorrectAnswer(null);
-        onClose();
+        getQuestions();
       });
   };
 
@@ -131,6 +124,7 @@ export default function CreateQuestion({
             className="w-full"
             onPress={handleAddQuestion}
             isLoading={isAddingQuestion}
+            isDisabled={isAddingQuestion}
           >
             Dodaj
           </Button>
