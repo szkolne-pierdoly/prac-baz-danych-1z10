@@ -1,7 +1,7 @@
 "use client";
 
 import { Question } from "@/app/models/Question";
-import { Checkbox, Divider, Modal, ModalBody, ModalContent, ModalHeader, Spinner } from "@heroui/react";
+import { Button, Checkbox, Divider, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner } from "@heroui/react";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 
 export default function AddQuestionModal({
@@ -18,6 +18,10 @@ export default function AddQuestionModal({
   const [idsToAdd, setIdsToAdd] = useState<number[]>([]);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  const handleAddQuestions = () => {
+    console.log(idsToAdd);
+  };
 
   const fetchAllQuestions = useCallback(() => {
     setIsQuestionsLoading(true);
@@ -102,6 +106,19 @@ export default function AddQuestionModal({
             </div>
           )}
         </ModalBody>
+        <ModalFooter className="flex flex-row justify-between">
+          <Button variant="flat" color="default" onPress={onClose}>
+            Anuluj
+          </Button>
+          <Button
+            variant="flat"
+            color="primary"
+            onPress={handleAddQuestions}
+            isDisabled={idsToAdd.length === 0}
+          >
+            Dodaj pytania
+          </Button>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

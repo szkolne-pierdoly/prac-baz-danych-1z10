@@ -25,15 +25,12 @@ export default function SequenceClientPage({
   sequence: Sequence;
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [isQuestionsLoading, setIsQuestionsLoading] = useState(false);
   const [isAddQuestionModalOpen, setIsAddQuestionModalOpen] = useState(false);
 
   const [editingSequenceName, setEditingSequenceName] = useState(sequence.name);
   const [editingSequenceQuestionsId, setEditingSequenceQuestionsId] = useState(
     sequence.questions.map((question) => question.id),
   );
-
-  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -43,6 +40,13 @@ export default function SequenceClientPage({
     setEditingSequenceQuestionsId(
       sequence.questions.map((question) => question.id),
     );
+  };
+
+  const handleAddQuestions = (questions: Question[]) => {
+    setEditingSequenceQuestionsId([
+      ...editingSequenceQuestionsId,
+      ...questions.map((question) => question.id),
+    ]);
   };
 
   const handleSave = () => {
@@ -191,7 +195,7 @@ export default function SequenceClientPage({
         </Card>
       )}
       <AddQuestionModal
-        isOpen={true ?? isAddQuestionModalOpen}
+        isOpen={isAddQuestionModalOpen}
         onClose={() => setIsAddQuestionModalOpen(false)}
         includedQuestionIds={editingSequenceQuestionsId ?? []}
       />
