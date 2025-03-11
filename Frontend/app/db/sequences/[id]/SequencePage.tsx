@@ -16,6 +16,8 @@ import {
 } from "@heroui/react";
 import React, { useState } from "react";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { Question } from "@/app/models/Question";
+import AddQuestionModal from "./AddQuestionModal";
 
 export default function SequenceClientPage({
   sequence,
@@ -23,10 +25,17 @@ export default function SequenceClientPage({
   sequence: Sequence;
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isQuestionsLoading, setIsQuestionsLoading] = useState(false);
+  const [isAddQuestionModalOpen, setIsAddQuestionModalOpen] = useState(false);
+
   const [editingSequenceName, setEditingSequenceName] = useState(sequence.name);
   const [editingSequenceQuestionsId, setEditingSequenceQuestionsId] = useState(
     sequence.questions.map((question) => question.id),
   );
+
+  const [allQuestions, setAllQuestions] = useState<Question[]>([]);
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -151,7 +160,12 @@ export default function SequenceClientPage({
                   Usuń pytania
                 </Button>
               )}
-              <Button variant="flat" color="primary" className="w-full">
+              <Button
+                variant="flat"
+                color="primary"
+                className="w-full"
+                onPress={() => setIsAddQuestionModalOpen(true)}
+              >
                 <PlusIcon size={16} />
                 Dodaj pytania
               </Button>
@@ -176,6 +190,11 @@ export default function SequenceClientPage({
           </CardBody>
         </Card>
       )}
+      <AddQuestionModal
+        isOpen={true ?? isAddQuestionModalOpen}
+        onClose={() => setIsAddQuestionModalOpen(false)}
+        includedQuestionIds={editingSequenceQuestionsId ?? []}
+      />
     </div>
   );
 }
