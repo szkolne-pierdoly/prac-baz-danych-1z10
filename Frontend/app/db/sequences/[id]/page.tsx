@@ -1,3 +1,4 @@
+import { Question } from "@/app/models/Question";
 import SequenceClientPage from "./SequencePage";
 
 export default async function SequencePage({

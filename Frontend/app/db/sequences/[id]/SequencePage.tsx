@@ -13,12 +13,17 @@ import {
   TableCell,
   Button,
   Input,
+  Modal,
+  ModalHeader,
+  ModalContent,
+  ModalFooter,
+  ModalBody,
 } from "@heroui/react";
-import React, { useState } from "react";
-import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { PencilIcon, PlusIcon, TrashIcon, XIcon } from "lucide-react";
 import { Question } from "@/app/models/Question";
 import AddQuestionModal from "./AddQuestionModal";
-
+import { useRouter } from "next/navigation";
 export default function SequenceClientPage({
   sequence,
 }: {
@@ -26,13 +31,63 @@ export default function SequenceClientPage({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isAddQuestionModalOpen, setIsAddQuestionModalOpen] = useState(false);
+  const [isDeleteSequenceModalOpen, setIsDeleteSequenceModalOpen] = useState(false);
 
   const [editingSequenceName, setEditingSequenceName] = useState(sequence.name);
   const [editingSequenceQuestionsId, setEditingSequenceQuestionsId] = useState(
     sequence.questions.map((question) => question.id),
   );
+  const [error, setError] = useState<string | null>(null);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  const router = useRouter();
+
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+  const [questions, setQuestions] = useState<
+    { question: Question; isDeleted: boolean; isAdded: boolean }[]
+  >([]);
+
+  useEffect(() => {
+    setQuestions(
+      sequence.questions.map((question) => ({
+        question: question,
+        isDeleted: false,
+        isAdded: false,
+      })),
+    );
+  }, [sequence]);
+
+  const handleSaveUpdate = async (): Promise<string> => {
+    if (
+      questions.length === 0 ||
+      editingSequenceName === "" ||
+      !editingSequenceName
+    ) {
+      return "EMPTY";
+    }
+    try {
+      const res = await fetch(`${apiUrl}/api/sequences/${sequence.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: editingSequenceName,
+          questionIds: questions
+            .filter((question) => !question.isDeleted)
+            .map((question) => question.question.id),
+        }),
+      });
+      if (!res.ok) {
+        res.json().then((data) => console.log(data));
+        return "ERROR";
+      }
+      return "SUCCESS";
+    } catch (error) {
+      console.error("Fetch error:", error);
+      return "ERROR";
+    }
+  };
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -42,26 +97,62 @@ export default function SequenceClientPage({
     );
   };
 
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditingSequenceName(sequence.name);
+    setEditingSequenceQuestionsId(
+      sequence.questions.map((question) => question.id),
+    );
+    setQuestions(
+      sequence.questions.map((question) => ({
+        question: question,
+        isDeleted: false,
+        isAdded: false,
+      })),
+    );
+    setSelectedQuestions(undefined);
+  };
+
   const handleAddQuestions = (questions: Question[]) => {
+    setQuestions((prevQuestions) => {
+      const existingQuestionIds = prevQuestions.map((q) => q.question.id);
+      const newQuestionsToAdd = questions.filter(
+        (q) => !existingQuestionIds.includes(q.id),
+      );
+      const newQuestionObjects = newQuestionsToAdd.map((q) => ({
+        question: q,
+        isDeleted: false,
+        isAdded: true,
+      }));
+      return [...prevQuestions, ...newQuestionObjects];
+    });
     setEditingSequenceQuestionsId([
       ...editingSequenceQuestionsId,
       ...questions.map((question) => question.id),
     ]);
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-  };
-
   const handleDelete = () => {
     const itemsToDelete = Array.from(selectedQuestions ?? []).map((item) =>
       parseInt(item as string, 10),
     );
-    console.log(itemsToDelete);
-    setEditingSequenceQuestionsId(
-      editingSequenceQuestionsId?.filter((id) => !itemsToDelete.includes(id)),
+    setQuestions((prevQuestions) =>
+      prevQuestions.map((q) =>
+        itemsToDelete.includes(q.question.id) ? { ...q, isDeleted: true } : q,
+      ),
     );
-    console.log(editingSequenceQuestionsId);
+  };
+
+  const handleDeleteSequence = () => {
+    fetch(`${apiUrl}/api/sequences/${sequence.id}`, {
+      method: "DELETE",
+    }).then((res) => {
+      if (!res.ok) {
+        res.json().then((data) => console.log(data));
+      } else {
+        router.push("/db/sequences");
+      }
+    });
   };
 
   const handleRecover = () => {
@@ -102,7 +193,11 @@ export default function SequenceClientPage({
               </div>
             )}
           </div>
-          {!isEditing && (
+          {isEditing ? (
+            <Button variant="flat" color="default" onPress={handleCancelEdit}>
+              Anuluj
+            </Button>
+          ) : (
             <Button variant="faded" color="primary" onPress={handleEdit}>
               <PencilIcon size={16} />
               Edytuj
@@ -127,20 +222,20 @@ export default function SequenceClientPage({
               <TableColumn>Odpowiedź</TableColumn>
             </TableHeader>
             <TableBody>
-              {sequence.questions.map((question) => (
+              {questions.map((question) => (
                 <TableRow
-                  key={question.id}
+                  key={question.question.id}
                   className={
-                    !editingSequenceQuestionsId?.includes(question.id)
+                    question.isDeleted
                       ? "bg-red-700 bg-opacity-10 text-red-500"
                       : ""
                   }
                 >
-                  <TableCell>{question.id}</TableCell>
-                  <TableCell>{question.content}</TableCell>
-                  <TableCell>{question.hint}</TableCell>
-                  <TableCell>{question.hint2 ?? "-"}</TableCell>
-                  <TableCell>{question.correctAnswer}</TableCell>
+                  <TableCell>{question.question.id}</TableCell>
+                  <TableCell>{question.question.content}</TableCell>
+                  <TableCell>{question.question.hint}</TableCell>
+                  <TableCell>{question.question.hint2 ?? "-"}</TableCell>
+                  <TableCell>{question.question.correctAnswer}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -180,14 +275,19 @@ export default function SequenceClientPage({
       {isEditing && (
         <Card className="w-full">
           <CardBody className="flex flex-row gap-2">
-            <Button variant="flat" color="default" className="w-1/3">
-              Anuluj
+            <Button
+              variant="flat"
+              color="danger"
+              className="w-1/3"
+              onPress={() => setIsDeleteSequenceModalOpen(true)}
+            >
+              Usuń sekwencję
             </Button>
             <Button
               variant="flat"
               color="primary"
               className="w-full"
-              onPress={handleSave}
+              onPress={handleSaveUpdate}
             >
               Zapisz zmiany
             </Button>
@@ -198,7 +298,38 @@ export default function SequenceClientPage({
         isOpen={isAddQuestionModalOpen}
         onClose={() => setIsAddQuestionModalOpen(false)}
         includedQuestionIds={editingSequenceQuestionsId ?? []}
+        handleAddQuestions={handleAddQuestions}
       />
+      <Modal
+        isOpen={isDeleteSequenceModalOpen}
+        onClose={() => setIsDeleteSequenceModalOpen(false)}
+      >
+        <ModalContent>
+          <ModalHeader>Napewno?</ModalHeader>
+          <ModalBody>
+            Usunięcie sekwencji spowoduje usunięcie samej sekwencji, pytania
+            dalej zostaną w bazie danych. Jest to akcja nieodwracalna!
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              variant="flat"
+              color="danger"
+              className="px-8"
+              onPress={handleDeleteSequence}
+            >
+              Usuń sekwencję
+            </Button>
+            <Button
+              variant="flat"
+              color="success"
+              className="w-full"
+              onPress={() => setIsDeleteSequenceModalOpen(false)}
+            >
+              Anuluj
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

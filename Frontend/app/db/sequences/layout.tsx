@@ -54,13 +54,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             )}
           </div>
           <div className="flex flex-row items-center justify-center gap-2">
-            <Button
-              variant="flat"
-              color="primary"
-              onPress={() => setShowCreateSequenceModal(true)}
-            >
-              Dodaj sekwencję
-            </Button>
+            {sequenceId === null && (
+              <Button
+                variant="flat"
+                color="primary"
+                onPress={() => setShowCreateSequenceModal(true)}
+              >
+                Dodaj sekwencję
+              </Button>
+            )}
           </div>
         </CardBody>
       </Card>
