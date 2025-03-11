@@ -1,4 +1,3 @@
-import { Question } from "@/app/models/Question";
 import SequenceClientPage from "./SequencePage";
 
 export default async function SequencePage({
@@ -13,5 +12,9 @@ export default async function SequencePage({
   const data = await response.json();
   const sequence = data.sequence;
 
-  return <SequenceClientPage sequence={sequence} />;
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-start">
+      <SequenceClientPage sequence={sequence} />
+    </div>
+  );
 }

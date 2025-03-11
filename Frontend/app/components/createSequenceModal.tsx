@@ -9,9 +9,11 @@ import {
   ModalHeader,
   Divider,
   ModalFooter,
+  Spinner,
 } from "@heroui/react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { createSequence } from "../actions/sequence";
 export default function CreateSequenceModal({
   isOpen,
   onClose,
@@ -21,30 +23,27 @@ export default function CreateSequenceModal({
 }) {
   const [sequenceName, setSequenceName] = useState("");
   const [emptyError, setEmptyError] = useState(false);
-
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleAddSequence = () => {
+  const handleAddSequence = async () => {
+    setIsLoading(true);
     if (sequenceName === "") {
       setEmptyError(true);
       return;
     }
     setEmptyError(false);
 
-    fetch(`${apiUrl}/api/sequences`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name: sequenceName }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        router.push(`/db/sequences/${data.id}`);
-      })
-      .catch((err) => console.error("Error adding sequence:", err));
+    const result = await createSequence(sequenceName, []);
+    if (result.isSuccess && result.sequence) {
+      router.push(`/db/sequences/${result.sequence?.id}`);
+      onClose();
+    } else {
+      setEmptyError(true);
+      setSequenceName("");
+      onClose();
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -76,6 +75,11 @@ export default function CreateSequenceModal({
           </Button>
         </ModalFooter>
       </ModalContent>
+      {isLoading && (
+        <div className="fixed w-screen h-screen flex flex-col items-center justify-center bg-black/50 top-0 left-0 z-50">
+          <Spinner />
+        </div>
+      )}
     </Modal>
   );
 }

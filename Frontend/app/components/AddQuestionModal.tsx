@@ -80,7 +80,9 @@ export default function AddQuestionModal({
                     className={`bg-white/5 p-2 px-4 rounded-lg border border-white/5 shadow-md flex flex-row gap-2 ${includedQuestionIds.includes(question.id) ? "opacity-30" : ""}`}
                     onClick={() => {
                       if (idsToAdd.includes(question.id)) {
-                        setIdsToAdd(idsToAdd.filter((id) => id !== question.id));
+                        setIdsToAdd(
+                          idsToAdd.filter((id) => id !== question.id),
+                        );
                       } else {
                         setIdsToAdd([...idsToAdd, question.id]);
                       }
