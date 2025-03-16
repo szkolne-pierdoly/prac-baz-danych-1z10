@@ -148,17 +148,21 @@ public class PlayerController : ControllerBase
                 {
                     if (singleResult.HttpStatusCode == 404)
                     {
-                        result = StatusCode(singleResult.HttpStatusCode, new
+                        result = StatusCode(singleResult?.HttpStatusCode ?? 500, new
                         {
-                            Status = singleResult.Status,
-                            Message = singleResult.Message ?? "Player not found"
+                            Status = singleResult?.Status ?? "ERROR",
+                            Message = singleResult?.Message ?? "Player not found"
                         });
                     }
                     else
                     {
                         result = StatusCode(singleResult.HttpStatusCode ?? 500, new
-                    {
-                        Status = singleResult.Status,
+                        {
+                            Status = singleResult.Status,
+                            Message = singleResult.Message ?? "Something went wrong, please try again later."
+                        });
+                    }
+                }
             }
             else
             {
