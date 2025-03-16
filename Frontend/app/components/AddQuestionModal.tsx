@@ -59,10 +59,10 @@ export default function AddQuestionModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
-      <ModalContent>
+      <ModalContent className="max-h-[90vh] overflow-y-hidden">
         <ModalHeader>Dodaj pytanie</ModalHeader>
         <Divider />
-        <ModalBody>
+        <ModalBody className="max-h-[90vh] overflow-y-auto">
           {isQuestionsLoading ? (
             <div className="w-full min-h-72 h-full flex justify-center items-center flex-col gap-4">
               <Spinner size="lg" />
@@ -116,6 +116,7 @@ export default function AddQuestionModal({
             </div>
           )}
         </ModalBody>
+        <Divider />
         <ModalFooter className="flex flex-row justify-between">
           <Button variant="flat" color="default" onPress={onClose}>
             Anuluj
