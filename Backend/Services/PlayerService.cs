@@ -130,6 +130,18 @@ public class PlayerService : IPlayerService
     {
         try
         {
+            var player = await _playerRepository.GetPlayerById(id);
+            if (player == null)
+            {
+                return new BaseResult
+                {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Player not found",
+                    HttpStatusCode = 404
+                };
+            }
+
             await _playerRepository.DeletePlayer(id);
             return new BaseResult
             {
