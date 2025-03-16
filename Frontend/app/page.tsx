@@ -36,7 +36,11 @@ export default function Home() {
                 <div className="text-2xl font-bold">Sekwencje: 4</div>
               </CardBody>
             </Card>
-            <Card className="w-full max-w-[25%] min-w-[100px]" isPressable>
+            <Card
+              className="w-full max-w-[25%] min-w-[100px]"
+              isPressable
+              onPress={() => router.push("/db/players")}
+            >
               <CardBody>
                 <div className="text-2xl font-bold">Gracze: 2</div>
               </CardBody>
