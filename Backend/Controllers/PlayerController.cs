@@ -22,7 +22,8 @@ public class PlayerController : ControllerBase
         var result = await _playerService.CreatePlayer(request);
         if (result.IsSuccess)
         {
-            return Ok(new {
+            return Ok(new
+            {
                 result.Status,
                 Message = result.Message ?? "Player created successfully",
                 Player = result.Player
@@ -30,7 +31,8 @@ public class PlayerController : ControllerBase
         }
         else
         {
-            return StatusCode(result.HttpStatusCode ?? 500, new {
+            return StatusCode(result.HttpStatusCode ?? 500, new
+            {
                 result.Status,
                 Message = result.Message ?? "Something went wrong, please try again later."
             });
@@ -43,7 +45,8 @@ public class PlayerController : ControllerBase
         var result = await _playerService.GetAllPlayers();
         if (result.IsSuccess)
         {
-            return Ok(new {
+            return Ok(new
+            {
                 result.Status,
                 Message = result.Message ?? "Players fetched successfully",
                 Players = result.Players
@@ -51,7 +54,8 @@ public class PlayerController : ControllerBase
         }
         else
         {
-            return StatusCode(result.HttpStatusCode ?? 500, new {
+            return StatusCode(result.HttpStatusCode ?? 500, new
+            {
                 result.Status,
                 Message = result.Message ?? "Something went wrong, please try again later."
             });
@@ -62,10 +66,12 @@ public class PlayerController : ControllerBase
     public async Task<IActionResult> UpdatePlayer(int id, [FromBody] UpdatePlayerRequest request)
     {
         var result = await _playerService.UpdatePlayer(request, id);
-        return result.IsSuccess ? Ok(new {
+        return result.IsSuccess ? Ok(new
+        {
             result.Status,
             Message = result.Message ?? "Player updated successfully"
-        }) : StatusCode(result.HttpStatusCode ?? 500, new {
+        }) : StatusCode(result.HttpStatusCode ?? 500, new
+        {
             result.Status,
             Message = result.Message ?? "Something went wrong, please try again later."
         });

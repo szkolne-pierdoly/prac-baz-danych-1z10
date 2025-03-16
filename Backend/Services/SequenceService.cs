@@ -20,12 +20,16 @@ public class SequenceService : ISequenceService
 
     public async Task<CreateSequenceResult> CreateSequence(CreateSequenceRequest request)
     {
-        try {
+        try
+        {
             var questions = new List<Question>();
-            if (request.QuestionIds != null) {
-                foreach (var questionId in request.QuestionIds) {
+            if (request.QuestionIds != null)
+            {
+                foreach (var questionId in request.QuestionIds)
+                {
                     var question = await _questionRepository.GetQuestionById(questionId);
-                    if (question != null) {
+                    if (question != null)
+                    {
                         questions.Add(question);
                     }
                 }
@@ -37,37 +41,48 @@ public class SequenceService : ISequenceService
             };
             await _sequenceRepository.CreateSequence(newSequence);
             return new CreateSequenceResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequence created successfully", Sequence = newSequence };
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             return new CreateSequenceResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
         }
     }
 
     public async Task<GetAllSequencesResult> GetAllSequences()
     {
-        try {
+        try
+        {
             var sequences = await _sequenceRepository.GetAllSequences();
             return new GetAllSequencesResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequences retrieved successfully", Sequences = sequences };
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             return new GetAllSequencesResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
         }
     }
 
     public async Task<GetSequenceResult> GetSequence(int id)
     {
-        try {
+        try
+        {
             var sequence = await _sequenceRepository.GetSequenceById(id);
             return new GetSequenceResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequence retrieved successfully", Sequence = sequence };
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             return new GetSequenceResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
         }
     }
 
     public async Task<UpdateSequenceResult> UpdateSequence(UpdateSequenceRequest request, int id)
     {
-        try {
+        try
+        {
             var sequence = await _sequenceRepository.GetSequenceById(id);
-            if (sequence == null) {
-                return new UpdateSequenceResult {
+            if (sequence == null)
+            {
+                return new UpdateSequenceResult
+                {
                     IsSuccess = false,
                     Status = "ERROR",
                     Message = "Sequence not found"
@@ -75,22 +90,28 @@ public class SequenceService : ISequenceService
             }
             sequence.Name = request.Name;
             var questions = new List<Question>();
-            foreach (var questionId in request.QuestionIds) {
+            foreach (var questionId in request.QuestionIds)
+            {
                 var question = await _questionRepository.GetQuestionById(questionId);
-                if (question != null) {
+                if (question != null)
+                {
                     questions.Add(question);
-                }   
+                }
             }
             sequence.Questions = questions;
             await _sequenceRepository.UpdateSequence(sequence);
-            return new UpdateSequenceResult {
+            return new UpdateSequenceResult
+            {
                 IsSuccess = true,
                 Status = "SUCCESS",
                 Message = "Sequence updated successfully",
                 Sequence = sequence
             };
-        } catch (Exception ex) {
-            return new UpdateSequenceResult {
+        }
+        catch (Exception ex)
+        {
+            return new UpdateSequenceResult
+            {
                 IsSuccess = false,
                 Status = "ERROR",
                 Message = ex.Message
@@ -100,10 +121,13 @@ public class SequenceService : ISequenceService
 
     public async Task<BaseResult> DeleteSequence(int id)
     {
-        try {
+        try
+        {
             await _sequenceRepository.DeleteSequence(id);
             return new BaseResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequence deleted successfully" };
-        } catch (Exception ex) {
+        }
+        catch (Exception ex)
+        {
             return new BaseResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
         }
     }

@@ -22,20 +22,22 @@ public class PlayerService : IPlayerService
         {
             var player = new Player { Name = request.Name };
             var createdPlayer = await _playerRepository.CreatePlayer(player);
-            
-            return new CreatePlayerResult {
-              IsSuccess = true,
-              Status = "SUCCESS",
-              Message = "Player created successfully",
-              Player = createdPlayer
+
+            return new CreatePlayerResult
+            {
+                IsSuccess = true,
+                Status = "SUCCESS",
+                Message = "Player created successfully",
+                Player = createdPlayer
             };
         }
         catch (Exception ex)
         {
-            return new CreatePlayerResult {
-              IsSuccess = false,
-              Status = "ERROR",
-              Message = ex.Message
+            return new CreatePlayerResult
+            {
+                IsSuccess = false,
+                Status = "ERROR",
+                Message = ex.Message
             };
         }
     }
@@ -45,16 +47,18 @@ public class PlayerService : IPlayerService
         try
         {
             var players = await _playerRepository.GetAllPlayers();
-            return new GetAllPlayersResult {
-              IsSuccess = true,
-              Status = "SUCCESS",
-              Message = "Players fetched successfully",
-              Players = players
+            return new GetAllPlayersResult
+            {
+                IsSuccess = true,
+                Status = "SUCCESS",
+                Message = "Players fetched successfully",
+                Players = players
             };
         }
         catch (Exception ex)
         {
-            return new GetAllPlayersResult {
+            return new GetAllPlayersResult
+            {
                 IsSuccess = false,
                 Status = "ERROR",
                 Message = ex.Message
@@ -67,7 +71,8 @@ public class PlayerService : IPlayerService
         try
         {
             var player = await _playerRepository.GetPlayerById(id);
-            return new GetPlayerByIdResult {
+            return new GetPlayerByIdResult
+            {
                 IsSuccess = true,
                 Status = "SUCCESS",
                 Message = "Player fetched successfully",
@@ -76,7 +81,8 @@ public class PlayerService : IPlayerService
         }
         catch (Exception ex)
         {
-            return new GetPlayerByIdResult {
+            return new GetPlayerByIdResult
+            {
                 IsSuccess = false,
                 Status = "ERROR",
                 Message = ex.Message
@@ -91,7 +97,8 @@ public class PlayerService : IPlayerService
             var player = await _playerRepository.GetPlayerById(id);
             if (player == null)
             {
-                return new BaseResult {
+                return new BaseResult
+                {
                     IsSuccess = false,
                     Status = "ERROR",
                     Message = "Player not found"
@@ -101,15 +108,17 @@ public class PlayerService : IPlayerService
             player.Name = request.Name;
             await _playerRepository.UpdatePlayer(player);
 
-            return new BaseResult {
+            return new BaseResult
+            {
                 IsSuccess = true,
                 Status = "SUCCESS",
                 Message = "Player updated successfully"
-            };  
+            };
         }
         catch (Exception ex)
         {
-            return new BaseResult {
+            return new BaseResult
+            {
                 IsSuccess = false,
                 Status = "ERROR",
                 Message = ex.Message
@@ -122,7 +131,8 @@ public class PlayerService : IPlayerService
         try
         {
             await _playerRepository.DeletePlayer(id);
-            return new BaseResult {
+            return new BaseResult
+            {
                 IsSuccess = true,
                 Status = "SUCCESS",
                 Message = "Player deleted successfully"
@@ -130,7 +140,8 @@ public class PlayerService : IPlayerService
         }
         catch (Exception ex)
         {
-            return new BaseResult {
+            return new BaseResult
+            {
                 IsSuccess = false,
                 Status = "ERROR",
                 Message = ex.Message
@@ -143,7 +154,8 @@ public class PlayerService : IPlayerService
         try
         {
             await _playerRepository.DeleteMultiplePlayers(ids);
-            return new BaseResult {
+            return new BaseResult
+            {
                 IsSuccess = true,
                 Status = "SUCCESS",
                 Message = "Players deleted successfully"
@@ -151,7 +163,8 @@ public class PlayerService : IPlayerService
         }
         catch (Exception ex)
         {
-            return new BaseResult {
+            return new BaseResult
+            {
                 IsSuccess = false,
                 Status = "ERROR",
                 Message = ex.Message

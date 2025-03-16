@@ -1,6 +1,7 @@
 
 namespace Backend.Models.Contracts.Request;
 
-public class ImportQuestionsRequest {
-  public required IFormFile File { get; set; }
+public class ImportQuestionsRequest
+{
+    public required IFormFile File { get; set; }
 }

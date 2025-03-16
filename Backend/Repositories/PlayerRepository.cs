@@ -9,7 +9,7 @@ namespace Backend.Repositories;
 public class PlayerRepository : IPlayerRepository
 {
     private readonly AppDbContext _context;
-    
+
     public PlayerRepository(AppDbContext context)
     {
         _context = context;
