@@ -22,7 +22,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { Question } from "@/app/models/Question";
-import AddQuestionModal from "@/app/components/AddQuestionModal";
+import AddQuestionModal from "@/app/components/addQuestionModal";
 import { useRouter } from "next/navigation";
 import { Key } from "@react-types/shared";
 import {
@@ -30,7 +30,7 @@ import {
   updateSequence,
   getSequence as getSequenceAction,
 } from "@/app/actions/sequence";
-import LoadingDialog from "@/app/components/LoadingDialog";
+import LoadingDialog from "@/app/components/loadingDialog";
 export default function SequenceClientPage({
   sequenceId,
 }: {
