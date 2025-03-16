@@ -22,7 +22,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
 import { Question } from "@/app/models/Question";
-import AddQuestionModal from "../../../components/AddQuestionModal";
+import AddQuestionModal from "@/app/components/AddQuestionModal";
 import { useRouter } from "next/navigation";
 import { Key } from "@react-types/shared";
 import {

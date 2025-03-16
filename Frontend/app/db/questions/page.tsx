@@ -24,7 +24,7 @@ import {
   deleteQuestion,
 } from "@/app/actions/question";
 import EditQuestionModal from "@/app/components/editQuestionModal";
-import ImportQuestionsModel from "@/app/components/importQuestionsModel";
+import ImportQuestionsModal from "@/app/components/importQuestionsModal";
 
 export default function QuestionsPage() {
   const [showAddQuestion, setShowAddQuestion] = useState(false);
@@ -32,9 +32,13 @@ export default function QuestionsPage() {
   const [showImportQuestions, setShowImportQuestions] = useState(false);
   const [isSavingUpdate, setIsSavingUpdate] = useState(false);
   const [isDeletingQuestion, setIsDeletingQuestion] = useState(false);
+  const [isSelectingQuestions, setIsSelectingQuestions] = useState(false);
 
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(
+    new Set(),
+  );
 
   const router = useRouter();
 
@@ -88,9 +92,28 @@ export default function QuestionsPage() {
             >
               <HomeIcon />
             </Button>
-            <div className="text-2xl font-bold">Pytania</div>
+            <div className="text-2xl font-bold">
+              Pytania{" "}
+              {selectedQuestions.size > 0 && `(${selectedQuestions.size})`}
+            </div>
           </div>
           <div className="flex flex-row items-center justify-center gap-2">
+            {isSelectingQuestions && (
+              <Button
+                variant="light"
+                color="danger"
+                onPress={() => setSelectedQuestions(new Set())}
+              >
+                Usuń zaznaczone pytania
+              </Button>
+            )}
+            <Button
+              variant="light"
+              color="default"
+              onPress={() => setIsSelectingQuestions(!isSelectingQuestions)}
+            >
+              {isSelectingQuestions ? "Zakończ" : "Zaznacz"}
+            </Button>
             <Button
               variant="light"
               color="default"
@@ -109,7 +132,15 @@ export default function QuestionsPage() {
         </CardBody>
       </Card>
       <div className="w-full flex flex-col items-start justify-start max-w-4xl overflow-auto max-h-[calc(100vh-64px)]">
-        <Table selectionMode="single" className="w-full h-full" isHeaderSticky>
+        <Table
+          selectionMode={isSelectingQuestions ? "multiple" : "single"}
+          className="w-full h-full"
+          isHeaderSticky
+          selectedKeys={selectedQuestions}
+          onSelectionChange={(keys) => {
+            setSelectedQuestions(new Set([...keys].map(String)));
+          }}
+        >
           <TableHeader>
             <TableColumn>ID</TableColumn>
             <TableColumn>Treść</TableColumn>
@@ -120,8 +151,10 @@ export default function QuestionsPage() {
           <TableBody>
             {questions.map((question) => (
               <TableRow
-                key={question.id}
-                onClick={() => setEditingQuestion(question)}
+                key={String(question.id)}
+                onClick={() =>
+                  isSelectingQuestions ? null : setEditingQuestion(question)
+                }
               >
                 <TableCell>{question.id}</TableCell>
                 <TableCell>{question.content}</TableCell>
@@ -153,7 +186,7 @@ export default function QuestionsPage() {
           <Spinner />
         </div>
       )}
-      <ImportQuestionsModel
+      <ImportQuestionsModal
         isOpen={showImportQuestions}
         onClose={() => setShowImportQuestions(false)}
         onSuccess={handleFetchQuestions}

@@ -14,7 +14,7 @@ import {
 import { useState } from "react";
 import { importQuestions } from "../actions/question";
 
-export default function ImportQuestionsModel({
+export default function ImportQuestionsModal({
   isOpen,
   onClose,
   onSuccess,
