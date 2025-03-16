@@ -14,6 +14,12 @@ public class QuestionRepository : IQuestionRepository
         _context = context;
     }
 
+    public async Task CreateMultipleQuestions(List<Question> questions)
+    {
+        await _context.Questions.AddRangeAsync(questions);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<Question?> GetQuestionById(int id)
     {
         return await _context.Questions.FindAsync(id);

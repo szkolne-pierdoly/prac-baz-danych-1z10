@@ -1,3 +1,4 @@
+using System.Xml.Serialization;
 using Backend.Data.Models;
 using Backend.Interface.Repositories;
 using Backend.Interface.Services;
@@ -43,6 +44,63 @@ public class QuestionService : IQuestionService
               Message = ex.Message
             };
         }
+    }
+
+    public async Task<ImportQuestionsResult> ImportQuestions(ImportQuestionsRequest request)
+    {
+      try {
+        var file = request.File;
+        if (file == null || file.Length == 0) {
+          return new ImportQuestionsResult {
+            IsSuccess = false,
+            Status = "ERROR",
+            Message = "File is required"
+          };
+        }
+        var questions = new List<Question>();
+        var serializer = new XmlSerializer(typeof(List<Question>), new XmlRootAttribute("Questions"));
+
+        using (var stream = file.OpenReadStream())
+        {
+          try
+          {
+            questions = serializer.Deserialize(stream) as List<Question>;
+          }
+          catch (InvalidOperationException xmlEx)
+          {
+            return new ImportQuestionsResult {
+              IsSuccess = false,
+              Status = "ERROR",
+              Message = $"Invalid XML file format: {xmlEx.Message}"
+            };
+          }
+        }
+
+        if (questions == null || questions.Count == 0) {
+          return new ImportQuestionsResult {
+            IsSuccess = false,
+            Status = "ERROR",
+            Message = "No questions found in file"
+          };
+        }
+
+        await _questionRepository.CreateMultipleQuestions(questions);
+
+        return new ImportQuestionsResult {
+          IsSuccess = true,
+          Status = "SUCCESS",
+          Message = "Questions imported successfully",
+          Questions = questions
+        };
+      }
+      catch (Exception ex)
+      {
+        return new ImportQuestionsResult {
+          IsSuccess = false,
+          Status = "ERROR",
+          Message = ex.Message,
+        };
+      }
     }
 
     public async Task<GetAllQuestionsResult> GetAllQuestions()

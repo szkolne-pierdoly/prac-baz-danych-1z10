@@ -34,6 +34,25 @@ public class QuestionController : ControllerBase
       }
     }
 
+    [HttpPost("import")]
+    public async Task<IActionResult> ImportQuestions([FromForm] ImportQuestionsRequest request)
+    {
+      var result = await _questionService.ImportQuestions(request);
+
+      if (result.IsSuccess) {
+        return Ok(new {
+            Status = result.Status,
+            Message = result.Message ?? "Questions imported successfully",
+            Questions = result.Questions
+        });
+      } else {
+        return StatusCode(result.HttpStatusCode ?? 500, new {
+            Status = result.Status,
+            Message = result.Message ?? "Something went wrong, please try again later."
+        });
+      }
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetAllQuestions()
     {
