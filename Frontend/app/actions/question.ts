@@ -140,3 +140,25 @@ export async function deleteQuestion(id: number): Promise<{
 
   return { isSuccess: true, message: "Question deleted successfully" };
 }
+
+export async function deleteMultipleQuestions(ids: number[]): Promise<{
+  isSuccess: boolean;
+  message: string;
+}> {
+  const idsString = ids.join(",");
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/questions/${idsString}`,
+    {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  if (!res.ok) {
+    return { isSuccess: false, message: "Failed to delete questions" };
+  }
+
+  return { isSuccess: true, message: "Questions deleted successfully" };
+}

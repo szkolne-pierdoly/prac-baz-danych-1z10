@@ -25,6 +25,7 @@ import {
 } from "@/app/actions/question";
 import EditQuestionModal from "@/app/components/editQuestionModal";
 import ImportQuestionsModal from "@/app/components/importQuestionsModal";
+import DeleteMultipleQuestionsModal from "@/app/components/deleteMultipleQuestionsModal";
 
 export default function QuestionsPage() {
   const [showAddQuestion, setShowAddQuestion] = useState(false);
@@ -33,6 +34,8 @@ export default function QuestionsPage() {
   const [isSavingUpdate, setIsSavingUpdate] = useState(false);
   const [isDeletingQuestion, setIsDeletingQuestion] = useState(false);
   const [isSelectingQuestions, setIsSelectingQuestions] = useState(false);
+  const [showDeleteMultipleQuestions, setShowDeleteMultipleQuestions] =
+    useState(false);
 
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -102,7 +105,8 @@ export default function QuestionsPage() {
               <Button
                 variant="light"
                 color="danger"
-                onPress={() => setSelectedQuestions(new Set())}
+                onPress={() => setShowDeleteMultipleQuestions(true)}
+                isDisabled={selectedQuestions.size === 0}
               >
                 Usuń zaznaczone pytania
               </Button>
@@ -138,7 +142,13 @@ export default function QuestionsPage() {
           isHeaderSticky
           selectedKeys={selectedQuestions}
           onSelectionChange={(keys) => {
-            setSelectedQuestions(new Set([...keys].map(String)));
+            if (keys === "all") {
+              setSelectedQuestions(new Set(questions.map((q) => String(q.id))));
+            } else if (keys === undefined) {
+              setSelectedQuestions(new Set());
+            } else {
+              setSelectedQuestions(new Set([...keys].map(String)));
+            }
           }}
         >
           <TableHeader>
@@ -177,7 +187,10 @@ export default function QuestionsPage() {
       />
       <CreateQuestion
         isOpen={showAddQuestion}
-        onClose={() => setShowAddQuestion(false)}
+        onClose={() => {
+          setShowAddQuestion(false);
+          setSelectedQuestions(new Set());
+        }}
         handleCreateQuestion={createQuestion}
         handleLoadQuestion={handleFetchQuestions}
       />
@@ -189,7 +202,23 @@ export default function QuestionsPage() {
       <ImportQuestionsModal
         isOpen={showImportQuestions}
         onClose={() => setShowImportQuestions(false)}
-        onSuccess={handleFetchQuestions}
+        onSuccess={() => {
+          handleFetchQuestions();
+          setSelectedQuestions(new Set());
+          setShowImportQuestions(false);
+        }}
+      />
+      <DeleteMultipleQuestionsModal
+        isOpen={showDeleteMultipleQuestions}
+        onClose={() => setShowDeleteMultipleQuestions(false)}
+        onSuccess={() => {
+          handleFetchQuestions();
+          setSelectedQuestions(new Set());
+          setIsSelectingQuestions(false);
+        }}
+        selectedQuestions={questions.filter((question) =>
+          selectedQuestions.has(String(question.id)),
+        )}
       />
     </div>
   );
