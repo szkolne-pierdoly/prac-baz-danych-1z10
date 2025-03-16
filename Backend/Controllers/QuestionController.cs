@@ -91,21 +91,27 @@ public class QuestionController : ControllerBase
       }
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteQuestion(int id)
+    [HttpDelete("{ids}")]
+    public async Task<IActionResult> DeleteQuestion(string ids)
     {
-      var result = await _questionService.DeleteQuestion(id);
-
-      if (result.IsSuccess) {
-        return Ok(new {
-            Status = result.Status,
-            Message = result.Message ?? "Question deleted successfully"
-        });
-      } else {
-        return StatusCode(result.HttpStatusCode ?? 500, new {
-            Status = result.Status,
-            Message = result.Message ?? "Something went wrong, please try again later."
-        });
+      IActionResult result;
+      if (ids.Contains(','))
+      {
+        var multiResult = await _questionService.DeleteMultipleQuestions(ids);
+        result = multiResult.IsSuccess ? Ok(new { Status = multiResult.Status, Message = multiResult.Message ?? "Questions deleted successfully" }) : StatusCode(multiResult.HttpStatusCode ?? 500, new { Status = multiResult.Status, Message = multiResult.Message ?? "Something went wrong, please try again later." });
       }
+      else
+      {
+        if (int.TryParse(ids, out int id))
+        {
+          var singleResult = await _questionService.DeleteQuestion(id);
+          result = singleResult.IsSuccess ? Ok(new { Status = singleResult.Status, Message = singleResult.Message ?? "Question deleted successfully" }) : StatusCode(singleResult.HttpStatusCode ?? 500, new { Status = singleResult.Status, Message = singleResult.Message ?? "Something went wrong, please try again later." });
+        }
+        else
+        {
+          result = StatusCode(400, new { Status = "ERROR", Message = "Invalid question ID format." });
+        }
+      }
+      return result;
     }
 }

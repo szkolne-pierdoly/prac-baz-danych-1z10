@@ -11,4 +11,5 @@ public interface IQuestionRepository
     Task<IEnumerable<Question>> GetAllQuestions();
     Task UpdateQuestion(Question question);
     Task DeleteQuestion(int id);
+    Task DeleteMultipleQuestions(int[] ids);
 }

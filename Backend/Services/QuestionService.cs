@@ -212,5 +212,56 @@ public class QuestionService : IQuestionService
             };
         }
     }
+
+    public async Task<BaseResult> DeleteMultipleQuestions(string ids)
+    {
+        try
+        {
+            if (string.IsNullOrEmpty(ids))
+            {
+                return new BaseResult {
+                  IsSuccess = false,
+                  Status = "ERROR",
+                  Message = "No IDs provided"
+                };
+            } 
+
+            var idStrings = ids.Split(',');
+            if (idStrings.Length == 0) {
+                return new BaseResult {
+                  IsSuccess = false,
+                  Status = "ERROR",
+                  Message = "No IDs provided"
+                };
+            }
+
+            if (!idStrings.All(idStr => int.TryParse(idStr, out _)))
+            {
+                return new BaseResult
+                {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Invalid IDs format. Please provide comma-separated integers."
+                };
+            }
+
+            var idsArray = idStrings.Select(int.Parse).ToArray();
+            await _questionRepository.DeleteMultipleQuestions(idsArray);
+
+            return new BaseResult {
+              IsSuccess = true,
+              Status = "SUCCESS",
+              Message = "Questions deleted successfully"
+            };
+        } 
+        catch (Exception ex)
+        {
+            return new BaseResult {
+              IsSuccess = false,
+              Status = "ERROR",
+              Message = ex.Message  
+            };
+        }
+    }
 }
 

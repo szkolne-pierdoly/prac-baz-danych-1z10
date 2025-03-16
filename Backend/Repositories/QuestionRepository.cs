@@ -51,4 +51,11 @@ public class QuestionRepository : IQuestionRepository
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task DeleteMultipleQuestions(int[] ids)
+    {
+        var questions = await _context.Questions.Where(q => ids.Contains(q.Id)).ToListAsync();
+        _context.Questions.RemoveRange(questions);
+        await _context.SaveChangesAsync();
+    }
 }

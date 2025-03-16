@@ -10,4 +10,5 @@ public interface IQuestionService
     Task<GetAllQuestionsResult> GetAllQuestions();
     Task<UpdateQuestionResult> UpdateQuestion(UpdateQuestionRequest request, int id);
     Task<BaseResult> DeleteQuestion(int id);
+    Task<BaseResult> DeleteMultipleQuestions(string ids);
 }
