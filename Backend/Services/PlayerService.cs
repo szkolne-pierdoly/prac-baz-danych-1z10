@@ -20,7 +20,11 @@ public class PlayerService : IPlayerService
     {
         try
         {
-            var player = new Player { Name = request.Name };
+            string color = string.Format("#{0:X2}{1:X2}{2:X2}", new Random().Next(256), new Random().Next(256), new Random().Next(256));
+            var player = new Player {
+                Name = request.Name,
+                Color = color
+            };
             var createdPlayer = await _playerRepository.CreatePlayer(player);
 
             return new CreatePlayerResult
