@@ -65,6 +65,33 @@ export async function createQuestion(
   };
 }
 
+export async function importQuestions(file: File): Promise<{
+  isSuccess: boolean;
+  message: string;
+}> {
+  const formData = new FormData();
+  formData.append("File", file);
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/questions/import`,
+    {
+      method: "POST",
+      body: formData,
+    },
+  );
+
+  console.error(await res.json());
+
+  if (!res.ok) {
+    return {
+      isSuccess: false,
+      message: `Failed to import questions: ${res.statusText}`,
+    };
+  }
+
+  return { isSuccess: true, message: "Questions imported successfully" };
+}
+
 export async function updateQuestion(question: Question): Promise<{
   isSuccess: boolean;
   message: string;
