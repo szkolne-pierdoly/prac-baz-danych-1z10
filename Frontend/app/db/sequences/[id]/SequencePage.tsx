@@ -44,9 +44,6 @@ export default function SequenceClientPage({
   const [isLoading, setIsLoading] = useState(false);
 
   const [editingSequenceName, setEditingSequenceName] = useState("");
-  const [editingSequenceQuestionsId, setEditingSequenceQuestionsId] = useState<
-    number[]
-  >([]);
 
   const [sequence, setSequence] = useState<Sequence | null>(null);
 
@@ -79,11 +76,7 @@ export default function SequenceClientPage({
   };
 
   const handleSaveUpdate = async (): Promise<string> => {
-    if (
-      questions.length === 0 ||
-      editingSequenceName === "" ||
-      !editingSequenceName
-    ) {
+    if (editingSequenceName === "" || !editingSequenceName) {
       return "EMPTY";
     }
     if (sequence) {
@@ -91,11 +84,15 @@ export default function SequenceClientPage({
       const result = await updateSequence(
         sequence.id,
         editingSequenceName,
-        editingSequenceQuestionsId,
+        questions
+          .filter((question) => !question.isDeleted)
+          .map((question) => question.question.id),
       );
       if (result.isSuccess) {
         setIsEditing(false);
         setIsLoading(false);
+        setSelectedQuestions(undefined);
+        getSequence();
         return "SUCCESS";
       }
       setIsLoading(false);
@@ -108,8 +105,12 @@ export default function SequenceClientPage({
     if (sequence) {
       setIsEditing(true);
       setEditingSequenceName(sequence.name);
-      setEditingSequenceQuestionsId(
-        sequence.questions.map((question) => question.id),
+      setQuestions(
+        sequence.questions.map((question) => ({
+          question: question,
+          isDeleted: false,
+          isAdded: false,
+        })),
       );
     }
   };
@@ -118,9 +119,6 @@ export default function SequenceClientPage({
     if (sequence) {
       setIsEditing(false);
       setEditingSequenceName(sequence.name);
-      setEditingSequenceQuestionsId(
-        sequence.questions.map((question) => question.id),
-      );
       setQuestions(
         sequence.questions.map((question) => ({
           question: question,
@@ -167,10 +165,6 @@ export default function SequenceClientPage({
       return [...updatedPrevQuestions, ...newQuestionObjects];
     });
     setIsLoading(true);
-    setEditingSequenceQuestionsId([
-      ...editingSequenceQuestionsId,
-      ...questions.map((question) => question.id),
-    ]);
     setIsAddQuestionModalOpen(false);
     setIsLoading(false);
   };
@@ -199,15 +193,13 @@ export default function SequenceClientPage({
     const selectedIdsToAdd = Array.from(selectedQuestions ?? []).map((item) =>
       parseInt(item as string, 10),
     );
-    const updatedEditingSequenceQuestionsId = [
-      ...(editingSequenceQuestionsId || []),
-    ];
-    selectedIdsToAdd.forEach((idToAdd) => {
-      if (!updatedEditingSequenceQuestionsId.includes(idToAdd)) {
-        updatedEditingSequenceQuestionsId.push(idToAdd);
-      }
-    });
-    setEditingSequenceQuestionsId(updatedEditingSequenceQuestionsId);
+    setQuestions(
+      questions.map((question) =>
+        selectedIdsToAdd.includes(question.question.id)
+          ? { ...question, isDeleted: false }
+          : question,
+      ),
+    );
   };
 
   const [selectedQuestions, setSelectedQuestions] = useState<
@@ -285,8 +277,10 @@ export default function SequenceClientPage({
               {Array.from(selectedQuestions ?? []).length > 0 &&
               Array.from(selectedQuestions ?? []).every(
                 (selectedQuestionId) =>
-                  !editingSequenceQuestionsId?.includes(
-                    parseInt(selectedQuestionId as string, 10),
+                  !questions.some(
+                    (question) =>
+                      question.question.id ===
+                      parseInt(selectedQuestionId as string, 10),
                   ),
               ) ? (
                 <Button variant="flat" color="primary" onPress={handleRecover}>
@@ -337,7 +331,9 @@ export default function SequenceClientPage({
       <AddQuestionModal
         isOpen={isAddQuestionModalOpen}
         onClose={() => setIsAddQuestionModalOpen(false)}
-        includedQuestionIds={editingSequenceQuestionsId ?? []}
+        includedQuestionIds={questions
+          .filter((question) => !question.isDeleted)
+          .map((question) => question.question.id)}
         handleAddQuestions={handleAddQuestions}
       />
       <Modal
