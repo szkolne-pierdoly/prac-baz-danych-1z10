@@ -30,7 +30,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col items-center justify-start h-screen py-4 gap-4 px-2 max-h-screen overflow-y-hidden">
-      <Card className="w-full flex flex-row items-start justify-start max-w-5xl h-[64px] sticky top-0 z-10">
+      <Card className="w-full flex flex-row items-start justify-start max-w-5xl h-[64px] min-h-[64px] sticky top-0 z-10">
         <CardBody className="flex flex-row items-center justify-between gap-2">
           <div className="flex flex-row items-center justify-center gap-2">
             <Button
