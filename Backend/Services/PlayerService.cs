@@ -1,4 +1,5 @@
 
+using System.Text.RegularExpressions;
 using Backend.Data.Models;
 using Backend.Interface.Repositories;
 using Backend.Interface.Services;
@@ -98,6 +99,16 @@ public class PlayerService : IPlayerService
     {
         try
         {
+            if (request.Color != null && !Regex.IsMatch(request.Color, "^[0-9a-fA-F]{6}$"))
+            {
+                return new BaseResult
+                {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Invalid color format. Color must be a 6-character hex code (e.g., 000000 or ffffff)."
+                };
+            }
+
             var player = await _playerRepository.GetPlayerById(id);
             if (player == null)
             {
@@ -119,7 +130,7 @@ public class PlayerService : IPlayerService
             {
                 player.Color = request.Color;
             }
-            
+
             await _playerRepository.UpdatePlayer(player);
 
             return new BaseResult
