@@ -110,6 +110,16 @@ public class PlayerService : IPlayerService
             }
 
             player.Name = request.Name;
+            if (request.Color == "random")
+            {
+                string color = string.Format("#{0:X2}{1:X2}{2:X2}", new Random().Next(256), new Random().Next(256), new Random().Next(256));
+                player.Color = color;
+            }
+            else if (request.Color != null)
+            {
+                player.Color = request.Color;
+            }
+            
             await _playerRepository.UpdatePlayer(player);
 
             return new BaseResult
