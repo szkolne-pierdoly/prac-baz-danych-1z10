@@ -9,7 +9,15 @@ export async function getPlayers(): Promise<{
 }> {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/players`);
   const data = await res.json();
-  return data;
+  if (!res.ok) {
+    return { isSuccess: false, message: "Failed to get players" };
+  }
+
+  return {
+    isSuccess: true,
+    message: "Players fetched successfully",
+    players: data.players,
+  };
 }
 
 export async function createPlayer(player: Player): Promise<{
@@ -26,8 +34,14 @@ export async function createPlayer(player: Player): Promise<{
     return { isSuccess: false, message: "Failed to create player" };
   }
 
-  const data = await res.json();
-  return data;
+  if (!res.ok) {
+    return { isSuccess: false, message: "Failed to create player" };
+  }
+
+  return {
+    isSuccess: true,
+    message: "Player created successfully",
+  };
 }
 
 export async function updatePlayer(player: Player): Promise<{
@@ -48,7 +62,16 @@ export async function updatePlayer(player: Player): Promise<{
   }
 
   const data = await res.json();
-  return data;
+
+  if (!res.ok) {
+    return { isSuccess: false, message: "Failed to update player" };
+  }
+
+  return {
+    isSuccess: true,
+    message: "Player updated successfully",
+    player: data.player,
+  };
 }
 
 export async function getPlayerById(id: number): Promise<{
@@ -65,9 +88,17 @@ export async function getPlayerById(id: number): Promise<{
   }
 
   const data = await res.json();
-  return data;
-}
 
+  if (!res.ok) {
+    return { isSuccess: false, message: "Failed to get player by id" };
+  }
+
+  return {
+    isSuccess: true,
+    message: "Player fetched successfully",
+    player: data.player,
+  };
+}
 export async function deletePlayer(id: number): Promise<{
   isSuccess: boolean;
   message: string;
@@ -83,8 +114,10 @@ export async function deletePlayer(id: number): Promise<{
     return { isSuccess: false, message: "Failed to delete player" };
   }
 
-  const data = await res.json();
-  return data;
+  return {
+    isSuccess: true,
+    message: "Player deleted successfully",
+  };
 }
 
 export async function deleteMultiplePlayers(ids: number[]): Promise<{
@@ -103,6 +136,8 @@ export async function deleteMultiplePlayers(ids: number[]): Promise<{
     return { isSuccess: false, message: "Failed to delete multiple players" };
   }
 
-  const data = await res.json();
-  return data;
+  return {
+    isSuccess: true,
+    message: "Players deleted successfully",
+  };
 }
