@@ -24,11 +24,12 @@ import {
   deleteQuestion,
 } from "@/app/actions/question";
 import EditQuestionModal from "@/app/components/editQuestionModal";
+import ImportQuestionsModel from "@/app/components/importQuestionsModel";
 
 export default function QuestionsPage() {
   const [showAddQuestion, setShowAddQuestion] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
-
+  const [showImportQuestions, setShowImportQuestions] = useState(false);
   const [isSavingUpdate, setIsSavingUpdate] = useState(false);
   const [isDeletingQuestion, setIsDeletingQuestion] = useState(false);
 
@@ -75,8 +76,8 @@ export default function QuestionsPage() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start h-screen py-4 gap-4 px-2">
-      <Card className="w-full flex flex-row items-start justify-start max-w-5xl">
+    <div className="flex flex-col items-center justify-start h-screen w-screen max-h-screen max-w-screen py-4 gap-4 px-2">
+      <Card className="w-full flex flex-row items-start justify-start max-w-5xl h-[64px] min-h-[64px]">
         <CardBody className="flex flex-row items-center justify-between gap-2">
           <div className="flex flex-row items-center justify-center gap-2">
             <Button
@@ -91,6 +92,13 @@ export default function QuestionsPage() {
           </div>
           <div className="flex flex-row items-center justify-center gap-2">
             <Button
+              variant="light"
+              color="default"
+              onPress={() => setShowImportQuestions(true)}
+            >
+              Zaimportuj z pliku
+            </Button>
+            <Button
               variant="flat"
               color="primary"
               onPress={() => setShowAddQuestion(true)}
@@ -100,8 +108,8 @@ export default function QuestionsPage() {
           </div>
         </CardBody>
       </Card>
-      <div className="w-full flex flex-col items-start justify-start max-w-4xl">
-        <Table selectionMode="single">
+      <div className="w-full flex flex-col items-start justify-start max-w-4xl overflow-auto max-h-[calc(100vh-64px)]">
+        <Table selectionMode="single" className="w-full h-full" isHeaderSticky>
           <TableHeader>
             <TableColumn>ID</TableColumn>
             <TableColumn>Treść</TableColumn>
@@ -145,6 +153,11 @@ export default function QuestionsPage() {
           <Spinner />
         </div>
       )}
+      <ImportQuestionsModel
+        isOpen={showImportQuestions}
+        onClose={() => setShowImportQuestions(false)}
+        onSuccess={handleFetchQuestions}
+      />
     </div>
   );
 }
