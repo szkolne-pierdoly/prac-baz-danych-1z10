@@ -62,19 +62,49 @@ public class PlayerController : ControllerBase
         }
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetPlayerById(int id)
+    {
+        var result = await _playerService.GetPlayerById(id);
+        if (result.IsSuccess)
+        {
+            return Ok(new
+            {
+                result.Status,
+                Message = result.Message ?? "Player fetched successfully",
+                Player = result.Player
+            });
+        }
+        else
+        {
+            return StatusCode(result.HttpStatusCode ?? 500, new
+            {
+                result.Status,
+                Message = result.Message ?? "Something went wrong, please try again later."
+            });
+        }
+    }
+
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdatePlayer(int id, [FromBody] UpdatePlayerRequest request)
     {
         var result = await _playerService.UpdatePlayer(request, id);
-        return result.IsSuccess ? Ok(new
+        if (result.IsSuccess)
         {
-            result.Status,
-            Message = result.Message ?? "Player updated successfully"
-        }) : StatusCode(result.HttpStatusCode ?? 500, new
+            return Ok(new
+            {
+                result.Status,
+                Message = result.Message ?? "Player updated successfully"
+            });
+        }
+        else
         {
-            result.Status,
-            Message = result.Message ?? "Something went wrong, please try again later."
-        });
+            return StatusCode(result.HttpStatusCode ?? 500, new
+            {
+                result.Status,
+                Message = result.Message ?? "Something went wrong, please try again later."
+            });
+        }
     }
 
     [HttpDelete("{ids}")]
@@ -84,18 +114,52 @@ public class PlayerController : ControllerBase
         if (ids.Contains(','))
         {
             var multiResult = await _playerService.DeleteMultiplePlayers(ids.Split(',').Select(int.Parse).ToArray());
-            result = multiResult.IsSuccess ? Ok(new { Status = multiResult.Status, Message = multiResult.Message ?? "Players deleted successfully" }) : StatusCode(multiResult.HttpStatusCode ?? 500, new { Status = multiResult.Status, Message = multiResult.Message ?? "Something went wrong, please try again later." });
+            if (multiResult.IsSuccess)
+            {
+                result = Ok(new
+                {
+                    Status = multiResult.Status,
+                    Message = multiResult.Message ?? "Players deleted successfully"
+                });
+            }
+            else
+            {
+                result = StatusCode(multiResult.HttpStatusCode ?? 500, new
+                {
+                    Status = multiResult.Status,
+                    Message = multiResult.Message ?? "Something went wrong, please try again later."
+                });
+            }
         }
         else
         {
             if (int.TryParse(ids, out int id))
             {
                 var singleResult = await _playerService.DeletePlayer(id);
-                result = singleResult.IsSuccess ? Ok(new { Status = singleResult.Status, Message = singleResult.Message ?? "Player deleted successfully" }) : StatusCode(singleResult.HttpStatusCode ?? 500, new { Status = singleResult.Status, Message = singleResult.Message ?? "Something went wrong, please try again later." });
+                if (singleResult.IsSuccess)
+                {
+                    result = Ok(new
+                    {
+                        Status = singleResult.Status,
+                        Message = singleResult.Message ?? "Player deleted successfully"
+                    });
+                }
+                else
+                {
+                    result = StatusCode(singleResult.HttpStatusCode ?? 500, new
+                    {
+                        Status = singleResult.Status,
+                        Message = singleResult.Message ?? "Something went wrong, please try again later."
+                    });
+                }
             }
             else
             {
-                result = StatusCode(400, new { Status = "ERROR", Message = "Invalid player ID format." });
+                result = StatusCode(400, new
+                {
+                    Status = "ERROR",
+                    Message = "Invalid player ID format."
+                });
             }
         }
         return result;
