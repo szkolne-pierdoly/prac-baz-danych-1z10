@@ -2,8 +2,27 @@
 
 import { Card, CardBody, Divider } from "@heroui/react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { getStats } from "./actions/other";
 
 export default function Home() {
+  const [stats, setStats] = useState<{
+    totalQuestions: number;
+    totalSequences: number;
+    totalPlayers: number;
+    totalGames: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const result = await getStats();
+      if (result.isSuccess && result.data) {
+        setStats(result.data);
+      }
+    };
+    fetchStats();
+  }, []);
+
   const router = useRouter();
   return (
     <div className="flex h-screen w-screen flex-col items-center justify-center">
@@ -24,7 +43,9 @@ export default function Home() {
               onPress={() => router.push("/db/questions")}
             >
               <CardBody>
-                <div className="text-2xl font-bold">Pytania: 17</div>
+                <div className="text-2xl font-bold">
+                  Pytania: {stats?.totalQuestions ?? "-"}
+                </div>
               </CardBody>
             </Card>
             <Card
@@ -33,7 +54,9 @@ export default function Home() {
               onPress={() => router.push("/db/sequences")}
             >
               <CardBody>
-                <div className="text-2xl font-bold">Sekwencje: 4</div>
+                <div className="text-2xl font-bold">
+                  Sekwencje: {stats?.totalSequences ?? "-"}
+                </div>
               </CardBody>
             </Card>
             <Card
@@ -42,12 +65,16 @@ export default function Home() {
               onPress={() => router.push("/db/players")}
             >
               <CardBody>
-                <div className="text-2xl font-bold">Gracze: 2</div>
+                <div className="text-2xl font-bold">
+                  Gracze: {stats?.totalPlayers ?? "-"}
+                </div>
               </CardBody>
             </Card>
             <Card className="w-full max-w-[25%] min-w-[100px]" isPressable>
               <CardBody>
-                <div className="text-2xl font-bold">Gry: 4</div>
+                <div className="text-2xl font-bold">
+                  Gry: {stats?.totalGames ?? "-"}
+                </div>
               </CardBody>
             </Card>
           </div>
