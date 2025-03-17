@@ -21,7 +21,7 @@ public class ApiController : ControllerBase
         return Ok("Hello World");
     }
 
-    [HttpGet("/stats")]
+    [HttpGet("/api/stats")]
     public async Task<IActionResult> GetStats()
     {
         var stats = await _apiService.GetStats();
