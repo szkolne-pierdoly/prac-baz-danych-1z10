@@ -40,7 +40,10 @@ export default function PlayersPage() {
                   size="lg"
                 />
               </div>
-              <div className="mt-2 text-xl font-bold">{player.name}</div>
+              <div className="mt-2 text-center">
+                <div className="text-xl font-bold">{player.name}</div>
+                <div className="text-gray-400 text-sm">ID: {player.id}</div>
+              </div>
             </CardBody>
           </Card>
         ))}

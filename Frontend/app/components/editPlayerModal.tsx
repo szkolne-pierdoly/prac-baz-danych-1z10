@@ -1,6 +1,16 @@
 "use client";
 
-import { Avatar, Button, Divider, Input, Modal, ModalBody, ModalCModalFooter, ontent, ModalHeader, ModalContent, ModalFooter } from "@heroui/react";
+import {
+  Avatar,
+  Button,
+  Divider,
+  Input,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  ModalContent,
+  ModalFooter,
+} from "@heroui/react";
 import { Player } from "../models/Player";
 import { useEffect, useState } from "react";
 import { updatePlayer } from "../actions/player";
@@ -76,7 +86,10 @@ export default function EditPlayerModal({
             style={{ backgroundColor: color }}
           />
           <div className="flex flex-col items-start justify-start">
-            <div className="text-2xl font-bold">{name}</div>
+            <div>
+              <div className="text-2xl font-bold">{name}</div>
+              <div className="text-gray-400 text-sm">ID: {player?.id}</div>
+            </div>
           </div>
         </ModalBody>
         <Divider />
