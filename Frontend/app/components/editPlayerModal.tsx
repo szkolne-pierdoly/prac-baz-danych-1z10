@@ -13,7 +13,7 @@ import {
 } from "@heroui/react";
 import { Player } from "../models/Player";
 import { useEffect, useState } from "react";
-import { updatePlayer } from "../actions/player";
+import { deletePlayer, updatePlayer } from "../actions/player";
 
 export default function EditPlayerModal({
   player,
@@ -30,16 +30,33 @@ export default function EditPlayerModal({
   const [color, setColor] = useState(player?.color);
   const [nameError, setNameError] = useState(false);
   const [colorError, setColorError] = useState(false);
+  const [isDeleteConfirm, setIsDeleteConfirm] = useState(false);
 
   useEffect(() => {
     setName(player?.name);
     setColor(player?.color);
   }, [player]);
 
+  const handleDelete = () => {
+    if (!player?.id) {
+      return;
+    }
+    deletePlayer(player.id).then((res) => {
+      if (res.isSuccess) {
+        setIsDeleteConfirm(false);
+        setName("");
+        setColor("");
+        onSuccess();
+        onClose();
+      }
+    });
+  };
+
   const handleClose = () => {
     setName("");
     setColor("");
     onClose();
+    setIsDeleteConfirm(false);
   };
 
   const handleSave = () => {
@@ -75,7 +92,7 @@ export default function EditPlayerModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <ModalContent>
         <ModalHeader>Edytuj gracza</ModalHeader>
         <Divider />
@@ -133,7 +150,40 @@ export default function EditPlayerModal({
             Zapisz
           </Button>
         </ModalFooter>
+        <Divider />
+        <ModalFooter className="flex flex-row items-center justify-center">
+          <Button
+            variant="light"
+            color="danger"
+            onPress={() => setIsDeleteConfirm(true)}
+          >
+            Usuń gracza
+          </Button>
+        </ModalFooter>
       </ModalContent>
+      <Modal
+        isOpen={isDeleteConfirm}
+        onClose={() => setIsDeleteConfirm(false)}
+        size="lg"
+      >
+        <ModalContent>
+          <ModalHeader>Usuń gracza</ModalHeader>
+          <Divider />
+          <ModalBody>
+            <div>Czy na pewno chcesz usunąć tego gracza permanentnie?</div>
+            <div>
+              <Button
+                variant="flat"
+                color="danger"
+                onPress={handleDelete}
+                className="w-full"
+              >
+                Usuń gracza
+              </Button>
+            </div>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Modal>
   );
 }
