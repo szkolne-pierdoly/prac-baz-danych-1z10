@@ -54,4 +54,9 @@ public class PlayerRepository : IPlayerRepository
         _context.Players.RemoveRange(players);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<int> GetTotalPlayers()
+    {
+        return await _context.Players.CountAsync();
+    }
 }

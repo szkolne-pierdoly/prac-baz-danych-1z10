@@ -58,4 +58,9 @@ public class QuestionRepository : IQuestionRepository
         _context.Questions.RemoveRange(questions);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<int> GetTotalQuestions()
+    {
+        return await _context.Questions.CountAsync();
+    }
 }

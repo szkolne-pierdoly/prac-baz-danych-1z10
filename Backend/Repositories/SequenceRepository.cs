@@ -45,4 +45,9 @@ public class SequenceRepository : ISequenceRepository
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task<int> GetTotalSequences()
+    {
+        return await _context.Sequences.CountAsync();
+    }
 }

@@ -12,4 +12,5 @@ public interface IQuestionRepository
     Task UpdateQuestion(Question question);
     Task DeleteQuestion(int id);
     Task DeleteMultipleQuestions(int[] ids);
+    Task<int> GetTotalQuestions();
 }

@@ -10,4 +10,5 @@ public interface ISequenceRepository
     Task<Sequence?> GetSequenceById(int id);
     Task UpdateSequence(Sequence sequence);
     Task DeleteSequence(int id);
+    Task<int> GetTotalSequences();
 }
