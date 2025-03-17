@@ -21,9 +21,9 @@ export default function PlayersPage() {
   }, []);
 
   return (
-    <div className="flex flex-row items-start justify-start w-full h-full gap-4">
+    <div className="flex flex-wrap items-start justify-center w-full gap-4">
       {players.map((player) => (
-        <Card key={player.id} className="min-w-64 w-full p-2">
+        <Card key={player.id} className="min-w-64 max-w-[33vw] p-2">
           <CardBody className="flex flex-col items-center justify-center">
             <div className="flex flex-row items-center justify-center">
               <Avatar
