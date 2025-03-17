@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody } from "@heroui/react";
+import { Card, CardBody, Divider } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { Sequence } from "../../models/Sequence";
 import { useState, useEffect } from "react";
@@ -34,12 +34,17 @@ export default function SequencesPage() {
           >
             <CardBody className="flex flex-col items-start justify-start gap-2">
               <div className="text-2xl font-bold">{sequence.name}</div>
-              <div className="flex flex-row items-center justify-between gap-2">
+              <div className="flex flex-row items-center justify-between gap-2 h-4">
                 <div className="text-sm text-gray-500">
-                  Ilość pytań: {sequence.questions.length ?? 0}
+                  Pierwsza część: {sequence.part1Questions.length} pytań
                 </div>
+                <Divider orientation="vertical" />
                 <div className="text-sm text-gray-500">
-                  Ilość gier: {sequence.questions.length ?? 0}
+                  Druga część: {sequence.part2Questions.length} pytań
+                </div>
+                <Divider orientation="vertical" />
+                <div className="text-sm text-gray-500">
+                  Trzecia część: {sequence.part3Questions.length} pytań
                 </div>
               </div>
             </CardBody>

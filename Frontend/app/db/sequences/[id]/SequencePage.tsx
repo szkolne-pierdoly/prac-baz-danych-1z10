@@ -47,8 +47,29 @@ export default function SequenceClientPage({
 
   const [sequence, setSequence] = useState<Sequence | null>(null);
 
-  const [questions, setQuestions] = useState<
-    { question: Question; isDeleted: boolean; isAdded: boolean }[]
+  const [part1Questions, setPart1Questions] = useState<
+    {
+      question: Question;
+      isDeleted: boolean;
+      isAdded: boolean;
+      index: number;
+    }[]
+  >([]);
+  const [part2Questions, setPart2Questions] = useState<
+    {
+      question: Question;
+      isDeleted: boolean;
+      isAdded: boolean;
+      index: number;
+    }[]
+  >([]);
+  const [part3Questions, setPart3Questions] = useState<
+    {
+      question: Question;
+      isDeleted: boolean;
+      isAdded: boolean;
+      index: number;
+    }[]
   >([]);
 
   const router = useRouter();
@@ -61,13 +82,30 @@ export default function SequenceClientPage({
     if (sequenceId) {
       setIsLoading(true);
       const result = await getSequenceAction(sequenceId);
+      console.log(result);
       if (result.isSuccess) {
-        setSequence(result.sequence ?? null);
-        setQuestions(
-          result.sequence?.questions.map((question) => ({
-            question: question,
+        setPart1Questions(
+          result.sequence?.part1Questions.map((question) => ({
+            question: question.question,
             isDeleted: false,
             isAdded: false,
+            index: question.order,
+          })) ?? [],
+        );
+        setPart2Questions(
+          result.sequence?.part2Questions.map((question) => ({
+            question: question.question,
+            isDeleted: false,
+            isAdded: false,
+            index: question.order,
+          })) ?? [],
+        );
+        setPart3Questions(
+          result.sequence?.part3Questions.map((question) => ({
+            question: question.question,
+            isDeleted: false,
+            isAdded: false,
+            index: question.order,
           })) ?? [],
         );
       }
@@ -84,7 +122,7 @@ export default function SequenceClientPage({
       const result = await updateSequence(
         sequence.id,
         editingSequenceName,
-        questions
+        part1Questions
           .filter((question) => !question.isDeleted)
           .map((question) => question.question.id),
       );
@@ -105,11 +143,12 @@ export default function SequenceClientPage({
     if (sequence) {
       setIsEditing(true);
       setEditingSequenceName(sequence.name);
-      setQuestions(
-        sequence.questions.map((question) => ({
-          question: question,
+      setPart1Questions(
+        sequence.part1Questions.map((question) => ({
+          question: question.question,
           isDeleted: false,
           isAdded: false,
+          index: question.order,
         })),
       );
     }
@@ -119,11 +158,12 @@ export default function SequenceClientPage({
     if (sequence) {
       setIsEditing(false);
       setEditingSequenceName(sequence.name);
-      setQuestions(
-        sequence.questions.map((question) => ({
-          question: question,
+      setPart1Questions(
+        sequence.part1Questions.map((question) => ({
+          question: question.question,
           isDeleted: false,
           isAdded: false,
+          index: question.order,
         })),
       );
       setSelectedQuestions(undefined);
@@ -131,7 +171,7 @@ export default function SequenceClientPage({
   };
 
   const handleAddQuestions = (questions: Question[]) => {
-    setQuestions((prevQuestions) => {
+    setPart1Questions((prevQuestions) => {
       const existingQuestionIdMap = new Map<number, number>();
       prevQuestions.forEach((q, index) => {
         existingQuestionIdMap.set(q.question.id, index);
@@ -140,6 +180,7 @@ export default function SequenceClientPage({
         question: Question;
         isDeleted: boolean;
         isAdded: boolean;
+        index: number;
       }[] = [];
 
       const updatedPrevQuestions = [...prevQuestions]; // Create a copy to avoid direct mutation
@@ -159,6 +200,7 @@ export default function SequenceClientPage({
             question: q,
             isDeleted: false,
             isAdded: false,
+            index: updatedPrevQuestions.length,
           });
         }
       });
@@ -173,7 +215,7 @@ export default function SequenceClientPage({
     const itemsToDelete = Array.from(selectedQuestions ?? []).map((item) =>
       parseInt(item as string, 10),
     );
-    setQuestions((prevQuestions) =>
+    setPart1Questions((prevQuestions) =>
       prevQuestions.map((q) =>
         itemsToDelete.includes(q.question.id) ? { ...q, isDeleted: true } : q,
       ),
@@ -193,8 +235,8 @@ export default function SequenceClientPage({
     const selectedIdsToAdd = Array.from(selectedQuestions ?? []).map((item) =>
       parseInt(item as string, 10),
     );
-    setQuestions(
-      questions.map((question) =>
+    setPart1Questions(
+      part1Questions.map((question) =>
         selectedIdsToAdd.includes(question.question.id)
           ? { ...question, isDeleted: false }
           : question,
@@ -254,7 +296,7 @@ export default function SequenceClientPage({
               <TableColumn>Odpowiedź</TableColumn>
             </TableHeader>
             <TableBody>
-              {questions.map((question) => (
+              {part1Questions.map((question) => (
                 <TableRow
                   key={question.question.id}
                   className={
@@ -263,7 +305,7 @@ export default function SequenceClientPage({
                       : ""
                   }
                 >
-                  <TableCell>{question.question.id}</TableCell>
+                  <TableCell>{question.index}</TableCell>
                   <TableCell>{question.question.content}</TableCell>
                   <TableCell>{question.question.hint}</TableCell>
                   <TableCell>{question.question.hint2 ?? "-"}</TableCell>
@@ -277,7 +319,7 @@ export default function SequenceClientPage({
               {Array.from(selectedQuestions ?? []).length > 0 &&
               Array.from(selectedQuestions ?? []).every(
                 (selectedQuestionId) =>
-                  !questions.some(
+                  !part1Questions.some(
                     (question) =>
                       question.question.id ===
                       parseInt(selectedQuestionId as string, 10),
@@ -331,7 +373,7 @@ export default function SequenceClientPage({
       <AddQuestionModal
         isOpen={isAddQuestionModalOpen}
         onClose={() => setIsAddQuestionModalOpen(false)}
-        includedQuestionIds={questions
+        includedQuestionIds={part1Questions
           .filter((question) => !question.isDeleted)
           .map((question) => question.question.id)}
         handleAddQuestions={handleAddQuestions}
