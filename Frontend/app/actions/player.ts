@@ -49,18 +49,28 @@ export async function createPlayer(name: string): Promise<{
   };
 }
 
-export async function updatePlayer(player: Player): Promise<{
+export async function updatePlayer(
+  id: number,
+  name: string,
+  color: string,
+): Promise<{
   isSuccess: boolean;
   message: string;
   player?: Player;
 }> {
+  console.log(name, color, id);
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/players/${player.id}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/api/players/${id}`,
     {
       method: "PUT",
-      body: JSON.stringify(player),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: name, color: color }),
     },
   );
+
+  console.log(res);
 
   if (!res.ok) {
     return { isSuccess: false, message: "Failed to update player" };
