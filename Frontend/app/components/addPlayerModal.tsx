@@ -36,6 +36,7 @@ export default function AddPlayerModal({
       console.log(response);
       if (response.isSuccess) {
         onSuccess();
+        onClose();
       } else {
         onClose();
       }
