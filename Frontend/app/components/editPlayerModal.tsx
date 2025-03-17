@@ -162,7 +162,7 @@ export default function EditPlayerModal({
         </ModalFooter>
       </ModalContent>
       <Modal
-        isOpen={isDeleteConfirm}
+        isOpen={isDeleteConfirm && isOpen}
         onClose={() => setIsDeleteConfirm(false)}
         size="lg"
       >
