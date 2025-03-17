@@ -22,22 +22,9 @@ public class SequenceService : ISequenceService
     {
         try
         {
-            var questions = new List<Question>();
-            if (request.QuestionIds != null)
-            {
-                foreach (var questionId in request.QuestionIds)
-                {
-                    var question = await _questionRepository.GetQuestionById(questionId);
-                    if (question != null)
-                    {
-                        questions.Add(question);
-                    }
-                }
-            }
             var newSequence = new Sequence
             {
-                Name = request.Name,
-                Questions = questions
+                Name = request.Name
             };
             await _sequenceRepository.CreateSequence(newSequence);
             return new CreateSequenceResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequence created successfully", Sequence = newSequence };
@@ -89,16 +76,39 @@ public class SequenceService : ISequenceService
                 };
             }
             sequence.Name = request.Name;
-            var questions = new List<Question>();
-            foreach (var questionId in request.QuestionIds)
+            var questions1 = new List<SequenceQuestion>();
+            var questions2 = new List<SequenceQuestion>();
+            var questions3 = new List<SequenceQuestion>();
+            foreach (var questionId in request.Part1QuestionIds)
             {
                 var question = await _questionRepository.GetQuestionById(questionId);
                 if (question != null)
                 {
-                    questions.Add(question);
+                    questions1.Add(new SequenceQuestion { Question = question, Order = questions1.Count + 1 });
                 }
             }
-            sequence.Questions = questions;
+            sequence.Part1Questions = questions1;
+            
+            foreach (var questionId in request.Part2QuestionIds)
+            {
+                var question = await _questionRepository.GetQuestionById(questionId);
+                if (question != null)
+                {
+                    questions2.Add(new SequenceQuestion { Question = question, Order = questions2.Count + 1 });
+                }
+            }
+            sequence.Part2Questions = questions2;
+            
+            foreach (var questionId in request.Part3QuestionIds)
+            {
+                var question = await _questionRepository.GetQuestionById(questionId);
+                if (question != null)
+                {
+                    questions3.Add(new SequenceQuestion { Question = question, Order = questions3.Count + 1 });
+                }
+            }
+            sequence.Part3Questions = questions3;
+
             await _sequenceRepository.UpdateSequence(sequence);
             return new UpdateSequenceResult
             {
