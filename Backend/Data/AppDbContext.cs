@@ -40,7 +40,23 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Answer>().HasKey(a => a.Id);
 
         modelBuilder.Entity<Sequence>()
-            .HasMany(s => s.Questions)
+            .HasMany(s => s.Part1Questions)
+            .WithMany();
+
+        modelBuilder.Entity<Sequence>()
+            .HasMany(s => s.Part2Questions)
+            .WithMany();
+
+        modelBuilder.Entity<Sequence>()
+            .HasMany(s => s.Part3Questions)
+            .WithMany();
+
+        modelBuilder.Entity<SequenceQuestion>()
+            .HasOne(s => s.Question)
+            .WithMany();
+
+        modelBuilder.Entity<SequenceQuestion>()
+            .HasOne(s => s.Question)
             .WithMany();
 
         modelBuilder.Entity<Game>()
