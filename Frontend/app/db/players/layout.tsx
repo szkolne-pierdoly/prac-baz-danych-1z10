@@ -1,10 +1,11 @@
 "use client";
 
-import AddPlayerDialog from "@/app/components/addPlayerDialog";
+import AddPlayerModal from "@/app/components/addPlayerModal";
 import { Button, Card, CardBody } from "@heroui/react";
 import { HomeIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
 export default function PlayersLayout({
   children,
 }: {
@@ -36,7 +37,7 @@ export default function PlayersLayout({
       <div className="w-full h-full max-w-4xl max-h-[calc(100vh-64px)]">
         {children}
       </div>
-      <AddPlayerDialog
+      <AddPlayerModal
         isOpen={isAddPlayerDialogOpen}
         onClose={() => setIsAddPlayerDialogOpen(false)}
         onSuccess={() => setIsAddPlayerDialogOpen(false)}

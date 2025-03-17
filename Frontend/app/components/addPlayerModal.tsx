@@ -13,7 +13,7 @@ import {
 import { useState } from "react";
 import { createPlayer } from "../actions/player";
 
-export default function AddPlayerDialog({
+export default function AddPlayerModal({
   isOpen,
   onClose,
   onSuccess,
