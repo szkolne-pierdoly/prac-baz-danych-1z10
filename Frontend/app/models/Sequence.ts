@@ -1,7 +1,9 @@
-import { Question } from "./Question";
+import SequenceQuestion from "./SequenceQuestion";
 
 export interface Sequence {
   id: number;
   name: string;
-  questions: Question[];
+  part1Questions: SequenceQuestion[];
+  part2Questions: SequenceQuestion[];
+  part3Questions: SequenceQuestion[];
 }
