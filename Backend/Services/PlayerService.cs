@@ -99,13 +99,13 @@ public class PlayerService : IPlayerService
     {
         try
         {
-            if (request.Color != null && !Regex.IsMatch(request.Color, "^[0-9a-fA-F]{6}$"))
+            if (request.Color != null && !Regex.IsMatch(request.Color, "^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"))
             {
                 return new BaseResult
                 {
                     IsSuccess = false,
                     Status = "ERROR",
-                    Message = "Invalid color format. Color must be a 6-character hex code (e.g., 000000 or ffffff)."
+                    Message = "Invalid color format. Color must be a 3 or 6-character hex code (e.g., #000 or #000000)."
                 };
             }
 
