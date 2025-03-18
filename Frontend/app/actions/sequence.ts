@@ -1,6 +1,7 @@
 "use server";
 
 import { Sequence } from "../models/Sequence";
+import SequenceQuestion from "../models/SequenceQuestion";
 
 export async function createSequence(
   name: string,
@@ -86,6 +87,72 @@ export async function getSequence(id: number): Promise<{
     isSuccess: true,
     message: "Sequence fetched successfully",
     sequence: data.sequence,
+  };
+}
+
+export async function getSequenceQuestions(id: number): Promise<{
+  isSuccess: boolean;
+  message: string;
+  part1?: SequenceQuestion[];
+  part2?: SequenceQuestion[];
+  part3?: SequenceQuestion[];
+}> {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/sequences/${id}/questions`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  if (!res.ok) {
+    return { isSuccess: false, message: "Failed to get sequence questions" };
+  }
+
+  const data = await res.json();
+
+  return {
+    isSuccess: true,
+    message: "Sequence questions fetched successfully",
+    part1: data.part1,
+    part2: data.part2,
+    part3: data.part3,
+  };
+}
+
+export async function getSequenceQuestionsPart(
+  id: number,
+  part: number,
+): Promise<{
+  isSuccess: boolean;
+  message: string;
+  questions?: SequenceQuestion[];
+}> {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/sequences/${id}/part/${part}/questions`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  if (!res.ok) {
+    return {
+      isSuccess: false,
+      message: "Failed to get sequence questions part",
+    };
+  }
+
+  const data = await res.json();
+
+  return {
+    isSuccess: true,
+    message: "Sequence questions part fetched successfully",
+    questions: data.questions,
   };
 }
 
