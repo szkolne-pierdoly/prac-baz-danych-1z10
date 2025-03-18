@@ -25,6 +25,8 @@ import {
   deleteSequence,
   updateSequence,
   getSequence as getSequenceAction,
+  getSequenceQuestions,
+  getSequenceQuestionsPart,
 } from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";
 import CreateSequenceModal from "@/app/components/createSequenceModal";
@@ -77,6 +79,10 @@ export default function SequenceClientPage({
   const [showCreateSequenceModal, setShowCreateSequenceModal] = useState(false);
 
   useEffect(() => {
+    getSequenceQuestions(sequenceId, 1).then((data) => {
+      console.log(data);
+    });
+
     getSequence();
   }, []);
 
@@ -326,7 +332,9 @@ export default function SequenceClientPage({
                 <Tab key="part2" title="Druga część" />
                 <Tab key="part3" title="Trzecia część" />
               </Tabs>
-              {selectedTab === "part1" && <SequenceQuestionsPart1 />}
+              {selectedTab === "part1" && (
+                <SequenceQuestionsPart1 sequenceId={sequenceId} />
+              )}
             </CardBody>
           </Card>
           {isEditing && (

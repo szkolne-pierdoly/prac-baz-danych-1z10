@@ -2,11 +2,28 @@
 
 import { Card, CardBody, Divider } from "@heroui/react";
 import SequenceQuestion from "../models/SequenceQuestion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getSequenceQuestionsPart } from "../actions/sequence";
 
-export default function SequenceQuestionsPart1() {
+export default function SequenceQuestionsPart1({
+  sequenceId,
+}: {
+  sequenceId: number;
+}) {
   const [questions, setQuestions] = useState<SequenceQuestion[]>([]);
 
+  const fetchQuestions = async () => {
+    const result = await getSequenceQuestionsPart(sequenceId, 1);
+    if (result.isSuccess) {
+      setQuestions(result.questions ?? []);
+    } else {
+      console.error(result.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
   return (
     <div className="flex flex-col gap-1">
       <p className="text-sm text-gray-500">
@@ -25,7 +42,12 @@ export default function SequenceQuestionsPart1() {
             {index + 1}
           </CardBody>
           <Divider orientation="vertical" />
-          <CardBody className="bg-white/5">Card {index + 1}</CardBody>
+          <CardBody className="bg-white/5">
+            {questions.find((question) => question.order === index + 1)
+              ?.question.content ?? (
+              <span className="text-red-400">No question</span>
+            )}
+          </CardBody>
         </Card>
       ))}
     </div>
