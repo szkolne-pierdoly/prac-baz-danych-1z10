@@ -1,11 +1,13 @@
 import { Player } from "./Player";
+import { Sequence } from "./Sequence";
+import { Answer } from "./Answer";
 
 export interface Game {
   id: number;
   name: string;
-  playerId: number;
   sequenceId: number;
-  // answers: Answer[]; // TODO: omitting complex types for now
-  // sequence: Sequence; // TODO: omitting complex types for now
+  playerId: number;
+  answers: Answer[];
+  sequence: Sequence;
   player: Player;
 }

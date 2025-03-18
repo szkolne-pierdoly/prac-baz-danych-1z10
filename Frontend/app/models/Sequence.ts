@@ -1,9 +1,9 @@
 import SequenceQuestion from "./SequenceQuestion";
+import { Game } from "./Game";
 
 export interface Sequence {
   id: number;
   name: string;
-  part1Questions: SequenceQuestion[];
-  part2Questions: SequenceQuestion[];
-  part3Questions: SequenceQuestion[];
+  games: Game[];
+  questions: SequenceQuestion[];
 }
