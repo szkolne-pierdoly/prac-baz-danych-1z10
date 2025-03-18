@@ -14,9 +14,13 @@ import {
   ModalBody,
   Tabs,
   Tab,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@heroui/react";
 import React, { useEffect, useState } from "react";
-import { PencilIcon, PlusIcon, TrashIcon, HomeIcon } from "lucide-react";
+import { PencilIcon, PlusIcon, TrashIcon, HomeIcon, MenuIcon, MoreVerticalIcon } from "lucide-react";
 import { Question } from "@/app/models/Question";
 import AddQuestionModal from "@/app/components/addQuestionModal";
 import { useRouter, usePathname } from "next/navigation";
@@ -306,20 +310,30 @@ export default function SequenceClientPage({
                   </div>
                 )}
               </div>
-              {isEditing ? (
-                <Button
-                  variant="flat"
-                  color="default"
-                  onPress={handleCancelEdit}
-                >
-                  Anuluj
-                </Button>
-              ) : (
-                <Button variant="faded" color="primary" onPress={handleEdit}>
-                  <PencilIcon size={16} />
-                  Edytuj
-                </Button>
-              )}
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button variant="light" color="default" isIconOnly>
+                    <MoreVerticalIcon />
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                  <DropdownItem
+                    key="rename"
+                    startContent={<PencilIcon />}
+                    onPress={handleEdit}
+                  >
+                    Zmień nazwę
+                  </DropdownItem>
+                  <DropdownItem
+                    key="delete"
+                    startContent={<TrashIcon />}
+                    color="danger"
+                    onPress={() => setIsDeleteSequenceModalOpen(true)}
+                  >
+                    Usuń
+                  </DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
             </CardBody>
             <Divider />
             <CardBody className="flex flex-col gap-2">
@@ -337,36 +351,6 @@ export default function SequenceClientPage({
               )}
             </CardBody>
           </Card>
-          {isEditing && (
-            <Card className="w-full">
-              <CardBody className="flex flex-row gap-2">
-                <Button
-                  variant="flat"
-                  color="danger"
-                  className="w-1/3"
-                  onPress={() => setIsDeleteSequenceModalOpen(true)}
-                >
-                  Usuń sekwencję
-                </Button>
-                <Button
-                  variant="flat"
-                  color="primary"
-                  className="w-full"
-                  onPress={handleSaveUpdate}
-                >
-                  Zapisz zmiany
-                </Button>
-              </CardBody>
-            </Card>
-          )}
-          <AddQuestionModal
-            isOpen={isAddQuestionModalOpen}
-            onClose={() => setIsAddQuestionModalOpen(false)}
-            includedQuestionIds={part1Questions
-              .filter((question) => !question.isDeleted)
-              .map((question) => question.question.id)}
-            handleAddQuestions={handleAddQuestions}
-          />
           <Modal
             isOpen={isDeleteSequenceModalOpen}
             onClose={() => setIsDeleteSequenceModalOpen(false)}
@@ -397,10 +381,6 @@ export default function SequenceClientPage({
               </ModalFooter>
             </ModalContent>
           </Modal>
-          <CreateSequenceModal
-            isOpen={showCreateSequenceModal}
-            onClose={() => setShowCreateSequenceModal(false)}
-          />
           <LoadingDialog isLoading={isLoading} />
         </div>
       </div>
