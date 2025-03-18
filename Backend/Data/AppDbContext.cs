@@ -30,7 +30,7 @@ public class AppDbContext : DbContext
     public DbSet<Player> Players { get; set; }
     public DbSet<Game> Games { get; set; }
     public DbSet<Answer> Answers { get; set; }
-
+    public DbSet<SequenceQuestion> SequenceQuestions { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Question>().HasKey(q => q.Id);
@@ -38,26 +38,16 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Player>().HasKey(p => p.Id);
         modelBuilder.Entity<Game>().HasKey(g => g.Id);
         modelBuilder.Entity<Answer>().HasKey(a => a.Id);
-
-        modelBuilder.Entity<Sequence>()
-            .HasMany(s => s.Part1Questions)
-            .WithMany();
-
-        modelBuilder.Entity<Sequence>()
-            .HasMany(s => s.Part2Questions)
-            .WithMany();
-
-        modelBuilder.Entity<Sequence>()
-            .HasMany(s => s.Part3Questions)
-            .WithMany();
+        modelBuilder.Entity<SequenceQuestion>().HasKey(sq => sq.Id);
 
         modelBuilder.Entity<SequenceQuestion>()
             .HasOne(s => s.Question)
             .WithMany();
 
-        modelBuilder.Entity<SequenceQuestion>()
-            .HasOne(s => s.Question)
-            .WithMany();
+        modelBuilder.Entity<Sequence>()
+            .HasMany(s => s.Questions)
+            .WithOne()
+            .HasForeignKey(sq => sq.SequenceId);
 
         modelBuilder.Entity<Game>()
             .HasOne(g => g.Sequence)
