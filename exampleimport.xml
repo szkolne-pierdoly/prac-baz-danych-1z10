@@ -15,4 +15,129 @@
     <Hint>It's essential for life.</Hint>
     <CorrectAnswer>H2O</CorrectAnswer>
   </Question>
+  <Question>
+    <Content>What is the largest planet in our solar system?</Content>
+    <Hint>It has a big red spot.</Hint>
+    <CorrectAnswer>Jupiter</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>Who painted the Mona Lisa?</Content>
+    <Hint>A famous Italian Renaissance artist.</Hint>
+    <CorrectAnswer>Leonardo da Vinci</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>What is the currency of Japan?</Content>
+    <Hint>Often used in sushi restaurants.</Hint>
+    <CorrectAnswer>Yen</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>What is the smallest country in the world?</Content>
+    <Hint>It's located within Rome.</Hint>
+    <CorrectAnswer>Vatican City</CorrectAnswer>
+    <Hint2>The Pope lives there.</Hint2>
+  </Question>
+  <Question>
+    <Content>What is the largest ocean on Earth?</Content>
+    <Hint>It's between America and Asia.</Hint>
+    <CorrectAnswer>Pacific Ocean</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>What is the speed of light in a vacuum?</Content>
+    <Hint>Approximately 3 x 10^8 m/s.</Hint>
+    <CorrectAnswer>299792458 m/s</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>Who wrote Hamlet?</Content>
+    <Hint>An English playwright and poet.</Hint>
+    <CorrectAnswer>William Shakespeare</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>What is the capital of Australia?</Content>
+    <Hint>Not Sydney or Melbourne.</Hint>
+    <CorrectAnswer>Canberra</CorrectAnswer>
+    <Hint2>Home to Parliament House.</Hint2>
+  </Question>
+  <Question>
+    <Content>What is the chemical symbol for gold?</Content>
+    <Hint>It's a precious metal.</Hint>
+    <CorrectAnswer>Au</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>What is the name of the Earth's natural satellite?</Content>
+    <Hint>We see it at night.</Hint>
+    <CorrectAnswer>Moon</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>What is the boiling point of water in Celsius?</Content>
+    <Hint>It's quite hot.</Hint>
+    <CorrectAnswer>100</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>Who invented the telephone?</Content>
+    <Hint>Think of bells.</Hint>
+    <CorrectAnswer>Alexander Graham Bell</CorrectAnswer>
+    <Hint2>He was also involved with hearing devices.</Hint2>
+  </Question>
+  <Question>
+    <Content>What is the capital of Spain?</Content>
+    <Hint>Home to Real Madrid.</Hint>
+    <CorrectAnswer>Madrid</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>What is the chemical symbol for oxygen?</Content>
+    <Hint>We breathe it.</Hint>
+    <CorrectAnswer>O</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>What is the name of the galaxy we live in?</Content>
+    <Hint>It looks milky.</Hint>
+    <CorrectAnswer>Milky Way</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>What is the freezing point of water in Celsius?</Content>
+    <Hint>It's quite cold.</Hint>
+    <CorrectAnswer>0</CorrectAnswer>
+    <Hint2>The same as 32 Fahrenheit.</Hint2>
+  </Question>
+  <Question>
+    <Content>Who discovered penicillin?</Content>
+    <Hint>A Scottish scientist.</Hint>
+    <CorrectAnswer>Alexander Fleming</CorrectAnswer>
+  </Question>
+    <Question>
+    <Content>What is the capital of Italy?</Content>
+    <Hint>Think of ancient ruins.</Hint>
+    <CorrectAnswer>Rome</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>What is the chemical symbol for silver?</Content>
+    <Hint>Another precious metal.</Hint>
+    <CorrectAnswer>Ag</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>What is the name of the closest star to Earth (excluding the Sun)?</Content>
+    <Hint>Part of the Alpha Centauri system.</Hint>
+    <CorrectAnswer>Proxima Centauri</CorrectAnswer>
+    <Hint2>A red dwarf star.</Hint2>
+  </Question>
+  <Question>
+    <Content>What is the atomic number of hydrogen?</Content>
+    <Hint>The simplest element.</Hint>
+    <CorrectAnswer>1</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>Who developed the theory of relativity?</Content>
+    <Hint>Known for E=mc^2.</Hint>
+    <CorrectAnswer>Albert Einstein</CorrectAnswer>
+  </Question>
+    <Question>
+    <Content>What is the capital of Brazil?</Content>
+    <Hint>A planned city.</Hint>
+    <CorrectAnswer>Brasilia</CorrectAnswer>
+  </Question>
+  <Question>
+    <Content>What is the chemical symbol for iron?</Content>
+    <Hint>A strong metal.</Hint>
+    <CorrectAnswer>Fe</CorrectAnswer>
+  </Question>
 </Questions>
