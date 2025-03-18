@@ -20,9 +20,13 @@ import {
   DropdownItem,
 } from "@heroui/react";
 import React, { useEffect, useState } from "react";
-import { PencilIcon, PlusIcon, TrashIcon, HomeIcon, MenuIcon, MoreVerticalIcon } from "lucide-react";
+import {
+  PencilIcon,
+  TrashIcon,
+  HomeIcon,
+  MoreVerticalIcon,
+} from "lucide-react";
 import { Question } from "@/app/models/Question";
-import AddQuestionModal from "@/app/components/addQuestionModal";
 import { useRouter, usePathname } from "next/navigation";
 import { Key } from "@react-types/shared";
 import {
@@ -33,7 +37,6 @@ import {
   getSequenceQuestionsPart,
 } from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";
-import CreateSequenceModal from "@/app/components/createSequenceModal";
 import SequenceQuestionsPart1 from "@/app/components/sequenceQuestionsPart1";
 
 export default function SequenceClientPage({
@@ -41,52 +44,16 @@ export default function SequenceClientPage({
 }: {
   sequenceId: number;
 }) {
-  const [isEditing, setIsEditing] = useState(false);
-  const [isAddQuestionModalOpen, setIsAddQuestionModalOpen] = useState(false);
-  const [isDeleteSequenceModalOpen, setIsDeleteSequenceModalOpen] =
-    useState(false);
-
   const [isLoading, setIsLoading] = useState(false);
 
-  const [editingSequenceName, setEditingSequenceName] = useState("");
-
-  const [sequence, setSequence] = useState<Sequence | null>(null);
+  const [sequence, setSequence] = useState<Sequence | undefined>(null);
   const [selectedTab, setSelectedTab] = useState<string>("part1");
-
-  const [part1Questions, setPart1Questions] = useState<
-    {
-      question: Question;
-      isDeleted: boolean;
-      isAdded: boolean;
-      index: number;
-    }[]
-  >([]);
-  const [part2Questions, setPart2Questions] = useState<
-    {
-      question: Question;
-      isDeleted: boolean;
-      isAdded: boolean;
-      index: number;
-    }[]
-  >([]);
-  const [part3Questions, setPart3Questions] = useState<
-    {
-      question: Question;
-      isDeleted: boolean;
-      isAdded: boolean;
-      index: number;
-    }[]
-  >([]);
+  const [pageSequenceId, setPageSequenceId] = useState<string | null>(null);
 
   const router = useRouter();
   const pathname = usePathname();
-  const [showCreateSequenceModal, setShowCreateSequenceModal] = useState(false);
 
   useEffect(() => {
-    getSequenceQuestions(sequenceId, 1).then((data) => {
-      console.log(data);
-    });
-
     getSequence();
   }, []);
 
@@ -94,133 +61,11 @@ export default function SequenceClientPage({
     if (sequenceId) {
       setIsLoading(true);
       const result = await getSequenceAction(sequenceId);
-      console.log(result);
       if (result.isSuccess) {
-        setPart1Questions(
-          result.sequence?.part1Questions.map((question) => ({
-            question: question.question,
-            isDeleted: false,
-            isAdded: false,
-            index: question.order,
-          })) ?? [],
-        );
-        setPart2Questions(
-          result.sequence?.part2Questions.map((question) => ({
-            question: question.question,
-            isDeleted: false,
-            isAdded: false,
-            index: question.order,
-          })) ?? [],
-        );
-        setPart3Questions(
-          result.sequence?.part3Questions.map((question) => ({
-            question: question.question,
-            isDeleted: false,
-            isAdded: false,
-            index: question.order,
-          })) ?? [],
-        );
+        setSequence(result.sequence);
       }
       setIsLoading(false);
     }
-  };
-
-  const handleSaveUpdate = async (): Promise<string> => {
-    if (editingSequenceName === "" || !editingSequenceName) {
-      return "EMPTY";
-    }
-    if (sequence) {
-      setIsLoading(true);
-      const result = await updateSequence(
-        sequence.id,
-        editingSequenceName,
-        part1Questions
-          .filter((question) => !question.isDeleted)
-          .map((question) => question.question.id),
-      );
-      if (result.isSuccess) {
-        setIsEditing(false);
-        setIsLoading(false);
-        setSelectedQuestions(undefined);
-        getSequence();
-        return "SUCCESS";
-      }
-      setIsLoading(false);
-    }
-    setIsLoading(false);
-    return "ERROR";
-  };
-
-  const handleEdit = () => {
-    if (sequence) {
-      setIsEditing(true);
-      setEditingSequenceName(sequence.name);
-      setPart1Questions(
-        sequence.part1Questions.map((question) => ({
-          question: question.question,
-          isDeleted: false,
-          isAdded: false,
-          index: question.order,
-        })),
-      );
-    }
-  };
-
-  const handleCancelEdit = () => {
-    if (sequence) {
-      setIsEditing(false);
-      setEditingSequenceName(sequence.name);
-      setPart1Questions(
-        sequence.part1Questions.map((question) => ({
-          question: question.question,
-          isDeleted: false,
-          isAdded: false,
-          index: question.order,
-        })),
-      );
-      setSelectedQuestions(undefined);
-    }
-  };
-
-  const handleAddQuestions = (questions: Question[]) => {
-    setPart1Questions((prevQuestions) => {
-      const existingQuestionIdMap = new Map<number, number>();
-      prevQuestions.forEach((q, index) => {
-        existingQuestionIdMap.set(q.question.id, index);
-      });
-      const newQuestionObjects: {
-        question: Question;
-        isDeleted: boolean;
-        isAdded: boolean;
-        index: number;
-      }[] = [];
-
-      const updatedPrevQuestions = [...prevQuestions]; // Create a copy to avoid direct mutation
-
-      questions.forEach((q) => {
-        if (existingQuestionIdMap.has(q.id)) {
-          const index = existingQuestionIdMap.get(q.id) as number;
-          if (updatedPrevQuestions[index].isDeleted) {
-            updatedPrevQuestions[index] = {
-              ...updatedPrevQuestions[index],
-              isDeleted: false,
-              isAdded: false,
-            };
-          }
-        } else {
-          newQuestionObjects.push({
-            question: q,
-            isDeleted: false,
-            isAdded: false,
-            index: updatedPrevQuestions.length,
-          });
-        }
-      });
-      return [...updatedPrevQuestions, ...newQuestionObjects];
-    });
-    setIsLoading(true);
-    setIsAddQuestionModalOpen(false);
-    setIsLoading(false);
   };
 
   const handleDeleteSequence = async () => {
@@ -231,12 +76,6 @@ export default function SequenceClientPage({
       }
     }
   };
-
-  const [selectedQuestions, setSelectedQuestions] = useState<
-    "all" | Iterable<Key> | undefined
-  >(undefined);
-
-  const [pageSequenceId, setPageSequenceId] = useState<string | null>(null);
 
   useEffect(() => {
     const pathParts = pathname.split("/");
@@ -283,7 +122,7 @@ export default function SequenceClientPage({
               <Button
                 variant="flat"
                 color="primary"
-                onPress={() => setShowCreateSequenceModal(true)}
+                onPress={() => console.log("create")}
               >
                 Dodaj sekwencję
               </Button>
@@ -296,19 +135,9 @@ export default function SequenceClientPage({
           <Card className="w-full max-h-[calc(100vh-160px)] overflow-y-scroll">
             <CardBody className="flex flex-row justify-between items-center min-h-[64px]">
               <div className="w-full">
-                {isEditing ? (
-                  <Input
-                    value={editingSequenceName}
-                    onChange={(e) => setEditingSequenceName(e.target.value)}
-                    label="Nazwa sekwencji"
-                    size="sm"
-                    className="min-w-96 max-w-96"
-                  />
-                ) : (
-                  <div className="text-2xl font-bold">
-                    Sekwencja: {sequence?.name}
-                  </div>
-                )}
+                <div className="text-2xl font-bold">
+                  Sekwencja: {sequence?.name}
+                </div>
               </div>
               <Dropdown>
                 <DropdownTrigger>
@@ -320,7 +149,7 @@ export default function SequenceClientPage({
                   <DropdownItem
                     key="rename"
                     startContent={<PencilIcon />}
-                    onPress={handleEdit}
+                    onPress={() => console.log("rename")}
                   >
                     Zmień nazwę
                   </DropdownItem>
@@ -328,7 +157,7 @@ export default function SequenceClientPage({
                     key="delete"
                     startContent={<TrashIcon />}
                     color="danger"
-                    onPress={() => setIsDeleteSequenceModalOpen(true)}
+                    onPress={() => console.log("delete")}
                   >
                     Usuń
                   </DropdownItem>
@@ -351,7 +180,7 @@ export default function SequenceClientPage({
               )}
             </CardBody>
           </Card>
-          <Modal
+          {/* <Modal
             isOpen={isDeleteSequenceModalOpen}
             onClose={() => setIsDeleteSequenceModalOpen(false)}
           >
@@ -380,7 +209,7 @@ export default function SequenceClientPage({
                 </Button>
               </ModalFooter>
             </ModalContent>
-          </Modal>
+          </Modal> */}
           <LoadingDialog isLoading={isLoading} />
         </div>
       </div>
