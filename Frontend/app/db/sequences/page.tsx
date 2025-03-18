@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { getAllSequences } from "@/app/actions/sequence";
 import CreateSequenceModal from "@/app/components/createSequenceModal";
 import { HomeIcon } from "lucide-react";
+import { SequencePart } from "@/app/enums/sequencePart";
 
 export default function SequencesPage() {
   const [sequences, setSequences] = useState<Sequence[]>([]);
@@ -63,15 +64,33 @@ export default function SequencesPage() {
                 <div className="text-2xl font-bold">{sequence.name}</div>
                 <div className="flex flex-row items-center justify-between gap-2 h-4">
                   <div className="text-sm text-gray-500">
-                    Pierwsza część: {sequence.part1Questions.length} pytań
+                    Pierwsza część:{" "}
+                    {
+                      sequence.questions.filter(
+                        (q) => q.sequencePart === SequencePart.Part1,
+                      ).length
+                    }{" "}
+                    pytań
                   </div>
                   <Divider orientation="vertical" />
                   <div className="text-sm text-gray-500">
-                    Druga część: {sequence.part2Questions.length} pytań
+                    Druga część:{" "}
+                    {
+                      sequence.questions.filter(
+                        (q) => q.sequencePart === SequencePart.Part2,
+                      ).length
+                    }{" "}
+                    pytań
                   </div>
                   <Divider orientation="vertical" />
                   <div className="text-sm text-gray-500">
-                    Trzecia część: {sequence.part3Questions.length} pytań
+                    Trzecia część:{" "}
+                    {
+                      sequence.questions.filter(
+                        (q) => q.sequencePart === SequencePart.Part3,
+                      ).length
+                    }{" "}
+                    pytań
                   </div>
                 </div>
               </CardBody>
