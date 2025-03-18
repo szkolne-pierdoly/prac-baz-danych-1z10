@@ -86,6 +86,62 @@ public class SequenceController : ControllerBase
             });
         }
     }
+
+    [HttpGet("{id}/questions")]
+    public async Task<IActionResult> GetSequenceQuestions(int id)
+    {
+        var result = await _sequenceService.GetSequenceQuestions(id);
+
+        if (result.IsSuccess)
+        {
+            return Ok(new
+            {
+                Status = result.Status,
+                Message = result.Message ?? "Sequence questions fetched successfully",
+                Part1 = result.Part1,
+                Part2 = result.Part2,
+                Part3 = result.Part3
+            });
+        }
+        else
+        {
+            return StatusCode(result.HttpStatusCode ?? 500, new
+            {
+                Status = result.Status,
+                Message = result.Message ?? "Something went wrong, please try again later."
+            });
+        }
+    }
+
+    [HttpGet("{id}/part/{part}/questions")]
+    public async Task<IActionResult> GetSequenceQuestionsPart(int id, int part)
+    {
+        if (part != 1 && part != 2 && part != 3)
+        {
+            return BadRequest("Invalid part number");
+        }
+
+        var result = await _sequenceService.GetSequenceQuestionsPart(id, part);
+
+        if (result.IsSuccess)
+        {
+            return Ok(new
+            {
+                Status = result.Status,
+                Message = result.Message ?? "Sequence questions part fetched successfully",
+                Questions = result.Questions
+            });
+        }
+        else
+        {
+            return StatusCode(result.HttpStatusCode ?? 500, new
+            {
+                Status = result.Status,
+                Message = result.Message ?? "Something went wrong, please try again later."
+            });
+        }
+    }
+
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateSequence([FromBody] UpdateSequenceRequest request, int id)
     {

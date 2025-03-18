@@ -61,6 +61,98 @@ public class SequenceService : ISequenceService
         }
     }
 
+    public async Task<GetSequenceQuestionsResult> GetSequenceQuestions(int id)
+    {
+        try
+        {
+            var sequence = await _sequenceRepository.GetSequenceById(id);
+            if (sequence == null)
+            {
+                return new GetSequenceQuestionsResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Sequence not found"
+                };
+            }
+            return new GetSequenceQuestionsResult {
+                IsSuccess = true,
+                Status = "SUCCESS",
+                Message = "Sequence questions retrieved successfully",
+                Part1 = sequence.Part1Questions.ToList(),
+                Part2 = sequence.Part2Questions.ToList(),
+                Part3 = sequence.Part3Questions.ToList()
+            };
+        }
+        catch (Exception ex)
+        {
+            return new GetSequenceQuestionsResult {
+                IsSuccess = false,
+                Status = "ERROR",
+                Message = ex.Message
+            };
+        }
+    }
+
+    public async Task<GetSequencePartQuestionResult> GetSequenceQuestionsPart(int id, int part)
+    {
+        try
+        {
+            var sequence = await _sequenceRepository.GetSequenceById(id);
+            if (sequence == null)
+            {
+                return new GetSequencePartQuestionResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Sequence not found",
+                    HttpStatusCode = 404
+                };
+            }
+            if (part == 1)
+            {
+                return new GetSequencePartQuestionResult {
+                    IsSuccess = true,
+                    Status = "SUCCESS",
+                    Message = "Sequence part 1 questions retrieved successfully",
+                    Questions = sequence.Part1Questions.ToList()
+                };
+            }
+            else if (part == 2)
+            {
+                return new GetSequencePartQuestionResult {
+                    IsSuccess = true,
+                    Status = "SUCCESS",
+                    Message = "Sequence part 2 questions retrieved successfully",
+                    Questions = sequence.Part2Questions.ToList()
+                };
+            }
+            else if (part == 3)
+            {
+                return new GetSequencePartQuestionResult {
+                    IsSuccess = true,
+                    Status = "SUCCESS",
+                    Message = "Sequence part 3 questions retrieved successfully",
+                    Questions = sequence.Part3Questions.ToList()
+                };
+            }
+            else
+            {
+                return new GetSequencePartQuestionResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Invalid part number"
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            return new GetSequencePartQuestionResult {
+                IsSuccess = false,
+                Status = "ERROR",
+                Message = ex.Message,
+                HttpStatusCode = 500
+            };
+        }
+    }
     public async Task<UpdateSequenceResult> UpdateSequence(UpdateSequenceRequest request, int id)
     {
         try
