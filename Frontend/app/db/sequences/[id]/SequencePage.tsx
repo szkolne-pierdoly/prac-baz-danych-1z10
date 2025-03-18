@@ -20,10 +20,10 @@ import {
   ModalBody,
 } from "@heroui/react";
 import React, { useEffect, useState } from "react";
-import { PencilIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { PencilIcon, PlusIcon, TrashIcon, HomeIcon } from "lucide-react";
 import { Question } from "@/app/models/Question";
 import AddQuestionModal from "@/app/components/addQuestionModal";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Key } from "@react-types/shared";
 import {
   deleteSequence,
@@ -31,6 +31,8 @@ import {
   getSequence as getSequenceAction,
 } from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";
+import CreateSequenceModal from "@/app/components/createSequenceModal";
+
 export default function SequenceClientPage({
   sequenceId,
 }: {
@@ -73,6 +75,8 @@ export default function SequenceClientPage({
   >([]);
 
   const router = useRouter();
+  const pathname = usePathname();
+  const [showCreateSequenceModal, setShowCreateSequenceModal] = useState(false);
 
   useEffect(() => {
     getSequence();
@@ -248,167 +252,240 @@ export default function SequenceClientPage({
     "all" | Iterable<Key> | undefined
   >(undefined);
 
+  const [pageSequenceId, setPageSequenceId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const pathParts = pathname.split("/");
+    if (pathParts.length > 3 && pathParts[2] === "sequences") {
+      setPageSequenceId(pathParts[3]);
+    } else {
+      setPageSequenceId(null);
+    }
+  }, [pathname]);
+
+  const handleGoSequences = () => {
+    if (pageSequenceId) {
+      router.push("/db/sequences");
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-4 w-full max-w-4xl items-center justify-center">
-      <Card className="w-full">
-        <CardBody className="flex flex-row justify-between items-center">
-          <div className="w-full">
-            {isEditing ? (
-              <Input
-                value={editingSequenceName}
-                onChange={(e) => setEditingSequenceName(e.target.value)}
-                label="Nazwa sekwencji"
-                size="sm"
-                className="min-w-96 max-w-96"
-              />
-            ) : (
-              <div className="text-2xl font-bold">
-                Sekwencja: {sequence?.name}
-              </div>
+    <div className="flex flex-col items-center justify-start h-screen py-4 gap-4 px-2 max-h-screen w-screen overflow-y-hidden">
+      <Card className="w-full flex flex-row items-start justify-start max-w-5xl h-[64px] min-h-[64px] sticky top-0 z-10">
+        <CardBody className="flex flex-row items-center justify-between gap-2">
+          <div className="flex flex-row items-center justify-center gap-2">
+            <Button
+              variant="flat"
+              color="default"
+              onPress={() => router.push("/")}
+              isIconOnly
+            >
+              <HomeIcon />
+            </Button>
+            <div
+              onClick={handleGoSequences}
+              className="text-2xl font-bold cursor-pointer"
+            >
+              Sekwencje
+            </div>
+            {pageSequenceId && (
+              <span className="text-2xl font-bold text-gray-500">
+                / Sekwencja ID{pageSequenceId}
+              </span>
             )}
           </div>
-          {isEditing ? (
-            <Button variant="flat" color="default" onPress={handleCancelEdit}>
-              Anuluj
-            </Button>
-          ) : (
-            <Button variant="faded" color="primary" onPress={handleEdit}>
-              <PencilIcon size={16} />
-              Edytuj
-            </Button>
-          )}
-        </CardBody>
-        <Divider />
-        <CardBody className="flex flex-col gap-2">
-          <div className="text-lg font-bold">Pytania:</div>
-          <Table
-            removeWrapper
-            selectionMode={isEditing ? "multiple" : "none"}
-            selectedKeys={selectedQuestions}
-            onSelectionChange={setSelectedQuestions}
-            className="rounded-lg overflow-hidden"
-          >
-            <TableHeader>
-              <TableColumn>ID</TableColumn>
-              <TableColumn>Treść</TableColumn>
-              <TableColumn>Podpowiedź</TableColumn>
-              <TableColumn>Podpowiedź 2</TableColumn>
-              <TableColumn>Odpowiedź</TableColumn>
-            </TableHeader>
-            <TableBody>
-              {part1Questions.map((question) => (
-                <TableRow
-                  key={question.question.id}
-                  className={
-                    question.isDeleted
-                      ? "bg-red-700 bg-opacity-10 text-red-500"
-                      : ""
-                  }
-                >
-                  <TableCell>{question.index}</TableCell>
-                  <TableCell>{question.question.content}</TableCell>
-                  <TableCell>{question.question.hint}</TableCell>
-                  <TableCell>{question.question.hint2 ?? "-"}</TableCell>
-                  <TableCell>{question.question.correctAnswer}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          {isEditing && (
-            <div className="flex flex-row gap-2">
-              {Array.from(selectedQuestions ?? []).length > 0 &&
-              Array.from(selectedQuestions ?? []).every(
-                (selectedQuestionId) =>
-                  !part1Questions.some(
-                    (question) =>
-                      question.question.id ===
-                      parseInt(selectedQuestionId as string, 10),
-                  ),
-              ) ? (
-                <Button variant="flat" color="primary" onPress={handleRecover}>
-                  <PlusIcon size={16} />
-                  Przywróć pytania
-                </Button>
-              ) : (
-                <Button variant="flat" color="danger" onPress={handleDelete}>
-                  <TrashIcon size={16} />
-                  Usuń pytania
-                </Button>
-              )}
+          <div className="flex flex-row items-center justify-center gap-2">
+            {pageSequenceId === null && (
               <Button
                 variant="flat"
                 color="primary"
-                className="w-full"
-                onPress={() => setIsAddQuestionModalOpen(true)}
+                onPress={() => setShowCreateSequenceModal(true)}
               >
-                <PlusIcon size={16} />
-                Dodaj pytania
+                Dodaj sekwencję
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </CardBody>
       </Card>
-      {isEditing && (
-        <Card className="w-full">
-          <CardBody className="flex flex-row gap-2">
-            <Button
-              variant="flat"
-              color="danger"
-              className="w-1/3"
-              onPress={() => setIsDeleteSequenceModalOpen(true)}
-            >
-              Usuń sekwencję
-            </Button>
-            <Button
-              variant="flat"
-              color="primary"
-              className="w-full"
-              onPress={handleSaveUpdate}
-            >
-              Zapisz zmiany
-            </Button>
-          </CardBody>
-        </Card>
-      )}
-      <AddQuestionModal
-        isOpen={isAddQuestionModalOpen}
-        onClose={() => setIsAddQuestionModalOpen(false)}
-        includedQuestionIds={part1Questions
-          .filter((question) => !question.isDeleted)
-          .map((question) => question.question.id)}
-        handleAddQuestions={handleAddQuestions}
-      />
-      <Modal
-        isOpen={isDeleteSequenceModalOpen}
-        onClose={() => setIsDeleteSequenceModalOpen(false)}
-      >
-        <ModalContent>
-          <ModalHeader>Napewno?</ModalHeader>
-          <ModalBody>
-            Usunięcie sekwencji spowoduje usunięcie samej sekwencji, pytania
-            dalej zostaną w bazie danych. Jest to akcja nieodwracalna!
-          </ModalBody>
-          <ModalFooter>
-            <Button
-              variant="flat"
-              color="danger"
-              className="px-8"
-              onPress={handleDeleteSequence}
-            >
-              Usuń sekwencję
-            </Button>
-            <Button
-              variant="flat"
-              color="success"
-              className="w-full"
-              onPress={() => setIsDeleteSequenceModalOpen(false)}
-            >
-              Anuluj
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-      <LoadingDialog isLoading={isLoading} />
+      <div className="w-full flex flex-col items-start justify-start max-w-4xl max-h-[calc(100vh-96px)] overflow-y-scroll">
+        <div className="flex flex-col gap-4 w-full items-center justify-center">
+          <Card className="w-full">
+            <CardBody className="flex flex-row justify-between items-center">
+              <div className="w-full">
+                {isEditing ? (
+                  <Input
+                    value={editingSequenceName}
+                    onChange={(e) => setEditingSequenceName(e.target.value)}
+                    label="Nazwa sekwencji"
+                    size="sm"
+                    className="min-w-96 max-w-96"
+                  />
+                ) : (
+                  <div className="text-2xl font-bold">
+                    Sekwencja: {sequence?.name}
+                  </div>
+                )}
+              </div>
+              {isEditing ? (
+                <Button
+                  variant="flat"
+                  color="default"
+                  onPress={handleCancelEdit}
+                >
+                  Anuluj
+                </Button>
+              ) : (
+                <Button variant="faded" color="primary" onPress={handleEdit}>
+                  <PencilIcon size={16} />
+                  Edytuj
+                </Button>
+              )}
+            </CardBody>
+            <Divider />
+            <CardBody className="flex flex-col gap-2">
+              <div className="text-lg font-bold">Pytania:</div>
+              <Table
+                removeWrapper
+                selectionMode={isEditing ? "multiple" : "none"}
+                selectedKeys={selectedQuestions}
+                onSelectionChange={setSelectedQuestions}
+                className="rounded-lg overflow-hidden"
+              >
+                <TableHeader>
+                  <TableColumn>ID</TableColumn>
+                  <TableColumn>Treść</TableColumn>
+                  <TableColumn>Podpowiedź</TableColumn>
+                  <TableColumn>Podpowiedź 2</TableColumn>
+                  <TableColumn>Odpowiedź</TableColumn>
+                </TableHeader>
+                <TableBody>
+                  {part1Questions.map((question) => (
+                    <TableRow
+                      key={question.question.id}
+                      className={
+                        question.isDeleted
+                          ? "bg-red-700 bg-opacity-10 text-red-500"
+                          : ""
+                      }
+                    >
+                      <TableCell>{question.index}</TableCell>
+                      <TableCell>{question.question.content}</TableCell>
+                      <TableCell>{question.question.hint}</TableCell>
+                      <TableCell>{question.question.hint2 ?? "-"}</TableCell>
+                      <TableCell>{question.question.correctAnswer}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              {isEditing && (
+                <div className="flex flex-row gap-2">
+                  {Array.from(selectedQuestions ?? []).length > 0 &&
+                  Array.from(selectedQuestions ?? []).every(
+                    (selectedQuestionId) =>
+                      !part1Questions.some(
+                        (question) =>
+                          question.question.id ===
+                          parseInt(selectedQuestionId as string, 10),
+                      ),
+                  ) ? (
+                    <Button
+                      variant="flat"
+                      color="primary"
+                      onPress={handleRecover}
+                    >
+                      <PlusIcon size={16} />
+                      Przywróć pytania
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="flat"
+                      color="danger"
+                      onPress={handleDelete}
+                    >
+                      <TrashIcon size={16} />
+                      Usuń pytania
+                    </Button>
+                  )}
+                  <Button
+                    variant="flat"
+                    color="primary"
+                    className="w-full"
+                    onPress={() => setIsAddQuestionModalOpen(true)}
+                  >
+                    <PlusIcon size={16} />
+                    Dodaj pytania
+                  </Button>
+                </div>
+              )}
+            </CardBody>
+          </Card>
+          {isEditing && (
+            <Card className="w-full">
+              <CardBody className="flex flex-row gap-2">
+                <Button
+                  variant="flat"
+                  color="danger"
+                  className="w-1/3"
+                  onPress={() => setIsDeleteSequenceModalOpen(true)}
+                >
+                  Usuń sekwencję
+                </Button>
+                <Button
+                  variant="flat"
+                  color="primary"
+                  className="w-full"
+                  onPress={handleSaveUpdate}
+                >
+                  Zapisz zmiany
+                </Button>
+              </CardBody>
+            </Card>
+          )}
+          <AddQuestionModal
+            isOpen={isAddQuestionModalOpen}
+            onClose={() => setIsAddQuestionModalOpen(false)}
+            includedQuestionIds={part1Questions
+              .filter((question) => !question.isDeleted)
+              .map((question) => question.question.id)}
+            handleAddQuestions={handleAddQuestions}
+          />
+          <Modal
+            isOpen={isDeleteSequenceModalOpen}
+            onClose={() => setIsDeleteSequenceModalOpen(false)}
+          >
+            <ModalContent>
+              <ModalHeader>Napewno?</ModalHeader>
+              <ModalBody>
+                Usunięcie sekwencji spowoduje usunięcie samej sekwencji, pytania
+                dalej zostaną w bazie danych. Jest to akcja nieodwracalna!
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  variant="flat"
+                  color="danger"
+                  className="px-8"
+                  onPress={handleDeleteSequence}
+                >
+                  Usuń sekwencję
+                </Button>
+                <Button
+                  variant="flat"
+                  color="success"
+                  className="w-full"
+                  onPress={() => setIsDeleteSequenceModalOpen(false)}
+                >
+                  Anuluj
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+          <CreateSequenceModal
+            isOpen={showCreateSequenceModal}
+            onClose={() => setShowCreateSequenceModal(false)}
+          />
+          <LoadingDialog isLoading={isLoading} />
+        </div>
+      </div>
     </div>
   );
 }
