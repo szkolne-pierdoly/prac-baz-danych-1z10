@@ -5,12 +5,6 @@ import {
   Card,
   CardBody,
   Divider,
-  Table,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  TableBody,
-  TableCell,
   Button,
   Input,
   Modal,
@@ -18,6 +12,8 @@ import {
   ModalContent,
   ModalFooter,
   ModalBody,
+  Tabs,
+  Tab,
 } from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import { PencilIcon, PlusIcon, TrashIcon, HomeIcon } from "lucide-react";
@@ -32,6 +28,7 @@ import {
 } from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";
 import CreateSequenceModal from "@/app/components/createSequenceModal";
+import SequenceQuestionsPart1 from "@/app/components/sequenceQuestionsPart1";
 
 export default function SequenceClientPage({
   sequenceId,
@@ -48,6 +45,7 @@ export default function SequenceClientPage({
   const [editingSequenceName, setEditingSequenceName] = useState("");
 
   const [sequence, setSequence] = useState<Sequence | null>(null);
+  const [selectedTab, setSelectedTab] = useState<string>("part1");
 
   const [part1Questions, setPart1Questions] = useState<
     {
@@ -215,17 +213,6 @@ export default function SequenceClientPage({
     setIsLoading(false);
   };
 
-  const handleDelete = () => {
-    const itemsToDelete = Array.from(selectedQuestions ?? []).map((item) =>
-      parseInt(item as string, 10),
-    );
-    setPart1Questions((prevQuestions) =>
-      prevQuestions.map((q) =>
-        itemsToDelete.includes(q.question.id) ? { ...q, isDeleted: true } : q,
-      ),
-    );
-  };
-
   const handleDeleteSequence = async () => {
     if (sequence) {
       const result = await deleteSequence(sequence.id);
@@ -233,19 +220,6 @@ export default function SequenceClientPage({
         router.push("/db/sequences");
       }
     }
-  };
-
-  const handleRecover = () => {
-    const selectedIdsToAdd = Array.from(selectedQuestions ?? []).map((item) =>
-      parseInt(item as string, 10),
-    );
-    setPart1Questions(
-      part1Questions.map((question) =>
-        selectedIdsToAdd.includes(question.question.id)
-          ? { ...question, isDeleted: false }
-          : question,
-      ),
-    );
   };
 
   const [selectedQuestions, setSelectedQuestions] = useState<
@@ -309,8 +283,8 @@ export default function SequenceClientPage({
       </Card>
       <div className="w-full flex flex-col items-start justify-start max-w-4xl max-h-[calc(100vh-96px)] overflow-y-scroll">
         <div className="flex flex-col gap-4 w-full items-center justify-center">
-          <Card className="w-full">
-            <CardBody className="flex flex-row justify-between items-center">
+          <Card className="w-full max-h-[calc(100vh-160px)] overflow-y-scroll">
+            <CardBody className="flex flex-row justify-between items-center min-h-[64px]">
               <div className="w-full">
                 {isEditing ? (
                   <Input
@@ -343,80 +317,16 @@ export default function SequenceClientPage({
             </CardBody>
             <Divider />
             <CardBody className="flex flex-col gap-2">
-              <div className="text-lg font-bold">Pytania:</div>
-              <Table
-                removeWrapper
-                selectionMode={isEditing ? "multiple" : "none"}
-                selectedKeys={selectedQuestions}
-                onSelectionChange={setSelectedQuestions}
-                className="rounded-lg overflow-hidden"
+              <Tabs
+                fullWidth
+                selectedKey={selectedTab}
+                onSelectionChange={(key) => setSelectedTab(key as string)}
               >
-                <TableHeader>
-                  <TableColumn>ID</TableColumn>
-                  <TableColumn>Treść</TableColumn>
-                  <TableColumn>Podpowiedź</TableColumn>
-                  <TableColumn>Podpowiedź 2</TableColumn>
-                  <TableColumn>Odpowiedź</TableColumn>
-                </TableHeader>
-                <TableBody>
-                  {part1Questions.map((question) => (
-                    <TableRow
-                      key={question.question.id}
-                      className={
-                        question.isDeleted
-                          ? "bg-red-700 bg-opacity-10 text-red-500"
-                          : ""
-                      }
-                    >
-                      <TableCell>{question.index}</TableCell>
-                      <TableCell>{question.question.content}</TableCell>
-                      <TableCell>{question.question.hint}</TableCell>
-                      <TableCell>{question.question.hint2 ?? "-"}</TableCell>
-                      <TableCell>{question.question.correctAnswer}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              {isEditing && (
-                <div className="flex flex-row gap-2">
-                  {Array.from(selectedQuestions ?? []).length > 0 &&
-                  Array.from(selectedQuestions ?? []).every(
-                    (selectedQuestionId) =>
-                      !part1Questions.some(
-                        (question) =>
-                          question.question.id ===
-                          parseInt(selectedQuestionId as string, 10),
-                      ),
-                  ) ? (
-                    <Button
-                      variant="flat"
-                      color="primary"
-                      onPress={handleRecover}
-                    >
-                      <PlusIcon size={16} />
-                      Przywróć pytania
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="flat"
-                      color="danger"
-                      onPress={handleDelete}
-                    >
-                      <TrashIcon size={16} />
-                      Usuń pytania
-                    </Button>
-                  )}
-                  <Button
-                    variant="flat"
-                    color="primary"
-                    className="w-full"
-                    onPress={() => setIsAddQuestionModalOpen(true)}
-                  >
-                    <PlusIcon size={16} />
-                    Dodaj pytania
-                  </Button>
-                </div>
-              )}
+                <Tab key="part1" title="Pierwsza część" />
+                <Tab key="part2" title="Druga część" />
+                <Tab key="part3" title="Trzecia część" />
+              </Tabs>
+              {selectedTab === "part1" && <SequenceQuestionsPart1 />}
             </CardBody>
           </Card>
           {isEditing && (
