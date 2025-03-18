@@ -8,4 +8,5 @@ public class Question
     public required string Hint { get; set; }
     public string? Hint2 { get; set; }
     public required string CorrectAnswer { get; set; }
+    
 }

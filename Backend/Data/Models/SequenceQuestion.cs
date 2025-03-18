@@ -1,4 +1,6 @@
 
+using Backend.Data.Enum;
+
 namespace Backend.Data.Models
 {
     public class SequenceQuestion
@@ -7,5 +9,7 @@ namespace Backend.Data.Models
         public required int Order { get; set; }
         public required Question Question { get; set; }
         public int QuestionId { get; set; }
+        public int SequenceId { get; set; }
+        public SequencePart SequencePart { get; set; }
     }
 }
