@@ -4,6 +4,7 @@ using Backend.Interface.Services;
 using Backend.Interface.Repositories;
 using Backend.Models.ServiceResults.SequenceService;
 using Backend.Models.ServiceResults.QuestionService;
+using Backend.Data.Enum;
 
 namespace Backend.Services;
 
@@ -78,9 +79,9 @@ public class SequenceService : ISequenceService
                 IsSuccess = true,
                 Status = "SUCCESS",
                 Message = "Sequence questions retrieved successfully",
-                Part1 = sequence.Part1Questions.ToList(),
-                Part2 = sequence.Part2Questions.ToList(),
-                Part3 = sequence.Part3Questions.ToList()
+                Part1 = sequence.Questions.Where(q => q.SequencePart == SequencePart.Part1).ToList(),
+                Part2 = sequence.Questions.Where(q => q.SequencePart == SequencePart.Part2).ToList(),
+                Part3 = sequence.Questions.Where(q => q.SequencePart == SequencePart.Part3).ToList()
             };
         }
         catch (Exception ex)
@@ -113,7 +114,7 @@ public class SequenceService : ISequenceService
                     IsSuccess = true,
                     Status = "SUCCESS",
                     Message = "Sequence part 1 questions retrieved successfully",
-                    Questions = sequence.Part1Questions.ToList()
+                    Questions = sequence.Questions.Where(q => q.SequencePart == SequencePart.Part1).ToList()
                 };
             }
             else if (part == 2)
@@ -122,7 +123,7 @@ public class SequenceService : ISequenceService
                     IsSuccess = true,
                     Status = "SUCCESS",
                     Message = "Sequence part 2 questions retrieved successfully",
-                    Questions = sequence.Part2Questions.ToList()
+                    Questions = sequence.Questions.Where(q => q.SequencePart == SequencePart.Part2).ToList()
                 };
             }
             else if (part == 3)
@@ -131,7 +132,7 @@ public class SequenceService : ISequenceService
                     IsSuccess = true,
                     Status = "SUCCESS",
                     Message = "Sequence part 3 questions retrieved successfully",
-                    Questions = sequence.Part3Questions.ToList()
+                    Questions = sequence.Questions.Where(q => q.SequencePart == SequencePart.Part3).ToList()
                 };
             }
             else
@@ -157,53 +158,75 @@ public class SequenceService : ISequenceService
     {
         try
         {
+            if (string.IsNullOrEmpty(request.Name) && request.Part1QuestionIds.Count == 0 && request.Part2QuestionIds.Count == 0 && request.Part3QuestionIds.Count == 0) {
+                return new UpdateSequenceResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "No data provided"
+                };
+            }
+
             var sequence = await _sequenceRepository.GetSequenceById(id);
             if (sequence == null)
             {
-                return new UpdateSequenceResult
-                {
+                return new UpdateSequenceResult {
                     IsSuccess = false,
                     Status = "ERROR",
-                    Message = "Sequence not found"
+                    Message = "Sequence not found",
+                    HttpStatusCode = 404
                 };
             }
-            sequence.Name = request.Name;
-            var questions1 = new List<SequenceQuestion>();
-            var questions2 = new List<SequenceQuestion>();
-            var questions3 = new List<SequenceQuestion>();
-            foreach (var questionId in request.Part1QuestionIds)
-            {
-                var question = await _questionRepository.GetQuestionById(questionId);
-                if (question != null)
-                {
-                    questions1.Add(new SequenceQuestion { Question = question, Order = questions1.Count + 1 });
-                }
-            }
-            sequence.Part1Questions = questions1;
-            
-            foreach (var questionId in request.Part2QuestionIds)
-            {
-                var question = await _questionRepository.GetQuestionById(questionId);
-                if (question != null)
-                {
-                    questions2.Add(new SequenceQuestion { Question = question, Order = questions2.Count + 1 });
-                }
-            }
-            sequence.Part2Questions = questions2;
-            
-            foreach (var questionId in request.Part3QuestionIds)
-            {
-                var question = await _questionRepository.GetQuestionById(questionId);
-                if (question != null)
-                {
-                    questions3.Add(new SequenceQuestion { Question = question, Order = questions3.Count + 1 });
-                }
-            }
-            sequence.Part3Questions = questions3;
 
+            if (!string.IsNullOrEmpty(request.Name))
+                sequence.Name = request.Name;
+
+            var part1Questions = new List<SequenceQuestion>();
+            var part2Questions = new List<SequenceQuestion>();
+            var part3Questions = new List<SequenceQuestion>();
+
+            if (request.Part1QuestionIds.Count > 0) {
+                foreach (var questionId in request.Part1QuestionIds) {
+                    var question = await _questionRepository.GetQuestionById(questionId);
+                    if (question != null) {
+                        var sequenceQuestion = new SequenceQuestion {
+                            Question = question,
+                            SequencePart = SequencePart.Part1,
+                            Order = part1Questions.Count + 1
+                        };
+                        part1Questions.Add(sequenceQuestion);
+                    }
+                }
+            }
+            if (request.Part2QuestionIds.Count > 0) {
+                foreach (var questionId in request.Part2QuestionIds) {
+                    var question = await _questionRepository.GetQuestionById(questionId);
+                    if (question != null) {
+                        var sequenceQuestion = new SequenceQuestion {
+                            Question = question,
+                            SequencePart = SequencePart.Part2,
+                            Order = part2Questions.Count + 1
+                        };
+                        part2Questions.Add(sequenceQuestion);
+                    }
+                }
+            }
+            if (request.Part3QuestionIds.Count > 0) {
+                foreach (var questionId in request.Part3QuestionIds) {
+                    var question = await _questionRepository.GetQuestionById(questionId);
+                    if (question != null) {
+                        var sequenceQuestion = new SequenceQuestion {
+                            Question = question,
+                            SequencePart = SequencePart.Part3,
+                            Order = part3Questions.Count + 1
+                        };
+                        part3Questions.Add(sequenceQuestion);
+                    }
+                }
+            }
+
+            sequence.Questions = part1Questions.Concat(part2Questions).Concat(part3Questions).ToList();
             await _sequenceRepository.UpdateSequence(sequence);
-            return new UpdateSequenceResult
-            {
+            return new UpdateSequenceResult {
                 IsSuccess = true,
                 Status = "SUCCESS",
                 Message = "Sequence updated successfully",

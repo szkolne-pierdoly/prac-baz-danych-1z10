@@ -23,11 +23,7 @@ public class SequenceRepository : ISequenceRepository
     public async Task<Sequence?> GetSequenceById(int id)
     {
         return await _context.Sequences
-            .Include(s => s.Part1Questions)
-                .ThenInclude(sq => sq.Question)
-            .Include(s => s.Part2Questions)
-                .ThenInclude(sq => sq.Question)
-            .Include(s => s.Part3Questions)
+            .Include(s => s.Questions)
                 .ThenInclude(sq => sq.Question)
             .FirstOrDefaultAsync(s => s.Id == id);
     }
@@ -35,11 +31,7 @@ public class SequenceRepository : ISequenceRepository
     public async Task<IEnumerable<Sequence>> GetAllSequences()
     {
         return await _context.Sequences
-            .Include(s => s.Part1Questions)
-                .ThenInclude(sq => sq.Question)
-            .Include(s => s.Part2Questions)
-                .ThenInclude(sq => sq.Question)
-            .Include(s => s.Part3Questions)
+            .Include(s => s.Questions)
                 .ThenInclude(sq => sq.Question)
             .ToListAsync();
     }
