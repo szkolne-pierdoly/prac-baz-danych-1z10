@@ -2,12 +2,27 @@
 
 import { Question } from "../models/Question";
 
-export async function getQuestions(): Promise<{
+export async function getQuestions(
+  page?: number,
+  pageSize?: number,
+  search?: string,
+): Promise<{
   isSuccess: boolean;
   message: string;
   questions?: Question[];
 }> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/questions`, {
+  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/questions`);
+  if (page) {
+    url.searchParams.append("page", page.toString());
+  }
+  if (pageSize) {
+    url.searchParams.append("pageSize", pageSize.toString());
+  }
+  if (search) {
+    url.searchParams.append("search", search);
+  }
+
+  const res = await fetch(url, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
