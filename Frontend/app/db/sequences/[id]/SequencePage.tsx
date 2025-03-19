@@ -50,6 +50,7 @@ export default function SequenceClientPage({
   const [renameSequenceName, setRenameSequenceName] = useState<string | null>(
     sequence?.name ?? null,
   );
+
   const router = useRouter();
   const pathname = usePathname();
 
@@ -71,6 +72,15 @@ export default function SequenceClientPage({
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const pathParts = pathname.split("/");
+    if (pathParts.length > 3 && pathParts[2] === "sequences") {
+      setPageSequenceId(pathParts[3]);
+    } else {
+      setPageSequenceId(null);
+    }
+  }, [pathname]);
 
   const handleDeleteSequence = async () => {
     if (sequence) {
@@ -97,15 +107,6 @@ export default function SequenceClientPage({
       }
     }
   };
-
-  useEffect(() => {
-    const pathParts = pathname.split("/");
-    if (pathParts.length > 3 && pathParts[2] === "sequences") {
-      setPageSequenceId(pathParts[3]);
-    } else {
-      setPageSequenceId(null);
-    }
-  }, [pathname]);
 
   const handleGoSequences = () => {
     if (pageSequenceId) {
