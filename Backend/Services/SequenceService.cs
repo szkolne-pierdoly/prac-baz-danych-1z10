@@ -158,7 +158,7 @@ public class SequenceService : ISequenceService
     {
         try
         {
-            if (string.IsNullOrEmpty(request.Name) && request != null && request.Part1QuestionIds == null && request.Part2QuestionIds == null && request.Part3QuestionIds == null) {
+            if (request != null && string.IsNullOrEmpty(request.Name) && request.Part1QuestionIds == null && request.Part2QuestionIds == null && request.Part3QuestionIds == null) {
                 return new UpdateSequenceResult {
                     IsSuccess = false,
                     Status = "ERROR",
@@ -177,14 +177,14 @@ public class SequenceService : ISequenceService
                 };
             }
 
-            if (!string.IsNullOrEmpty(request.Name))
+            if (request?.Name != null && request.Name != "")
                 sequence.Name = request.Name;
 
             var part1Questions = new List<SequenceQuestion>();
             var part2Questions = new List<SequenceQuestion>();
             var part3Questions = new List<SequenceQuestion>();
 
-            if (request.Part1QuestionIds != null && request.Part1QuestionIds.Count > 0) {
+            if (request?.Part1QuestionIds != null && request.Part1QuestionIds.Count > 0) {
                 foreach (var questionId in request.Part1QuestionIds) {
                     var question = await _questionRepository.GetQuestionById(questionId);
                     if (question != null) {
@@ -197,7 +197,7 @@ public class SequenceService : ISequenceService
                     }
                 }
             }
-            if (request.Part2QuestionIds != null && request.Part2QuestionIds.Count > 0) {
+            if (request?.Part2QuestionIds != null && request.Part2QuestionIds.Count > 0) {
                 foreach (var questionId in request.Part2QuestionIds) {
                     var question = await _questionRepository.GetQuestionById(questionId);
                     if (question != null) {
@@ -210,7 +210,7 @@ public class SequenceService : ISequenceService
                     }
                 }
             }
-            if (request.Part3QuestionIds != null && request.Part3QuestionIds.Count > 0) {
+            if (request?.Part3QuestionIds != null && request.Part3QuestionIds.Count > 0) {
                 foreach (var questionId in request.Part3QuestionIds) {
                     var question = await _questionRepository.GetQuestionById(questionId);
                     if (question != null) {
