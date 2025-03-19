@@ -158,8 +158,8 @@ export async function getSequenceQuestionsPart(
 
 export async function updateSequence(
   id: number,
-  name: string,
-  questionIds: number[],
+  name: string | null,
+  questionIds: number[] | null,
 ): Promise<{
   isSuccess: boolean;
   message: string;

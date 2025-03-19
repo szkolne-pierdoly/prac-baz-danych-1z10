@@ -12,6 +12,12 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  ModalFooter,
+  ModalBody,
+  ModalHeader,
+  ModalContent,
+  Modal,
+  Input,
 } from "@heroui/react";
 import React, { useEffect, useState } from "react";
 import {
@@ -24,6 +30,7 @@ import { useRouter, usePathname } from "next/navigation";
 import {
   deleteSequence,
   getSequence as getSequenceAction,
+  updateSequence,
 } from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";
 import SequenceQuestionsPart1 from "@/app/components/sequenceQuestionsPart1";
@@ -34,17 +41,25 @@ export default function SequenceClientPage({
   sequenceId: number;
 }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isShowConfirmDelete, setIsShowConfirmDelete] = useState(false);
+  const [isShowRename, setIsShowRename] = useState(false);
 
-  const [sequence, setSequence] = useState<Sequence | undefined>(null);
+  const [sequence, setSequence] = useState<Sequence | undefined>(undefined);
   const [selectedTab, setSelectedTab] = useState<string>("part1");
   const [pageSequenceId, setPageSequenceId] = useState<string | null>(null);
-
+  const [renameSequenceName, setRenameSequenceName] = useState<string | null>(
+    sequence?.name ?? null,
+  );
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
     getSequence();
   }, []);
+
+  useEffect(() => {
+    setRenameSequenceName(sequence?.name ?? null);
+  }, [sequence]);
 
   const getSequence = async () => {
     if (sequenceId) {
@@ -62,6 +77,23 @@ export default function SequenceClientPage({
       const result = await deleteSequence(sequence.id);
       if (result.isSuccess) {
         router.push("/db/sequences");
+      }
+    }
+  };
+
+  const handleRenameSequence = async () => {
+    if (renameSequenceName) {
+      if (sequence) {
+        const result = await updateSequence(
+          sequence.id,
+          renameSequenceName ?? null,
+          null,
+        );
+        console.log(result);
+        if (result.isSuccess) {
+          setSequence(result.sequence);
+          setIsShowRename(false);
+        }
       }
     }
   };
@@ -138,7 +170,7 @@ export default function SequenceClientPage({
                   <DropdownItem
                     key="rename"
                     startContent={<PencilIcon />}
-                    onPress={() => console.log("rename")}
+                    onPress={() => setIsShowRename(true)}
                   >
                     Zmień nazwę
                   </DropdownItem>
@@ -146,7 +178,7 @@ export default function SequenceClientPage({
                     key="delete"
                     startContent={<TrashIcon />}
                     color="danger"
-                    onPress={() => console.log("delete")}
+                    onPress={() => setIsShowConfirmDelete(true)}
                   >
                     Usuń
                   </DropdownItem>
@@ -169,9 +201,9 @@ export default function SequenceClientPage({
               )}
             </CardBody>
           </Card>
-          {/* <Modal
-            isOpen={isDeleteSequenceModalOpen}
-            onClose={() => setIsDeleteSequenceModalOpen(false)}
+          <Modal
+            isOpen={isShowConfirmDelete}
+            onClose={() => setIsShowConfirmDelete(false)}
           >
             <ModalContent>
               <ModalHeader>Napewno?</ModalHeader>
@@ -192,13 +224,42 @@ export default function SequenceClientPage({
                   variant="flat"
                   color="success"
                   className="w-full"
-                  onPress={() => setIsDeleteSequenceModalOpen(false)}
+                  onPress={() => setIsShowConfirmDelete(false)}
                 >
                   Anuluj
                 </Button>
               </ModalFooter>
             </ModalContent>
-          </Modal> */}
+          </Modal>
+          <Modal isOpen={isShowRename} onClose={() => setIsShowRename(false)}>
+            <ModalContent>
+              <ModalHeader>Zmień nazwę</ModalHeader>
+              <ModalBody>
+                <Input
+                  value={renameSequenceName ?? ""}
+                  onChange={(e) => setRenameSequenceName(e.target.value)}
+                />
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  variant="flat"
+                  color="default"
+                  className="px-8"
+                  onPress={() => setIsShowRename(false)}
+                >
+                  Anuluj
+                </Button>
+                <Button
+                  variant="flat"
+                  color="success"
+                  className="w-full"
+                  onPress={handleRenameSequence}
+                >
+                  Zmień nazwę
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
           <LoadingDialog isLoading={isLoading} />
         </div>
       </div>
