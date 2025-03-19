@@ -113,11 +113,20 @@ public class QuestionService : IQuestionService
         }
     }
 
-    public async Task<GetAllQuestionsResult> GetAllQuestions()
+    public async Task<GetAllQuestionsResult> GetQuestions(string? search = null, int? page = null, int? pageSize = null)
     {
         try
         {
-            var questions = await _questionRepository.GetAllQuestions();
+            IEnumerable<Question> questions;
+
+            if (pageSize != null)
+            {
+                questions = await _questionRepository.GetQuestions(page ?? 1, pageSize.Value, search);
+            }
+            else
+            {
+                questions = await _questionRepository.GetAllQuestions(search);
+            }
 
             return new GetAllQuestionsResult
             {

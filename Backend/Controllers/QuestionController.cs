@@ -1,5 +1,6 @@
 using Backend.Interface.Services;
 using Backend.Models.Contracts.Request;
+using Backend.Models.ServiceResults.QuestionService;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
@@ -64,9 +65,9 @@ public class QuestionController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllQuestions()
+    public async Task<IActionResult> GetQuestions([FromQuery] string? search = null, [FromQuery] int? page = null, [FromQuery] int? pageSize = null)
     {
-        var result = await _questionService.GetAllQuestions();
+        var result = await _questionService.GetQuestions(search, page, pageSize);
 
         if (result.IsSuccess)
         {

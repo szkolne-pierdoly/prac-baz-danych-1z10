@@ -31,9 +31,27 @@ public class QuestionRepository : IQuestionRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Question>> GetAllQuestions()
+    public async Task<IEnumerable<Question>> GetAllQuestions(string? search = null)
     {
-        return await _context.Questions.ToListAsync();
+        var query = _context.Questions.AsQueryable();
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(q => q.Content.Contains(search));
+        }
+        return await query.ToListAsync();
+    }
+
+    public async Task<IEnumerable<Question>> GetQuestions(int page = 1, int pageSize = 10, string? search = null)
+    {
+        var query = _context.Questions.AsQueryable();
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            query = query.Where(q => q.Content.Contains(search) || q.Hint.Contains(search) || q.CorrectAnswer.Contains(search) || q.Hint2 != null && q.Hint2.Contains(search));
+        }
+
+        return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
     }
 
     public async Task UpdateQuestion(Question question)
