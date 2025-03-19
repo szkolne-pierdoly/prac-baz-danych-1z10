@@ -48,7 +48,12 @@ public class QuestionRepository : IQuestionRepository
 
         if (!string.IsNullOrEmpty(search))
         {
-            query = query.Where(q => q.Content.Contains(search) || q.Hint.Contains(search) || q.CorrectAnswer.Contains(search) || q.Hint2 != null && q.Hint2.Contains(search));
+            var searchLower = search.ToLower();
+            query = query.Where(q =>
+                q.Content.ToLower().Contains(searchLower) ||
+                q.Hint.ToLower().Contains(searchLower) ||
+                q.CorrectAnswer.ToLower().Contains(searchLower) ||
+                (q.Hint2 != null && q.Hint2.ToLower().Contains(searchLower)));
         }
 
         return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
