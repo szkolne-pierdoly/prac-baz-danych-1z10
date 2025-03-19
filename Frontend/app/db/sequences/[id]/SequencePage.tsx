@@ -6,12 +6,6 @@ import {
   CardBody,
   Divider,
   Button,
-  Input,
-  Modal,
-  ModalHeader,
-  ModalContent,
-  ModalFooter,
-  ModalBody,
   Tabs,
   Tab,
   Dropdown,
@@ -26,15 +20,10 @@ import {
   HomeIcon,
   MoreVerticalIcon,
 } from "lucide-react";
-import { Question } from "@/app/models/Question";
 import { useRouter, usePathname } from "next/navigation";
-import { Key } from "@react-types/shared";
 import {
   deleteSequence,
-  updateSequence,
   getSequence as getSequenceAction,
-  getSequenceQuestions,
-  getSequenceQuestionsPart,
 } from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";
 import SequenceQuestionsPart1 from "@/app/components/sequenceQuestionsPart1";
