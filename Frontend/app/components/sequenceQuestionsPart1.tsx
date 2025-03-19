@@ -15,16 +15,21 @@ import SequenceQuestion from "../models/SequenceQuestion";
 import { useCallback, useEffect, useState } from "react";
 import { getSequenceQuestionsPart } from "../actions/sequence";
 import { ArrowLeftRight, Plus } from "lucide-react";
+import SelectPart1QuestionModal from "./selectPart1QuestionModal";
 
 export default function SequenceQuestionsPart1({
   sequenceId,
 }: {
   sequenceId: number;
 }) {
-  const [questions, setQuestions] = useState<SequenceQuestion[]>([]);
+  const [isShowSelectPart1Question, setIsShowSelectPart1Question] =
+    useState(false);
+
   const [focusedQuestionIndex, setFocusedQuestionIndex] = useState<
     number | null
   >(null);
+
+  const [questions, setQuestions] = useState<SequenceQuestion[]>([]);
   const [focusedQuestion, setFocusedQuestion] =
     useState<SequenceQuestion | null>(null);
 
@@ -119,6 +124,7 @@ export default function SequenceQuestionsPart1({
                   color="primary"
                   fullWidth
                   startContent={<Plus className="outline-none" />}
+                  onPress={() => setIsShowSelectPart1Question(true)}
                 >
                   Wybierz pytanie
                 </Button>
@@ -142,6 +148,12 @@ export default function SequenceQuestionsPart1({
           )}
         </ModalContent>
       </Modal>
+      <SelectPart1QuestionModal
+        isOpen={isShowSelectPart1Question}
+        onClose={() => setIsShowSelectPart1Question(false)}
+        onSuccess={() => {}}
+        position={focusedQuestionIndex ?? 0}
+      />
     </div>
   );
 }
