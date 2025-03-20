@@ -79,6 +79,7 @@ export default function FirstPartView({ sequenceId }: { sequenceId: number }) {
         }}
         sequenceId={sequenceId}
         focusedQuestionIndex={focusedQuestionIndex ?? 0}
+        part={1}
       />
       <LoadingDialog isLoading={isLoading} />
     </div>

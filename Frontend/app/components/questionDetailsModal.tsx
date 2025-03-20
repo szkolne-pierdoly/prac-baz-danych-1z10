@@ -15,6 +15,7 @@ export default function QuestionDetailsModal({
   question,
   onSave,
   sequenceId,
+  part,
   focusedQuestionIndex,
 }: {
   isOpen: boolean;
@@ -22,6 +23,7 @@ export default function QuestionDetailsModal({
   question: Question | null;
   onSave: () => void;
   sequenceId: number;
+  part: number;
   focusedQuestionIndex: number;
 }) {
   const [focusedQuestion, setFocusedQuestion] = useState<Question | null>(null);
@@ -41,7 +43,7 @@ export default function QuestionDetailsModal({
     setIsLoading(true);
     const result = await updateQuestionInSequenceActions(
       sequenceId,
-      1,
+      part,
       focusedQuestionIndex ?? 0,
       focusedQuestion?.id ?? 0,
     );
