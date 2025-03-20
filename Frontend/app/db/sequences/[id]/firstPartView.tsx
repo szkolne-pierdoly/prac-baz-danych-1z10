@@ -1,17 +1,13 @@
 "use client";
 
 import { Card, CardBody, Divider } from "@heroui/react";
-import SequenceQuestion from "../models/SequenceQuestion";
+import SequenceQuestion from "@/app/models/SequenceQuestion";
 import { useCallback, useEffect, useState } from "react";
-import { getSequenceQuestionsPart } from "../actions/sequence";
-import LoadingDialog from "./loadingDialog";
-import QuestionDetailsModal from "./questionDetailsModal";
+import { getSequenceQuestionsPart } from "@/app/actions/sequence";
+import LoadingDialog from "@/app/components/loadingDialog";
+import QuestionDetailsModal from "@/app/components/questionDetailsModal";
 
-export default function SequenceQuestionsPart1({
-  sequenceId,
-}: {
-  sequenceId: number;
-}) {
+export default function FirstPartView({ sequenceId }: { sequenceId: number }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const [focusedQuestionIndex, setFocusedQuestionIndex] = useState<

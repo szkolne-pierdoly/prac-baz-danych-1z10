@@ -33,7 +33,7 @@ import {
   updateSequence,
 } from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";
-import SequenceQuestionsPart1 from "@/app/components/sequenceQuestionsPart1";
+import FirstPartView from "./firstPartView";
 
 export default function SequenceClientPage({
   sequenceId,
@@ -198,7 +198,7 @@ export default function SequenceClientPage({
                 <Tab key="part3" title="Trzecia część" />
               </Tabs>
               {selectedTab === "part1" && (
-                <SequenceQuestionsPart1 sequenceId={sequenceId} />
+                <FirstPartView sequenceId={sequenceId} />
               )}
             </CardBody>
           </Card>
