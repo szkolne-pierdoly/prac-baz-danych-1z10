@@ -28,13 +28,12 @@ export default function SelectPart1QuestionModal({
   onSuccess: (question: Question) => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
   const [searchName, setSearchName] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
 
   const fetchQuestions = useCallback(async () => {
-    setIsLoadingMore(true);
+    setIsLoading(true);
     const currentPage = Math.floor(questions.length / 10) + 1;
     const result = await getQuestions(currentPage, undefined, searchName);
     if (result.isSuccess) {
@@ -44,12 +43,18 @@ export default function SelectPart1QuestionModal({
       ]);
       setTotalItems(result.totalItems ?? 0);
     }
-    setIsLoadingMore(false);
+    setIsLoading(false);
   }, [questions, searchName]);
 
   useEffect(() => {
-    fetchQuestions();
-  }, []);
+    if (isOpen) {
+      fetchQuestions();
+    } else {
+      setQuestions([]);
+      setSearchName("");
+      setTotalItems(0);
+    }
+  }, [isOpen]);
 
   const handleSelect = (question: Question) => {
     onSuccess(question);
@@ -108,7 +113,7 @@ export default function SelectPart1QuestionModal({
                 <Button
                   variant="flat"
                   color="primary"
-                  isLoading={isLoadingMore}
+                  isLoading={isLoading}
                   onPress={() => {
                     fetchQuestions();
                   }}
