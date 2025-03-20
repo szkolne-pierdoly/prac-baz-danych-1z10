@@ -18,7 +18,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Question } from "../models/Question";
 import { getQuestions } from "../actions/question";
 
-export default function SelectPart1QuestionModal({
+export default function SelectQuestionModal({
   isOpen,
   onClose,
   onSuccess,

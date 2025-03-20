@@ -6,8 +6,8 @@ import { ArrowLeftRight, Plus, Save } from "lucide-react";
 import { Question } from "../models/Question";
 import { useEffect, useState } from "react";
 import { updateQuestionInSequenceActions } from "../actions/sequence";
-import SelectPart1QuestionModal from "./selectPart1QuestionModal";
 import LoadingDialog from "./loadingDialog";
+import SelectQuestionModal from "./selectQuestionModal";
 
 export default function QuestionDetailsModal({
   isOpen,
@@ -141,7 +141,7 @@ export default function QuestionDetailsModal({
           </>
         )}
       </ModalContent>
-      <SelectPart1QuestionModal
+      <SelectQuestionModal
         isOpen={showSelectModal}
         onClose={() => setShowSelectModal(false)}
         onSuccess={(question: Question) => {
