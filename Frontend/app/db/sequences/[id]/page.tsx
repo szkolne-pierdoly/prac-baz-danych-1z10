@@ -1,4 +1,4 @@
-import SequenceClientPage from "./SequencePage";
+import SequenceClientPage from "./sequenceClientPage";
 
 export default async function SequencePage({
   params,
