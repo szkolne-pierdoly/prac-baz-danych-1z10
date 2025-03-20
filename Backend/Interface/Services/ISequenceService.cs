@@ -10,6 +10,7 @@ public interface ISequenceService
     Task<GetSequenceResult> GetSequence(int id);
     Task<GetSequenceQuestionsResult> GetSequenceQuestions(int id);
     Task<GetSequencePartQuestionResult> GetSequenceQuestionsPart(int id, int part);
+    Task<UpdateSequenceQuestionResult> UpdateSequenceQuestion(int sequenceId, int part, int questionIndex, UpdateSequenceQuestionRequest request);
     Task<UpdateSequenceResult> UpdateSequence(UpdateSequenceRequest request, int id);
     Task<BaseResult> DeleteSequence(int id);
 }

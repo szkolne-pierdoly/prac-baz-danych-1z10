@@ -5,6 +5,7 @@ using Backend.Interface.Repositories;
 using Backend.Models.ServiceResults.SequenceService;
 using Backend.Models.ServiceResults.QuestionService;
 using Backend.Data.Enum;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Services;
 
@@ -154,6 +155,79 @@ public class SequenceService : ISequenceService
             };
         }
     }
+
+    public async Task<UpdateSequenceQuestionResult> UpdateSequenceQuestion(int sequenceId, int part, int questionIndex, UpdateSequenceQuestionRequest request)
+    {
+        try
+        {
+            if (part < 1 || part > 3)
+            {
+                return new UpdateSequenceQuestionResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Invalid part number"
+                };
+            }
+
+            SequencePart sequencePart = part == 1 ? SequencePart.Part1 : part == 2 ? SequencePart.Part2 : SequencePart.Part3;
+
+            var sequence = await _sequenceRepository.GetSequenceById(sequenceId);
+            if (sequence == null)
+            {
+                return new UpdateSequenceQuestionResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Sequence not found",
+                    HttpStatusCode = 404
+                };
+            }
+
+            var question = await _questionRepository.GetQuestionById(request.QuestionId);
+            if (question == null)
+            {
+                return new UpdateSequenceQuestionResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Question not found",
+                    HttpStatusCode = 404
+                };
+            }
+
+            var sequenceQuestion = new SequenceQuestion {
+                Question = question,
+                SequencePart = sequencePart,
+                Order = questionIndex
+            };
+
+            foreach (var existingQuestion in sequence.Questions.ToList())
+            {
+                if (existingQuestion.Order == questionIndex)
+                {
+                    sequence.Questions.Remove(existingQuestion);
+                }
+            }
+            sequence.Questions.Add(sequenceQuestion);
+
+            await _sequenceRepository.UpdateSequence(sequence);
+
+            return new UpdateSequenceQuestionResult {
+                IsSuccess = true,
+                Status = "SUCCESS",
+                Message = "Sequence question updated successfully",
+                SequenceQuestion = sequenceQuestion
+            };
+        }
+        catch (Exception ex)
+        {
+            return new UpdateSequenceQuestionResult {
+                IsSuccess = false,
+                Status = "ERROR",
+                Message = ex.Message,
+                HttpStatusCode = 500
+            };
+        }
+    }
+
     public async Task<UpdateSequenceResult> UpdateSequence(UpdateSequenceRequest request, int id)
     {
         try
