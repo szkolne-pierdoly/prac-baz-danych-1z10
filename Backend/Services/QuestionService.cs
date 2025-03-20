@@ -128,12 +128,15 @@ public class QuestionService : IQuestionService
                 questions = await _questionRepository.GetAllQuestions(search);
             }
 
+            var totalItems = await _questionRepository.GetTotalItems(search);
+
             return new GetAllQuestionsResult
             {
                 IsSuccess = true,
                 Status = "SUCCESS",
                 Message = "Questions fetched successfully",
-                Questions = questions
+                Questions = questions,
+                TotalItems = totalItems
             };
         }
         catch (Exception ex)

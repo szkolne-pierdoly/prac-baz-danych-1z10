@@ -75,7 +75,8 @@ public class QuestionController : ControllerBase
             {
                 Status = result.Status,
                 Message = result.Message ?? "Questions fetched successfully",
-                Questions = result.Questions
+                Questions = result.Questions,
+                TotalItems = result.TotalItems
             });
         }
         else

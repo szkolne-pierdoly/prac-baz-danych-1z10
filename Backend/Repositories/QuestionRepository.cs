@@ -59,6 +59,23 @@ public class QuestionRepository : IQuestionRepository
         return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
     }
 
+    public async Task<int> GetTotalItems(string? search = null)
+    {
+        var query = _context.Questions.AsQueryable();
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            var searchLower = search.ToLower();
+            query = query.Where(q =>
+                q.Content.ToLower().Contains(searchLower) ||
+                q.Hint.ToLower().Contains(searchLower) ||
+                q.CorrectAnswer.ToLower().Contains(searchLower) ||
+                (q.Hint2 != null && q.Hint2.ToLower().Contains(searchLower)));
+        }
+
+        return await query.CountAsync();
+    }
+
     public async Task UpdateQuestion(Question question)
     {
         _context.Entry(question).State = EntityState.Modified;
