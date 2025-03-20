@@ -44,26 +44,28 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
   }, [focusedQuestionIndex, questions]);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-1">
       <div className="text-sm text-gray-500">
         Druga część gry nie ma wymaganej liczby pytań, trwa dopuki nie zostanie
         3 graczy. potem przechodzi sie do finału (części trzeciej)
       </div>
       <Divider />
-      <div className="text-xl font-bold">Pytania:</div>
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-2">
+      <div className="text-xl font-bold mb-2">Pytania:</div>
+      <div>
+        <div className="flex flex-col gap-1">
           {questions.length > 0 && (
             <>
               {questions.map((question) => (
                 <Card
                   key={question.id}
                   className={`rounded-sm ${
-                    questions[0].id === question.id
-                      ? "rounded-t-xl"
-                      : questions[questions.length - 1].id === question.id
-                        ? "rounded-b-xl"
-                        : ""
+                    questions.length === 1
+                      ? "rounded-xl"
+                      : questions[0].id === question.id
+                        ? "rounded-t-xl"
+                        : questions[questions.length - 1].id === question.id
+                          ? "rounded-b-xl"
+                          : ""
                   } flex flex-row justify-start items-center h-12`}
                   isPressable
                   onPress={() => setFocusedQuestionIndex(question.order)}
@@ -82,11 +84,13 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
             </>
           )}
           {!isLoading && questions.length === 0 && (
-            <div className="text-red-400 text-center text-2xl font-bold mt-2 mb-8">
-              Brak pytań!
-            </div>
+            <>
+              <div className="text-red-400 text-center text-2xl font-bold mt-2 mb-8">
+                Brak pytań!
+              </div>
+              <Divider />
+            </>
           )}
-          <Divider />
           <div className="flex justify-center items-center mt-2">
             <Button
               variant="flat"

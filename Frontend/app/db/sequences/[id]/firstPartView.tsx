@@ -49,7 +49,7 @@ export default function FirstPartView({ sequenceId }: { sequenceId: number }) {
         z nich. Wymagane jest dokładnie 20 pytań.
       </p>
       <Divider />
-      <div className="text-xl font-bold">Pytania:</div>
+      <div className="text-xl font-bold mb-2">Pytania:</div>
       {[...Array(20)].map((_, index) => (
         <Card
           key={index}
