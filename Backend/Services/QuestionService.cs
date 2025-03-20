@@ -113,7 +113,7 @@ public class QuestionService : IQuestionService
         }
     }
 
-    public async Task<GetAllQuestionsResult> GetQuestions(string? search = null, int? page = null, int? pageSize = null)
+    public async Task<GetAllQuestionsResult> GetQuestions(string? search = null, int? page = null, int? pageSize = null, int? ignoreInSequence = null)
     {
         try
         {
@@ -121,7 +121,7 @@ public class QuestionService : IQuestionService
 
             if (pageSize != null)
             {
-                questions = await _questionRepository.GetQuestions(page ?? 1, pageSize.Value, search);
+                questions = await _questionRepository.GetQuestions(page ?? 1, pageSize.Value, search, ignoreInSequence);
             }
             else
             {

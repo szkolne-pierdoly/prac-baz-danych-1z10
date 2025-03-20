@@ -31,7 +31,7 @@ public class QuestionRepository : IQuestionRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task<IEnumerable<Question>> GetAllQuestions(string? search = null)
+    public async Task<IEnumerable<Question>> GetAllQuestions(string? search = null, int? ignoreInSequence = null)
     {
         var query = _context.Questions.AsQueryable();
 
@@ -39,10 +39,16 @@ public class QuestionRepository : IQuestionRepository
         {
             query = query.Where(q => q.Content.Contains(search));
         }
+
+        if (ignoreInSequence != null)
+        {
+            query = query.Where(q => q.Id != ignoreInSequence);
+        }
+
         return await query.ToListAsync();
     }
 
-    public async Task<IEnumerable<Question>> GetQuestions(int page = 1, int pageSize = 10, string? search = null)
+    public async Task<IEnumerable<Question>> GetQuestions(int page = 1, int pageSize = 10, string? search = null, int? ignoreInSequence = null)
     {
         var query = _context.Questions.AsQueryable();
 
@@ -54,6 +60,11 @@ public class QuestionRepository : IQuestionRepository
                 q.Hint.ToLower().Contains(searchLower) ||
                 q.CorrectAnswer.ToLower().Contains(searchLower) ||
                 (q.Hint2 != null && q.Hint2.ToLower().Contains(searchLower)));
+        }
+
+        if (ignoreInSequence != null)
+        {
+            query = query.Where(q => q.Id != ignoreInSequence);
         }
 
         return await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();

@@ -65,9 +65,9 @@ public class QuestionController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetQuestions([FromQuery] string? search = null, [FromQuery] int? page = null, [FromQuery] int? pageSize = null)
+    public async Task<IActionResult> GetQuestions([FromQuery] string? search = null, [FromQuery] int? page = null, [FromQuery] int? pageSize = null, [FromQuery] int? ignoreInSequence = null)
     {
-        var result = await _questionService.GetQuestions(search, page, pageSize);
+        var result = await _questionService.GetQuestions(search, page, pageSize, ignoreInSequence);
 
         if (result.IsSuccess)
         {
