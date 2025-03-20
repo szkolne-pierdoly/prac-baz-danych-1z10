@@ -1,35 +1,17 @@
 "use client";
 
-import {
-  Card,
-  CardBody,
-  Divider,
-  Modal,
-  ModalHeader,
-  ModalContent,
-  ModalBody,
-  ModalFooter,
-  Button,
-} from "@heroui/react";
+import { Card, CardBody, Divider } from "@heroui/react";
 import SequenceQuestion from "../models/SequenceQuestion";
 import { useCallback, useEffect, useState } from "react";
-import {
-  getSequenceQuestionsPart,
-  updateQuestionInSequenceActions,
-} from "../actions/sequence";
-import { ArrowLeftRight, Plus } from "lucide-react";
-import SelectPart1QuestionModal from "./selectPart1QuestionModal";
-import { Question } from "../models/Question";
+import { getSequenceQuestionsPart } from "../actions/sequence";
 import LoadingDialog from "./loadingDialog";
+import QuestionDetailsModal from "./questionDetailsModal";
 
 export default function SequenceQuestionsPart1({
   sequenceId,
 }: {
   sequenceId: number;
 }) {
-  const [isShowSelectPart1Question, setIsShowSelectPart1Question] =
-    useState(false);
-  const [isUpdated, setIsUpdated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const [focusedQuestionIndex, setFocusedQuestionIndex] = useState<
@@ -64,23 +46,6 @@ export default function SequenceQuestionsPart1({
     }
   }, [focusedQuestionIndex, questions]);
 
-  const handleSave = async () => {
-    setIsLoading(true);
-    const result = await updateQuestionInSequenceActions(
-      sequenceId,
-      1,
-      focusedQuestionIndex ?? 0,
-      focusedQuestion?.question.id ?? 0,
-    );
-    if (result.isSuccess) {
-      setIsUpdated(false);
-    } else {
-      console.error(result.message);
-    }
-    setIsLoading(false);
-    setFocusedQuestionIndex(null);
-  };
-
   return (
     <div className="flex flex-col gap-1">
       <p className="text-sm text-gray-500">
@@ -108,101 +73,16 @@ export default function SequenceQuestionsPart1({
           </CardBody>
         </Card>
       ))}
-      <Modal
+      <QuestionDetailsModal
         isOpen={focusedQuestionIndex !== null}
         onClose={() => setFocusedQuestionIndex(null)}
-      >
-        <ModalContent>
-          <ModalHeader>Szczegóły pytania nr {focusedQuestionIndex}</ModalHeader>
-          <Divider />
-          <ModalBody>
-            {focusedQuestion ? (
-              <div className="flex flex-col gap-2">
-                <div>
-                  <div className="text-gray-500 text-sm">Pytanie:</div>
-                  <div>{focusedQuestion.question.content}</div>
-                </div>
-                <Divider />
-                <div>
-                  <div className="text-gray-500 text-sm">
-                    Poprawna odpowiedź:
-                  </div>
-                  <div>{focusedQuestion.question.correctAnswer}</div>
-                </div>
-                <Divider />
-                <div>
-                  <div className="text-gray-500 text-sm">Podpowiedź: </div>
-                  <div>{focusedQuestion.question.hint}</div>
-                </div>
-                <Divider />
-                <div>
-                  <div className="text-gray-500 text-sm">Podpowiedź 2:</div>
-                  <div>{focusedQuestion.question.hint2 ?? "-"}</div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-4">
-                <div className="text-xl font-bold text-center">
-                  Brak wybranego pytania
-                </div>
-                <Button
-                  variant="flat"
-                  color="primary"
-                  fullWidth
-                  startContent={<Plus className="outline-none" />}
-                  onPress={() => setIsShowSelectPart1Question(true)}
-                >
-                  Wybierz pytanie
-                </Button>
-              </div>
-            )}
-          </ModalBody>
-          {focusedQuestion && (
-            <>
-              <Divider />
-              <ModalFooter>
-                {isUpdated ? (
-                  <Button
-                    variant="flat"
-                    color="primary"
-                    fullWidth
-                    startContent={<mark className="outline-none" />}
-                    onPress={handleSave}
-                  >
-                    Zapisz
-                  </Button>
-                ) : (
-                  <Button
-                    variant="flat"
-                    color="secondary"
-                    fullWidth
-                    startContent={<ArrowLeftRight className="outline-none" />}
-                  >
-                    Zamień pytanie
-                  </Button>
-                )}
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
-      </Modal>
-      <SelectPart1QuestionModal
-        isOpen={isShowSelectPart1Question}
-        onClose={() => setIsShowSelectPart1Question(false)}
-        onSuccess={(question: Question) => {
-          setQuestions([
-            ...questions,
-            {
-              question: question,
-              order: focusedQuestionIndex ?? 0,
-              sequenceId: sequenceId,
-              sequencePart: 1,
-              id: 0,
-              questionId: 0,
-            },
-          ]);
-          setIsUpdated(true);
+        question={focusedQuestion?.question ?? null}
+        onSave={() => {
+          fetchQuestions();
+          setFocusedQuestionIndex(null);
         }}
+        sequenceId={sequenceId}
+        focusedQuestionIndex={focusedQuestionIndex ?? 0}
       />
       <LoadingDialog isLoading={isLoading} />
     </div>
