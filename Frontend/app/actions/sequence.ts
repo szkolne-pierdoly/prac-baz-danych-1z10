@@ -217,3 +217,41 @@ export async function deleteSequence(id: number): Promise<{
 
   return { isSuccess: true, message: "Sequence deleted successfully" };
 }
+
+export async function updateQuestionInSequenceActions(
+  id: number,
+  part: number,
+  questionIndex: number,
+  questionId: number,
+): Promise<{
+  isSuccess: boolean;
+  message: string;
+  question?: SequenceQuestion;
+}> {
+  const body = JSON.stringify({
+    QuestionId: questionId,
+  });
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/sequences/${id}/part/${part}/question/${questionIndex}`,
+    {
+      method: "PUT",
+      body: body,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  if (!res.ok) {
+    return { isSuccess: false, message: "Failed to update question" };
+  }
+
+  const data = await res.json();
+
+  return {
+    isSuccess: true,
+    message: "Question updated successfully",
+    question: data.question,
+  };
+}

@@ -26,7 +26,7 @@ export default function SelectPart1QuestionModal({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (question: Question) => void;
   position: number;
 }) {
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +52,11 @@ export default function SelectPart1QuestionModal({
     fetchQuestions();
   }, []);
 
+  const handleSelect = (question: Question) => {
+    onSuccess(question);
+    onClose();
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl" className="h-[32rem]">
       <ModalContent>
@@ -74,7 +79,11 @@ export default function SelectPart1QuestionModal({
           )}
           <div className="flex flex-col gap-2">
             {questions.map((question) => (
-              <Card key={question.id} isPressable>
+              <Card
+                key={question.id}
+                isPressable
+                onPress={() => handleSelect(question)}
+              >
                 <CardBody className="bg-white/5">
                   <div className="text-lg font-bold">{question.content}</div>
                   <div className="text-sm text-gray-500">

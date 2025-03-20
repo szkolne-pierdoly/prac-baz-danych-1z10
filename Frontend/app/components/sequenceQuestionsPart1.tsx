@@ -13,9 +13,14 @@ import {
 } from "@heroui/react";
 import SequenceQuestion from "../models/SequenceQuestion";
 import { useCallback, useEffect, useState } from "react";
-import { getSequenceQuestionsPart } from "../actions/sequence";
+import {
+  getSequenceQuestionsPart,
+  updateQuestionInSequenceActions,
+} from "../actions/sequence";
 import { ArrowLeftRight, Plus } from "lucide-react";
 import SelectPart1QuestionModal from "./selectPart1QuestionModal";
+import { Question } from "../models/Question";
+import LoadingDialog from "./loadingDialog";
 
 export default function SequenceQuestionsPart1({
   sequenceId,
@@ -24,6 +29,8 @@ export default function SequenceQuestionsPart1({
 }) {
   const [isShowSelectPart1Question, setIsShowSelectPart1Question] =
     useState(false);
+  const [isUpdated, setIsUpdated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [focusedQuestionIndex, setFocusedQuestionIndex] = useState<
     number | null
@@ -43,7 +50,9 @@ export default function SequenceQuestionsPart1({
   }, [sequenceId]);
 
   useEffect(() => {
+    setIsLoading(true);
     fetchQuestions();
+    setIsLoading(false);
   }, [fetchQuestions]);
 
   useEffect(() => {
@@ -54,6 +63,23 @@ export default function SequenceQuestionsPart1({
       );
     }
   }, [focusedQuestionIndex, questions]);
+
+  const handleSave = async () => {
+    setIsLoading(true);
+    const result = await updateQuestionInSequenceActions(
+      sequenceId,
+      1,
+      focusedQuestionIndex ?? 0,
+      focusedQuestion?.question.id ?? 0,
+    );
+    console.log(result);
+    if (result.isSuccess) {
+      setIsUpdated(false);
+    } else {
+      console.error(result.message);
+    }
+    setIsLoading(false);
+  };
 
   return (
     <div className="flex flex-col gap-1">
@@ -135,14 +161,26 @@ export default function SequenceQuestionsPart1({
             <>
               <Divider />
               <ModalFooter>
-                <Button
-                  variant="flat"
-                  color="secondary"
-                  fullWidth
-                  startContent={<ArrowLeftRight className="outline-none" />}
-                >
-                  Zamień pytanie
-                </Button>
+                {isUpdated ? (
+                  <Button
+                    variant="flat"
+                    color="primary"
+                    fullWidth
+                    startContent={<mark className="outline-none" />}
+                    onPress={handleSave}
+                  >
+                    Zapisz
+                  </Button>
+                ) : (
+                  <Button
+                    variant="flat"
+                    color="secondary"
+                    fullWidth
+                    startContent={<ArrowLeftRight className="outline-none" />}
+                  >
+                    Zamień pytanie
+                  </Button>
+                )}
               </ModalFooter>
             </>
           )}
@@ -151,9 +189,23 @@ export default function SequenceQuestionsPart1({
       <SelectPart1QuestionModal
         isOpen={isShowSelectPart1Question}
         onClose={() => setIsShowSelectPart1Question(false)}
-        onSuccess={() => {}}
+        onSuccess={(question: Question) => {
+          setQuestions([
+            ...questions,
+            {
+              question: question,
+              order: focusedQuestionIndex ?? 0,
+              sequenceId: sequenceId,
+              sequencePart: 1,
+              id: 0,
+              questionId: 0,
+            },
+          ]);
+          setIsUpdated(true);
+        }}
         position={focusedQuestionIndex ?? 0}
       />
+      <LoadingDialog isLoading={isLoading} />
     </div>
   );
 }
