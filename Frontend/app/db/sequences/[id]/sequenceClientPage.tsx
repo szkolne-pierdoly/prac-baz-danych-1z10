@@ -34,6 +34,7 @@ import {
 } from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";
 import FirstPartView from "./firstPartView";
+import SecondPartView from "./secondPartView";
 
 export default function SequenceClientPage({
   sequenceId,
@@ -45,7 +46,7 @@ export default function SequenceClientPage({
   const [isShowRename, setIsShowRename] = useState(false);
 
   const [sequence, setSequence] = useState<Sequence | undefined>(undefined);
-  const [selectedTab, setSelectedTab] = useState<string>("part1");
+  const [selectedTab, setSelectedTab] = useState<string>("part2"); // TODO: change to part1
   const [pageSequenceId, setPageSequenceId] = useState<string | null>(null);
   const [renameSequenceName, setRenameSequenceName] = useState<string | null>(
     sequence?.name ?? null,
@@ -199,6 +200,9 @@ export default function SequenceClientPage({
               </Tabs>
               {selectedTab === "part1" && (
                 <FirstPartView sequenceId={sequenceId} />
+              )}
+              {selectedTab === "part2" && (
+                <SecondPartView sequenceId={sequenceId} />
               )}
             </CardBody>
           </Card>
