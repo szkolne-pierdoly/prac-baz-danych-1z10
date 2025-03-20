@@ -2,8 +2,9 @@
 
 import { getSequenceQuestionsPart } from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";
+import QuestionDetailsModal from "@/app/components/questionDetailsModal";
 import SequenceQuestion from "@/app/models/SequenceQuestion";
-import { Button, Divider } from "@heroui/react";
+import { Button, Card, CardBody, Divider } from "@heroui/react";
 import { PlusIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
@@ -19,18 +20,18 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
     useState<SequenceQuestion | null>(null);
 
   const fetchQuestions = useCallback(async () => {
+    setIsLoading(true);
     const result = await getSequenceQuestionsPart(sequenceId, 2);
     if (result.isSuccess) {
       setQuestions(result.questions ?? []);
     } else {
       console.error(result.message);
     }
+    setIsLoading(false);
   }, [sequenceId]);
 
   useEffect(() => {
-    setIsLoading(true);
     fetchQuestions();
-    setIsLoading(false);
   }, [fetchQuestions]);
 
   useEffect(() => {
@@ -50,13 +51,37 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
       </div>
       <Divider />
       <div className="text-xl font-bold">Pytania:</div>
-      <div>
-        <div>
-          {questions.length > 0 ? (
-            questions.map((question) => (
-              <div key={question.id}>{question.question.content}</div>
-            ))
-          ) : (
+      <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2">
+          {questions.length > 0 && (
+            <>
+              {questions.map((question) => (
+                <Card
+                  key={question.id}
+                  className={`rounded-sm ${
+                    questions[0].id === question.id
+                      ? "rounded-t-xl"
+                      : questions[questions.length - 1].id === question.id
+                        ? "rounded-b-xl"
+                        : ""
+                  } flex flex-row justify-start items-center h-12`}
+                  isPressable
+                  onPress={() => setFocusedQuestionIndex(question.order)}
+                >
+                  <CardBody className="bg-white/5 w-12 text-center text-lg font-bold">
+                    {question.order}
+                  </CardBody>
+                  <Divider orientation="vertical" />
+                  <CardBody className="bg-white/5">
+                    {question.question.content ?? (
+                      <span className="text-red-400">No question</span>
+                    )}
+                  </CardBody>
+                </Card>
+              ))}
+            </>
+          )}
+          {!isLoading && questions.length === 0 && (
             <div className="text-red-400 text-center text-2xl font-bold mt-2 mb-8">
               Brak pytań!
             </div>
@@ -66,7 +91,7 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
             <Button
               variant="flat"
               color="primary"
-              onPress={() => {}}
+              onPress={() => setFocusedQuestionIndex(questions.length + 1)}
               startContent={<PlusIcon />}
               className="w-1/3"
             >
@@ -75,6 +100,17 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
           </div>
         </div>
       </div>
+      <QuestionDetailsModal
+        isOpen={focusedQuestionIndex !== null}
+        onClose={() => setFocusedQuestionIndex(null)}
+        question={focusedQuestion?.question ?? null}
+        onSave={() => {
+          fetchQuestions();
+        }}
+        sequenceId={sequenceId}
+        focusedQuestionIndex={focusedQuestionIndex ?? 0}
+        part={2}
+      />
       <LoadingDialog isLoading={isLoading} />
     </div>
   );
