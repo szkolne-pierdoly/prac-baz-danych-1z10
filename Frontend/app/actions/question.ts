@@ -6,16 +6,24 @@ export async function getQuestions(
   page?: number,
   pageSize?: number,
   search?: string,
+  ignoreInSequence?: number,
 ): Promise<{
   isSuccess: boolean;
   message: string;
   questions?: Question[];
   totalItems?: number;
 }> {
-  console.warn(`page: ${page}, pageSize: ${pageSize}, search: ${search}`);
-  const url = new URL(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/questions?pageSize=${pageSize ?? 10}&page=${page ?? 1}&search=${search ?? ""}`,
-  );
+  let url = `${process.env.NEXT_PUBLIC_API_URL}/api/questions`;
+  if (pageSize != null) url += `?pageSize=${pageSize}`;
+  else if (page != null) url += `?pageSize=10`;
+  if (page != null)
+    url += url.includes("?") ? `&page=${page}` : `?page=${page}`;
+  if (search != null && search !== "")
+    url += url.includes("?") ? `&search=${search}` : `?search=${search}`;
+  if (ignoreInSequence != null)
+    url += url.includes("?")
+      ? `&ignoreInSequence=${ignoreInSequence}`
+      : `?ignoreInSequence=${ignoreInSequence}`;
 
   const res = await fetch(url, {
     method: "GET",
