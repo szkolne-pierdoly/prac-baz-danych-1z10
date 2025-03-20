@@ -10,17 +10,12 @@ export async function getQuestions(
   isSuccess: boolean;
   message: string;
   questions?: Question[];
+  totalItems?: number;
 }> {
-  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/questions`);
-  if (page) {
-    url.searchParams.append("page", page.toString());
-  }
-  if (pageSize) {
-    url.searchParams.append("pageSize", pageSize.toString());
-  }
-  if (search) {
-    url.searchParams.append("search", search);
-  }
+  console.warn(`page: ${page}, pageSize: ${pageSize}, search: ${search}`);
+  const url = new URL(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/questions?pageSize=${pageSize ?? 10}&page=${page ?? 1}&search=${search ?? ""}`,
+  );
 
   const res = await fetch(url, {
     method: "GET",
@@ -39,6 +34,7 @@ export async function getQuestions(
     isSuccess: true,
     message: "Questions fetched successfully",
     questions: data.questions,
+    totalItems: data.totalItems,
   };
 }
 

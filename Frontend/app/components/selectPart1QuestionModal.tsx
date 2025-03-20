@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Button,
   Card,
   CardBody,
   Divider,
@@ -27,23 +28,24 @@ export default function SelectPart1QuestionModal({
   onSuccess: (question: Question) => void;
 }) {
   const [isLoading, setIsLoading] = useState(false);
-
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
   const [searchName, setSearchName] = useState("");
-
   const [questions, setQuestions] = useState<Question[]>([]);
 
   const fetchQuestions = useCallback(async () => {
-    setIsLoading(true);
-    const result = await getQuestions(1, 10, searchName);
+    setIsLoadingMore(true);
+    const currentPage = Math.floor(questions.length / 10) + 1;
+    const result = await getQuestions(currentPage, undefined, searchName);
     if (result.isSuccess) {
-      setQuestions(result.questions ?? []);
+      setQuestions((prevQuestions) => [
+        ...prevQuestions,
+        ...(result.questions ?? []),
+      ]);
+      setTotalItems(result.totalItems ?? 0);
     }
-    setIsLoading(false);
-  }, [searchName]);
-
-  useEffect(() => {
-    fetchQuestions();
-  }, [fetchQuestions, searchName]);
+    setIsLoadingMore(false);
+  }, [questions, searchName]);
 
   useEffect(() => {
     fetchQuestions();
@@ -58,11 +60,15 @@ export default function SelectPart1QuestionModal({
     <Modal isOpen={isOpen} onClose={onClose} size="2xl" className="h-[32rem]">
       <ModalContent>
         <ModalHeader className="flex flex-col gap-2">
-          Wybierz pytanie
+          Wybierz pytanie {questions.length} / {totalItems}
           <Input
             placeholder="Szukaj pytania"
             value={searchName}
-            onChange={(e) => setSearchName(e.target.value)}
+            onChange={(e) => {
+              setSearchName(e.target.value);
+              setQuestions([]);
+              fetchQuestions();
+            }}
           />
         </ModalHeader>
         <Divider />
@@ -74,7 +80,7 @@ export default function SelectPart1QuestionModal({
               <Spinner size="lg" />
             </div>
           )}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 mb-3">
             {questions.map((question) => (
               <Card
                 key={question.id}
@@ -82,7 +88,9 @@ export default function SelectPart1QuestionModal({
                 onPress={() => handleSelect(question)}
               >
                 <CardBody className="bg-white/5">
-                  <div className="text-lg font-bold">{question.content}</div>
+                  <div className="text-lg font-bold">
+                    {question.id}. {question.content}
+                  </div>
                   <div className="text-sm text-gray-500">
                     Podpowiedź: {question.hint}
                   </div>
@@ -95,6 +103,20 @@ export default function SelectPart1QuestionModal({
                 </CardBody>
               </Card>
             ))}
+            {questions.length < totalItems && (
+              <div className="flex justify-center mt-3">
+                <Button
+                  variant="flat"
+                  color="primary"
+                  isLoading={isLoadingMore}
+                  onPress={() => {
+                    fetchQuestions();
+                  }}
+                >
+                  Załaduj więcej
+                </Button>
+              </div>
+            )}
           </div>
         </ModalBody>
       </ModalContent>
