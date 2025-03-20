@@ -201,7 +201,7 @@ public class SequenceService : ISequenceService
 
             foreach (var existingQuestion in sequence.Questions.ToList())
             {
-                if (existingQuestion.Order == questionIndex)
+                if (existingQuestion.Order == questionIndex && existingQuestion.SequencePart == sequencePart)
                 {
                     sequence.Questions.Remove(existingQuestion);
                 }
