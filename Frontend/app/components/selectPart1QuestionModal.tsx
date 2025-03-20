@@ -15,19 +15,16 @@ import { ModalContent } from "@heroui/react";
 import { Modal } from "@heroui/react";
 import { useCallback, useEffect, useState } from "react";
 import { Question } from "../models/Question";
-import { getSequenceQuestionsPart } from "../actions/sequence";
 import { getQuestions } from "../actions/question";
 
 export default function SelectPart1QuestionModal({
   isOpen,
   onClose,
   onSuccess,
-  position,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: (question: Question) => void;
-  position: number;
 }) {
   const [isLoading, setIsLoading] = useState(false);
 

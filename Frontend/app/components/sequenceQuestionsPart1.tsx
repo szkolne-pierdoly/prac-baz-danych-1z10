@@ -72,13 +72,13 @@ export default function SequenceQuestionsPart1({
       focusedQuestionIndex ?? 0,
       focusedQuestion?.question.id ?? 0,
     );
-    console.log(result);
     if (result.isSuccess) {
       setIsUpdated(false);
     } else {
       console.error(result.message);
     }
     setIsLoading(false);
+    setFocusedQuestionIndex(null);
   };
 
   return (
@@ -203,7 +203,6 @@ export default function SequenceQuestionsPart1({
           ]);
           setIsUpdated(true);
         }}
-        position={focusedQuestionIndex ?? 0}
       />
       <LoadingDialog isLoading={isLoading} />
     </div>
