@@ -1,13 +1,22 @@
 "use client";
 
-import { Button, Divider, ModalFooter } from "@heroui/react";
+import {
+  Button,
+  Divider,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  ModalFooter,
+} from "@heroui/react";
 import { Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/react";
-import { ArrowLeftRight, Plus, Save, Trash } from "lucide-react";
+import { ArrowLeftRight, EllipsisVerticalIcon, Plus, Save } from "lucide-react";
 import { Question } from "../models/Question";
 import { useEffect, useState } from "react";
 import { updateQuestionInSequenceActions } from "../actions/sequence";
 import LoadingDialog from "./loadingDialog";
 import SelectQuestionModal from "./selectQuestionModal";
+import ReorderQuestionModal from "./reorderQuestionModal";
 
 export default function QuestionDetailsModal({
   isOpen,
@@ -31,6 +40,7 @@ export default function QuestionDetailsModal({
   const [isLoading, setIsLoading] = useState(false);
   const [showSelectModal, setShowSelectModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showReorderModal, setShowReorderModal] = useState(false);
   useEffect(() => {
     if (isOpen) {
       setFocusedQuestion(question);
@@ -160,14 +170,28 @@ export default function QuestionDetailsModal({
                   >
                     Zamień pytanie
                   </Button>
-                  <Button
-                    variant="flat"
-                    color="danger"
-                    isIconOnly
-                    onPress={() => setShowDeleteModal(true)}
-                  >
-                    <Trash className="outline-none" />
-                  </Button>
+                  <Dropdown>
+                    <DropdownTrigger>
+                      <Button variant="light" isIconOnly>
+                        <EllipsisVerticalIcon />
+                      </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu>
+                      <DropdownItem
+                        key="reorder"
+                        onPress={() => setShowReorderModal(true)}
+                      >
+                        Przenieś pytanie
+                      </DropdownItem>
+                      <DropdownItem
+                        key="delete"
+                        onPress={() => setShowDeleteModal(true)}
+                        color="danger"
+                      >
+                        Usuń pytanie
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </Dropdown>
                 </div>
               )}
             </ModalFooter>
@@ -209,6 +233,19 @@ export default function QuestionDetailsModal({
           </ModalFooter>
         </ModalContent>
       </Modal>
+      <ReorderQuestionModal
+        isOpen={showReorderModal}
+        onClose={() => {
+          setShowReorderModal(false);
+        }}
+        onSuccess={() => {
+          onClose();
+          onSave();
+        }}
+        sequenceId={sequenceId}
+        part={part}
+        moveFrom={focusedQuestionIndex ?? 0}
+      />
     </Modal>
   );
 }

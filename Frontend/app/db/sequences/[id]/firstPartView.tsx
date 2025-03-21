@@ -54,8 +54,9 @@ export default function FirstPartView({ sequenceId }: { sequenceId: number }) {
         <Card
           key={index}
           className={`rounded-sm ${index === 0 ? "rounded-t-xl" : index === 19 ? "rounded-b-xl" : ""} flex flex-row justify-start items-center h-12`}
-          isPressable
           onPress={() => setFocusedQuestionIndex(index + 1)}
+          isPressable
+          isHoverable
         >
           <CardBody className="bg-white/5 w-12 text-center text-lg font-bold">
             {index + 1}

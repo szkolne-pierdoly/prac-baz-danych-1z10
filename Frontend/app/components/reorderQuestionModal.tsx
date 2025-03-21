@@ -70,6 +70,7 @@ export default function ReorderQuestionModal({
             variant="flat"
             onPress={handleReorder}
             color="primary"
+            isDisabled={newPosition === moveFrom}
           >
             Przenieś
           </Button>
