@@ -244,9 +244,6 @@ public class SequenceService : ISequenceService
 
             await _sequenceRepository.UpdateSequence(sequence);
 
-            // Align questions after update
-            await AlignQuestionsInSequence(sequenceId, part);
-
             return new UpdateSequenceQuestionResult {
                 IsSuccess = true,
                 Status = "SUCCESS",
@@ -375,6 +372,43 @@ public class SequenceService : ISequenceService
                 Status = "ERROR",
                 Message = ex.Message
             };
+        }
+    }
+
+    public async Task<BaseResult> CleanSequencePartOrder(int id, int part)
+    {
+        try
+        {
+            var sequence = await _sequenceRepository.GetSequenceById(id);
+            if (sequence == null)
+            {
+                return new BaseResult { IsSuccess = false, Status = "ERROR", Message = "Sequence not found" };
+            }
+
+            SequencePart sequencePart = part == 1 ? SequencePart.Part1 : part == 2 ? SequencePart.Part2 : SequencePart.Part3;
+
+            var questionsInPart = sequence.Questions
+                .Where(q => q.SequencePart == sequencePart)
+                .OrderBy(q => q.Order)
+                .ToList();
+
+            for (int i = 0; i < questionsInPart.Count; i++)
+            {
+                questionsInPart[i].Order = i + 1;
+            }
+
+            sequence.Questions = sequence.Questions
+                .Where(q => q.SequencePart != sequencePart)
+                .Concat(questionsInPart)
+                .ToList();
+
+            await _sequenceRepository.UpdateSequence(sequence);
+
+            return new BaseResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequence part order cleaned successfully" };
+        }
+        catch (Exception ex)
+        {
+            return new BaseResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
         }
     }
 

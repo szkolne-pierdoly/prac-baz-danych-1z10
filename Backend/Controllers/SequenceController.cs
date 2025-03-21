@@ -166,6 +166,29 @@ public class SequenceController : ControllerBase
         }
     }
 
+    [HttpPut("{id}/part/{part}/clean")]
+    public async Task<IActionResult> CleanSequencePartOrder(int id, int part)
+    {
+        var result = await _sequenceService.CleanSequencePartOrder(id, part);
+
+        if (result.IsSuccess)
+        {
+            return Ok(new
+            {
+                Status = result.Status,
+                Message = result.Message ?? "Sequence part order cleaned successfully"
+            });
+        }
+        else
+        {
+            return StatusCode(result.HttpStatusCode ?? 500, new
+            {
+                Status = result.Status,
+                Message = result.Message ?? "Something went wrong, please try again later."
+            });
+        }
+    }
+
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateSequence([FromBody] UpdateSequenceRequest request, int id)
     {
