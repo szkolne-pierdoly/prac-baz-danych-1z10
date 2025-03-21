@@ -35,6 +35,7 @@ import {
 import LoadingDialog from "@/app/components/loadingDialog";
 import FirstPartView from "./firstPartView";
 import SecondPartView from "./secondPartView";
+import ThirdPartView from "./thirdPageView";
 
 export default function SequenceClientPage({
   sequenceId,
@@ -203,6 +204,9 @@ export default function SequenceClientPage({
               )}
               {selectedTab === "part2" && (
                 <SecondPartView sequenceId={sequenceId} />
+              )}
+              {selectedTab === "part3" && (
+                <ThirdPartView sequenceId={sequenceId} />
               )}
             </CardBody>
           </Card>
