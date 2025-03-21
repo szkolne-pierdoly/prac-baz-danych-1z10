@@ -182,6 +182,19 @@ public class SequenceService : ISequenceService
                 };
             }
 
+            if (request.QuestionId == -1)
+            {
+                sequence.Questions.Remove(sequence.Questions.FirstOrDefault(q => q.SequencePart == sequencePart && q.Order == questionIndex));
+
+                await _sequenceRepository.UpdateSequence(sequence);
+                
+                return new UpdateSequenceQuestionResult {
+                    IsSuccess = true,
+                    Status = "SUCCESS",
+                    Message = "Sequence question removed successfully"
+                };
+            }
+
             var question = await _questionRepository.GetQuestionById(request.QuestionId);
             if (question == null)
             {
