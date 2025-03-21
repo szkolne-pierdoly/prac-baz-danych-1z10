@@ -285,6 +285,71 @@ public class SequenceService : ISequenceService
         await _sequenceRepository.UpdateSequence(sequence);
     }
 
+    public async Task<BaseResult> ReorderSequenceQuestion(int sequenceId, int part, int question, ReorderSequenceQuestionRequest request)
+    {
+        try
+        {
+            var sequence = await _sequenceRepository.GetSequenceById(sequenceId);
+            if (sequence == null)
+            {
+                return new BaseResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Sequence not found"
+                };
+            }
+            else if (sequence.Questions.Count == 0)
+            {
+                return new BaseResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Sequence is empty"
+                };
+            }
+
+            var sequencePart = part == 1 ? SequencePart.Part1 : part == 2 ? SequencePart.Part2 : SequencePart.Part3;
+
+            var questionsInPart = sequence.Questions.Where(q => q.SequencePart == sequencePart).OrderBy(q => q.Order).ToList();
+
+            var oldQuestion = questionsInPart.FirstOrDefault(q => q.Order == question);
+            if (oldQuestion != null)
+            {
+                if (question > request.MoveTo)
+                {
+                    foreach (var questionToShift in questionsInPart.Where(q => q.Order >= request.MoveTo && q.Order < question).OrderByDescending(q => q.Order))
+                    {
+                        questionToShift.Order++;
+                    }
+                }
+                else
+                {
+                    foreach (var questionToShift in questionsInPart.Where(q => q.Order <= request.MoveTo && q.Order > question).OrderBy(q => q.Order))
+                    {
+                        questionToShift.Order--;
+                    }
+                }
+
+                oldQuestion.Order = request.MoveTo;
+
+                await _sequenceRepository.UpdateSequence(sequence);
+
+                return new BaseResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequence question reordered successfully" };
+            }
+            else
+            {
+                return new BaseResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Question not found in the specified part"
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            return new BaseResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
+        }
+    }
+
     public async Task<UpdateSequenceResult> UpdateSequence(UpdateSequenceRequest request, int id)
     {
         try

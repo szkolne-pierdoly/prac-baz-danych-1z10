@@ -189,6 +189,29 @@ public class SequenceController : ControllerBase
         }
     }
 
+    [HttpPut("{id}/part/{part}/questions/{question}/reorder")]
+    public async Task<IActionResult> ReorderSequenceQuestion(int id, int part, int question, [FromBody] ReorderSequenceQuestionRequest request)
+    {
+        var result = await _sequenceService.ReorderSequenceQuestion(id, part, question, request);
+
+        if (result.IsSuccess)
+        {
+            return Ok(new
+            {
+                Status = result.Status,
+                Message = result.Message ?? "Sequence question reordered successfully"
+            });
+        }
+        else
+        {
+            return StatusCode(result.HttpStatusCode ?? 500, new
+            {
+                Status = result.Status,
+                Message = result.Message ?? "Something went wrong, please try again later."
+            });
+        }
+    }
+
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateSequence([FromBody] UpdateSequenceRequest request, int id)
     {
