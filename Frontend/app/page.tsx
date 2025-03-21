@@ -28,7 +28,7 @@ export default function Home() {
     <div className="flex h-screen w-screen flex-col items-center justify-center">
       <h1 className="text-center text-6xl mb-4">Panel operatora</h1>
       <Divider />
-      <div className="flex flex-col w-full h-full items-center justify-start max-h-[75vh] px-2">
+      <div className="flex flex-col w-full h-full items-center justify-start max-h-[75vh] px-2 gap-4">
         <div className="flex flex-col items-center justify-center mt-4 w-full max-w-4xl gap-4">
           <div className="w-full flex flex-col items-center justify-center gap-1">
             <div className="w-full text-2xl font-bold">Baza danych</div>
@@ -78,6 +78,14 @@ export default function Home() {
               </CardBody>
             </Card>
           </div>
+        </div>
+        <Divider />
+        <div className="flex flex-col items-center justify-center mt-4 w-full max-w-4xl gap-4">
+          <Card isPressable isHoverable>
+            <CardBody className="bg-emerald-600/30">
+              <div className="text-2xl font-bold">Rozpocznij grę!</div>
+            </CardBody>
+          </Card>
         </div>
       </div>
     </div>
