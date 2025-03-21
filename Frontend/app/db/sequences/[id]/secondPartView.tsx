@@ -23,7 +23,7 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
     setIsLoading(true);
     const result = await getSequenceQuestionsPart(sequenceId, 2);
     if (result.isSuccess) {
-      setQuestions(result.questions ?? []);
+      setQuestions((result.questions ?? []).sort((a, b) => a.order - b.order));
     } else {
       console.error(result.message);
     }
