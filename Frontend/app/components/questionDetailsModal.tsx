@@ -2,7 +2,7 @@
 
 import { Button, Divider, ModalFooter } from "@heroui/react";
 import { Modal, ModalBody, ModalContent, ModalHeader } from "@heroui/react";
-import { ArrowLeftRight, Plus, Save } from "lucide-react";
+import { ArrowLeftRight, Plus, Save, Trash } from "lucide-react";
 import { Question } from "../models/Question";
 import { useEffect, useState } from "react";
 import { updateQuestionInSequenceActions } from "../actions/sequence";
@@ -30,12 +30,15 @@ export default function QuestionDetailsModal({
   const [isUpdated, setIsUpdated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showSelectModal, setShowSelectModal] = useState(false);
-
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   useEffect(() => {
     if (isOpen) {
       setFocusedQuestion(question);
     } else {
       setFocusedQuestion(null);
+      setIsUpdated(false);
+      setShowSelectModal(false);
+      setIsLoading(false);
     }
   }, [isOpen, question]);
 
@@ -55,6 +58,24 @@ export default function QuestionDetailsModal({
     setIsLoading(false);
     onSave();
     onClose();
+  };
+
+  const handleDelete = async () => {
+    setIsLoading(true);
+    const result = await updateQuestionInSequenceActions(
+      sequenceId,
+      part,
+      focusedQuestionIndex ?? 0,
+      -1,
+    );
+    if (result.isSuccess) {
+      setIsLoading(false);
+      onSave();
+      onClose();
+    } else {
+      console.error(result.message);
+    }
+    setIsLoading(false);
   };
 
   return (
@@ -129,15 +150,25 @@ export default function QuestionDetailsModal({
                   </Button>
                 </div>
               ) : (
-                <Button
-                  variant="flat"
-                  color="secondary"
-                  fullWidth
-                  startContent={<ArrowLeftRight className="outline-none" />}
-                  onPress={() => setShowSelectModal(true)}
-                >
-                  Zamień pytanie
-                </Button>
+                <div className="flex flex-row gap-2 w-full">
+                  <Button
+                    variant="flat"
+                    color="secondary"
+                    fullWidth
+                    startContent={<ArrowLeftRight className="outline-none" />}
+                    onPress={() => setShowSelectModal(true)}
+                  >
+                    Zamień pytanie
+                  </Button>
+                  <Button
+                    variant="flat"
+                    color="danger"
+                    isIconOnly
+                    onPress={() => setShowDeleteModal(true)}
+                  >
+                    <Trash className="outline-none" />
+                  </Button>
+                </div>
               )}
             </ModalFooter>
           </>
@@ -153,6 +184,31 @@ export default function QuestionDetailsModal({
         }}
       />
       <LoadingDialog isLoading={isLoading} />
+      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)}>
+        <ModalContent>
+          <ModalHeader>Usuń pytanie</ModalHeader>
+          <ModalBody>
+            <div className="text-center text-sm">
+              Czy na pewno chcesz usunąć to pytanie? Akcja ta jest
+              nieodwracalna. Pytanie zostanie usunięte tylko z tej sekwencji,
+              dalej będzie w bazie danych oraz innych sekwencjach.
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button variant="flat" color="danger" onPress={handleDelete}>
+              Usuń
+            </Button>
+            <Button
+              variant="flat"
+              color="primary"
+              fullWidth
+              onPress={() => setShowDeleteModal(false)}
+            >
+              Anuluj
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Modal>
   );
 }
