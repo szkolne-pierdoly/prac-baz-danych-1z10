@@ -3,6 +3,7 @@
 import { getSequenceQuestionsPart } from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";
 import QuestionDetailsModal from "@/app/components/questionDetailsModal";
+import ReorderQuestionModal from "@/app/components/reorderQuestionModal";
 import SequenceQuestion from "@/app/models/SequenceQuestion";
 import { Button, Card, CardBody, Divider } from "@heroui/react";
 import { PlusIcon } from "lucide-react";
@@ -10,6 +11,7 @@ import { useCallback, useEffect, useState } from "react";
 
 export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
   const [isLoading, setIsLoading] = useState(false);
+  const [showReorderModal, setShowReorderModal] = useState(false);
 
   const [focusedQuestionIndex, setFocusedQuestionIndex] = useState<
     number | null
@@ -68,13 +70,23 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
                           : ""
                   } flex flex-row justify-start items-center h-12`}
                   isPressable
-                  onPress={() => setFocusedQuestionIndex(question.order)}
                 >
-                  <CardBody className="bg-white/5 w-12 text-center text-lg font-bold">
+                  <CardBody
+                    className="bg-white/5 w-12 text-center text-lg font-bold"
+                    onClick={() => {
+                      setFocusedQuestionIndex(question.order);
+                      setShowReorderModal(true);
+                    }}
+                  >
                     {question.order}
                   </CardBody>
                   <Divider orientation="vertical" />
-                  <CardBody className="bg-white/5">
+                  <CardBody
+                    className="bg-white/5"
+                    onClick={() => {
+                      setFocusedQuestionIndex(question.order);
+                    }}
+                  >
                     {question.question.content ?? (
                       <span className="text-red-400">No question</span>
                     )}
@@ -105,7 +117,7 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
         </div>
       </div>
       <QuestionDetailsModal
-        isOpen={focusedQuestionIndex !== null}
+        isOpen={focusedQuestionIndex !== null && !showReorderModal}
         onClose={() => setFocusedQuestionIndex(null)}
         question={focusedQuestion?.question ?? null}
         onSave={() => {
@@ -114,6 +126,19 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
         sequenceId={sequenceId}
         focusedQuestionIndex={focusedQuestionIndex ?? 0}
         part={2}
+      />
+      <ReorderQuestionModal
+        isOpen={showReorderModal}
+        onClose={() => {
+          setShowReorderModal(false);
+          setFocusedQuestionIndex(null);
+        }}
+        onSuccess={() => {
+          fetchQuestions();
+        }}
+        sequenceId={sequenceId}
+        part={2}
+        moveFrom={focusedQuestionIndex ?? 0}
       />
       <LoadingDialog isLoading={isLoading} />
     </div>

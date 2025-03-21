@@ -255,3 +255,68 @@ export async function updateQuestionInSequenceActions(
     question: data.question,
   };
 }
+
+export async function reorderQuestionInSequenceActions(
+  id: number,
+  part: number,
+  questionIndex: number,
+  newPosition: number,
+): Promise<{
+  isSuccess: boolean;
+  message: string;
+}> {
+  const body = JSON.stringify({
+    MoveTo: newPosition,
+  });
+
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/sequences/${id}/part/${part}/questions/${questionIndex}/reorder`,
+    {
+      method: "PUT",
+      body: body,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  if (!res.ok) {
+    return { isSuccess: false, message: "Failed to reorder question" };
+  }
+
+  const data = await res.json();
+
+  return {
+    isSuccess: true,
+    message: data.message || "Question reordered successfully",
+  };
+}
+
+export async function cleanSequencePartOrderActions(
+  id: number,
+  part: number,
+): Promise<{
+  isSuccess: boolean;
+  message: string;
+}> {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/sequences/${id}/part/${part}/clean`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  if (!res.ok) {
+    return { isSuccess: false, message: "Failed to clean sequence part order" };
+  }
+
+  const data = await res.json();
+
+  return {
+    isSuccess: true,
+    message: data.message || "Sequence part order cleaned successfully",
+  };
+}
