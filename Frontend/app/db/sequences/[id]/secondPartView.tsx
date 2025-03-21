@@ -1,11 +1,14 @@
 "use client";
 
-import { getSequenceQuestionsPart } from "@/app/actions/sequence";
+import {
+  cleanSequencePartOrderActions,
+  getSequenceQuestionsPart,
+} from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";
 import QuestionDetailsModal from "@/app/components/questionDetailsModal";
 import SequenceQuestion from "@/app/models/SequenceQuestion";
-import { Button, Card, CardBody, Divider } from "@heroui/react";
-import { PlusIcon } from "lucide-react";
+import { Button, Card, CardBody, Divider, Tooltip } from "@heroui/react";
+import { PlusIcon, SparklesIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 
 export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
@@ -42,6 +45,19 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
       );
     }
   }, [focusedQuestionIndex, questions]);
+
+  const cleanOrder = useCallback(async () => {
+    setIsLoading(true);
+    const result = await cleanSequencePartOrderActions(sequenceId, 2);
+    if (result.isSuccess) {
+      fetchQuestions().then(() => {
+        setIsLoading(false);
+      });
+    } else {
+      console.error(result.message);
+      setIsLoading(false);
+    }
+  }, [sequenceId, fetchQuestions]);
 
   return (
     <div className="flex flex-col gap-1">
@@ -94,7 +110,7 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
               <Divider />
             </>
           )}
-          <div className="flex justify-center items-center mt-2">
+          <div className="flex justify-center items-center mt-2 gap-2">
             <Button
               variant="flat"
               color="primary"
@@ -104,6 +120,11 @@ export default function SecondPartView({ sequenceId }: { sequenceId: number }) {
             >
               Dodaj pytania
             </Button>
+            <Tooltip content="Usuń przerwy w kolejności pytań">
+              <Button variant="flat" isIconOnly onPress={cleanOrder}>
+                <SparklesIcon />
+              </Button>
+            </Tooltip>
           </div>
         </div>
       </div>
