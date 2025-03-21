@@ -354,7 +354,8 @@ public class SequenceService : ISequenceService
     {
         try
         {
-            if (request != null && string.IsNullOrEmpty(request.Name) && request.Part1QuestionIds == null && request.Part2QuestionIds == null && request.Part3QuestionIds == null) {
+            if (request == null || (string.IsNullOrEmpty(request.Name) && request.Part1QuestionIds == null && request.Part2QuestionIds == null && request.Part3QuestionIds == null))
+            {
                 return new UpdateSequenceResult {
                     IsSuccess = false,
                     Status = "ERROR",
@@ -373,54 +374,40 @@ public class SequenceService : ISequenceService
                 };
             }
 
-            if (request?.Name != null && request.Name != "")
+            // Update sequence name if provided
+            if (!string.IsNullOrEmpty(request.Name))
+            {
                 sequence.Name = request.Name;
-
-            var part1Questions = new List<SequenceQuestion>();
-            var part2Questions = new List<SequenceQuestion>();
-            var part3Questions = new List<SequenceQuestion>();
-
-            if (request?.Part1QuestionIds != null && request.Part1QuestionIds.Count > 0) {
-                foreach (var questionId in request.Part1QuestionIds) {
-                    var question = await _questionRepository.GetQuestionById(questionId);
-                    if (question != null) {
-                        var sequenceQuestion = new SequenceQuestion {
-                            Question = question,
-                            SequencePart = SequencePart.Part1,
-                            Order = part1Questions.Count + 1
-                        };
-                        part1Questions.Add(sequenceQuestion);
-                    }
-                }
-            }
-            if (request?.Part2QuestionIds != null && request.Part2QuestionIds.Count > 0) {
-                foreach (var questionId in request.Part2QuestionIds) {
-                    var question = await _questionRepository.GetQuestionById(questionId);
-                    if (question != null) {
-                        var sequenceQuestion = new SequenceQuestion {
-                            Question = question,
-                            SequencePart = SequencePart.Part2,
-                            Order = part2Questions.Count + 1
-                        };
-                        part2Questions.Add(sequenceQuestion);
-                    }
-                }
-            }
-            if (request?.Part3QuestionIds != null && request.Part3QuestionIds.Count > 0) {
-                foreach (var questionId in request.Part3QuestionIds) {
-                    var question = await _questionRepository.GetQuestionById(questionId);
-                    if (question != null) {
-                        var sequenceQuestion = new SequenceQuestion {
-                            Question = question,
-                            SequencePart = SequencePart.Part3,
-                            Order = part3Questions.Count + 1
-                        };
-                        part3Questions.Add(sequenceQuestion);
-                    }
-                }
             }
 
-            sequence.Questions = part1Questions.Concat(part2Questions).Concat(part3Questions).ToList();
+            // Update questions only if new question IDs are provided
+            if (request.Part1QuestionIds != null || request.Part2QuestionIds != null || request.Part3QuestionIds != null)
+            {
+                var newQuestions = new List<SequenceQuestion>();
+
+                if (request.Part1QuestionIds != null)
+                {
+                    newQuestions.AddRange(await AddQuestionsToSequence(request.Part1QuestionIds, SequencePart.Part1));
+                }
+                if (request.Part2QuestionIds != null)
+                {
+                    newQuestions.AddRange(await AddQuestionsToSequence(request.Part2QuestionIds, SequencePart.Part2));
+                }
+                if (request.Part3QuestionIds != null)
+                {
+                    newQuestions.AddRange(await AddQuestionsToSequence(request.Part3QuestionIds, SequencePart.Part3));
+                }
+
+                // Remove existing questions that are not in the new list
+                sequence.Questions = sequence.Questions.Where(q => !newQuestions.Any(nq => nq.Question.Id == q.Question.Id)).ToList();
+
+                // Add new questions
+                sequence.Questions.AddRangeExtension(newQuestions);
+
+                // Reorder questions
+                await ReorderQuestions(sequence);
+            }
+
             await _sequenceRepository.UpdateSequence(sequence);
             return new UpdateSequenceResult {
                 IsSuccess = true,
@@ -437,6 +424,37 @@ public class SequenceService : ISequenceService
                 Status = "ERROR",
                 Message = ex.Message
             };
+        }
+    }
+
+    private async Task<List<SequenceQuestion>> AddQuestionsToSequence(List<int> questionIds, SequencePart part)
+    {
+        var questions = new List<SequenceQuestion>();
+        for (int i = 0; i < questionIds.Count; i++)
+        {
+            var question = await _questionRepository.GetQuestionById(questionIds[i]);
+            if (question != null)
+            {
+                questions.Add(new SequenceQuestion
+                {
+                    Question = question,
+                    SequencePart = part,
+                    Order = i + 1
+                });
+            }
+        }
+        return questions;
+    }
+
+    private async Task ReorderQuestions(Sequence sequence)
+    {
+        foreach (var part in new[] { SequencePart.Part1, SequencePart.Part2, SequencePart.Part3 })
+        {
+            var partQuestions = sequence.Questions.Where(q => q.SequencePart == part).OrderBy(q => q.Order).ToList();
+            for (int i = 0; i < partQuestions.Count; i++)
+            {
+                partQuestions[i].Order = i + 1;
+            }
         }
     }
 
@@ -487,6 +505,17 @@ public class SequenceService : ISequenceService
         catch (Exception ex)
         {
             return new BaseResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
+        }
+    }
+}
+
+public static class CollectionExtensions
+{
+    public static void AddRangeExtension<T>(this ICollection<T> destination, IEnumerable<T> source)
+    {
+        foreach (var item in source)
+        {
+            destination.Add(item);
         }
     }
 }
