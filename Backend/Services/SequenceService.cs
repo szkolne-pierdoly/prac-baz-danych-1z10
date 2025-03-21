@@ -182,9 +182,19 @@ public class SequenceService : ISequenceService
                 };
             }
 
+            var questionsInPart = sequence.Questions.Where(q => q.SequencePart == sequencePart).OrderBy(q => q.Order).ToList();
+
             if (request.QuestionId == -1)
             {
-                sequence.Questions.Remove(sequence.Questions.FirstOrDefault(q => q.SequencePart == sequencePart && q.Order == questionIndex));
+                var questionToRemove = questionsInPart.FirstOrDefault(q => q.Order == questionIndex);
+                if (questionToRemove != null)
+                {
+                    sequence.Questions.Remove(questionToRemove);
+                    foreach (var sQuestion in questionsInPart.Where(q => q.Order > questionIndex).OrderBy(q => q.Order))
+                    {
+                        sQuestion.Order--;
+                    }
+                }
 
                 await _sequenceRepository.UpdateSequence(sequence);
                 
@@ -212,16 +222,30 @@ public class SequenceService : ISequenceService
                 Order = questionIndex
             };
 
-            foreach (var existingQuestion in sequence.Questions.ToList())
+            var existingQuestion = questionsInPart.FirstOrDefault(q => q.Order == questionIndex);
+            if (existingQuestion != null)
             {
-                if (existingQuestion.Order == questionIndex && existingQuestion.SequencePart == sequencePart)
+                sequence.Questions.Remove(existingQuestion);
+                // Shift all subsequent questions up
+                foreach (var questionToShift in questionsInPart.Where(q => q.Order > questionIndex).OrderBy(q => q.Order))
                 {
-                    sequence.Questions.Remove(existingQuestion);
+                    questionToShift.Order--;
                 }
             }
+
             sequence.Questions.Add(sequenceQuestion);
 
+            // Fill any gaps in the order
+            var updatedQuestionsInPart = sequence.Questions.Where(q => q.SequencePart == sequencePart).OrderBy(q => q.Order).ToList();
+            for (int i = 0; i < updatedQuestionsInPart.Count; i++)
+            {
+                updatedQuestionsInPart[i].Order = i + 1;
+            }
+
             await _sequenceRepository.UpdateSequence(sequence);
+
+            // Align questions after update
+            await AlignQuestionsInSequence(sequenceId, part);
 
             return new UpdateSequenceQuestionResult {
                 IsSuccess = true,
@@ -239,6 +263,29 @@ public class SequenceService : ISequenceService
                 HttpStatusCode = 500
             };
         }
+    }
+
+    private async Task AlignQuestionsInSequence(int sequenceId, int part)
+    {
+        var sequence = await _sequenceRepository.GetSequenceById(sequenceId);
+        if (sequence == null)
+        {
+            return;
+        }
+
+        SequencePart sequencePart = part == 1 ? SequencePart.Part1 : part == 2 ? SequencePart.Part2 : SequencePart.Part3;
+
+        var questionsInPart = sequence.Questions
+            .Where(q => q.SequencePart == sequencePart)
+            .OrderBy(q => q.Order)
+            .ToList();
+
+        for (int i = 0; i < questionsInPart.Count; i++)
+        {
+            questionsInPart[i].Order = i + 1;
+        }
+
+        await _sequenceRepository.UpdateSequence(sequence);
     }
 
     public async Task<UpdateSequenceResult> UpdateSequence(UpdateSequenceRequest request, int id)
