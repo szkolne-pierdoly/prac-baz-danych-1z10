@@ -37,17 +37,22 @@ export async function createSequence(
   };
 }
 
-export async function getAllSequences(): Promise<{
+export async function getAllSequences(includeQuestions?: boolean): Promise<{
   isSuccess: boolean;
   message: string;
   sequences?: Sequence[];
 }> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/sequences`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/sequences${
+      includeQuestions ? "?includeQuestions=true" : ""
+    }`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
     },
-  });
+  );
 
   if (!res.ok) {
     return { isSuccess: false, message: "Failed to get sequences" };

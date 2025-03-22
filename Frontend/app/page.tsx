@@ -81,7 +81,11 @@ export default function Home() {
         </div>
         <Divider />
         <div className="flex flex-col items-center justify-center mt-4 w-full max-w-4xl gap-4">
-          <Card isPressable isHoverable>
+          <Card
+            isPressable
+            isHoverable
+            onPress={() => router.push("/game/start")}
+          >
             <CardBody className="bg-emerald-600/30">
               <div className="text-2xl font-bold">Rozpocznij grę!</div>
             </CardBody>
