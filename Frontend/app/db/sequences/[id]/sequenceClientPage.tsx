@@ -47,7 +47,7 @@ export default function SequenceClientPage({
   const [isShowRename, setIsShowRename] = useState(false);
 
   const [sequence, setSequence] = useState<Sequence | undefined>(undefined);
-  const [selectedTab, setSelectedTab] = useState<string>("part2"); // TODO: change to part1
+  const [selectedTab, setSelectedTab] = useState<string>("part1");
   const [pageSequenceId, setPageSequenceId] = useState<string | null>(null);
   const [renameSequenceName, setRenameSequenceName] = useState<string | null>(
     sequence?.name ?? null,
