@@ -40,9 +40,9 @@ public class SequenceController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllSequences()
+    public async Task<IActionResult> GetAllSequences([FromQuery] bool? includeQuestions)
     {
-        var result = await _sequenceService.GetAllSequences();
+        var result = await _sequenceService.GetAllSequences(includeQuestions ?? true);
 
         if (result.IsSuccess)
         {

@@ -28,12 +28,19 @@ public class SequenceRepository : ISequenceRepository
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 
-    public async Task<IEnumerable<Sequence>> GetAllSequences()
+    public async Task<IEnumerable<Sequence>> GetAllSequences(bool includeQuestions)
     {
-        return await _context.Sequences
-            .Include(s => s.Questions)
-                .ThenInclude(sq => sq.Question)
-            .ToListAsync();
+        if (includeQuestions)
+        {
+            return await _context.Sequences
+                .Include(s => s.Questions)
+                    .ThenInclude(sq => sq.Question)
+                .ToListAsync();
+        }
+        else
+        {
+            return await _context.Sequences.ToListAsync();
+        }
     }
 
     public async Task UpdateSequence(Sequence sequence)
