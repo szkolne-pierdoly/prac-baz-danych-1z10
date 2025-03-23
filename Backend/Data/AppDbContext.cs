@@ -54,26 +54,24 @@ public class AppDbContext : DbContext
             .WithMany(s => s.Games)
             .HasForeignKey(g => g.SequenceId);
 
-        modelBuilder.Entity<Answer>()
-            .HasOne(a => a.question)
-            .WithMany()
-            .HasForeignKey(a => a.QuestionId);
-
-        modelBuilder.Entity<Player>()
-            .HasMany(p => p.Games)
-            .WithOne(g => g.Player)
-            .HasForeignKey(g => g.PlayerId);
+        modelBuilder.Entity<Game>()
+            .HasMany(g => g.Players)
+            .WithOne()
+            .HasForeignKey(p => p.GameId);
 
         modelBuilder.Entity<Game>()
-            .HasOne(g => g.Sequence)
-            .WithMany(s => s.Games)
-            .HasForeignKey(g => g.SequenceId);
+            .HasMany(g => g.Actions)
+            .WithOne()
+            .HasForeignKey(a => a.GameId);
 
-        modelBuilder.Entity<Answer>()
-            .HasOne(a => a.question)
+        modelBuilder.Entity<GameAction>()
+            .HasOne(a => a.Player)
             .WithMany()
-            .HasForeignKey(a => a.QuestionId);
+            .HasForeignKey(a => a.PlayerId);
 
-
+        modelBuilder.Entity<GamePlayer>()
+            .HasOne(a => a.Player)
+            .WithMany(p => p.Players)
+            .HasForeignKey(a => a.PlayerId);
     }
 }
