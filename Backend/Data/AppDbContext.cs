@@ -51,7 +51,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Game>()
             .HasOne(g => g.Sequence)
-            .WithMany(s => s.Games)
+            .WithMany()
             .HasForeignKey(g => g.SequenceId);
 
         modelBuilder.Entity<Game>()
@@ -67,11 +67,6 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<GameAction>()
             .HasOne(a => a.Player)
             .WithMany()
-            .HasForeignKey(a => a.PlayerId);
-
-        modelBuilder.Entity<GamePlayer>()
-            .HasOne(a => a.Player)
-            .WithMany(p => p.Players)
             .HasForeignKey(a => a.PlayerId);
     }
 }
