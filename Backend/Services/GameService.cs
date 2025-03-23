@@ -88,10 +88,10 @@ public class GameService : IGameService
         }
     }
 
-    public async Task<GetAllGamesResult> GetAllGames()
+    public async Task<GetAllGamesResult> GetAllGames(bool includePlayers = false, bool includeActions = false, bool includeSequence = false, int? limit = null, int? offset = null, string? search = null)
     {
         try {
-            var games = await _gameRepository.GetAllGames();
+            var games = await _gameRepository.GetAllGames(includePlayers, includeActions, includeSequence, limit, offset, search);
             return new GetAllGamesResult {
                 IsSuccess = true,
                 Status = "SUCCESS",

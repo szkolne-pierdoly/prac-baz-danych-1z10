@@ -27,9 +27,9 @@ public class GameController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllGames()
+    public async Task<IActionResult> GetAllGames([FromQuery] bool includePlayers = false, [FromQuery] bool includeActions = false, [FromQuery] bool includeSequence = false, [FromQuery] int? limit = null, [FromQuery] int? offset = null, [FromQuery] string? search = null)
     {
-        var result = await _gameService.GetAllGames();
+        var result = await _gameService.GetAllGames(includePlayers, includeActions, includeSequence, limit, offset, search);
         if (!result.IsSuccess) {
             return StatusCode(result.HttpStatusCode ?? 400, result);
         }

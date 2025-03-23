@@ -21,14 +21,55 @@ public class GameRepository : IGameRepository
         return game;
     }
 
-    public async Task<List<Game>> GetAllGames()
+    public async Task<List<Game>> GetAllGames(bool includePlayers = false, bool includeActions = false, bool includeSequence = false, int? limit = null, int? offset = null, string? search = null)
     {
-        return await _context.Games.ToListAsync();
+        IQueryable<Game> query = _context.Games
+            .Include(g => g.Sequence);
+
+        if (includePlayers)
+            query = query.Include(g => g.Players);
+        if (includeActions)
+            query = query.Include(g => g.Actions);
+        if (includeSequence)
+            query = query.Include(g => g.Sequence);
+
+        if (search != null)
+        {
+            string searchQuery = search.ToLower(); // For case-insensitive search
+
+            query = query.Where(g =>
+                   g.Name != null && g.Name.ToLower().Contains(searchQuery) || // Search in Game Name
+                   g.Sequence.Name.ToLower().Contains(searchQuery) || // Search in Sequence Name
+                   g.Players.Any(p => p.Name.ToLower().Contains(searchQuery)) // Search in Player Names
+               )
+                .OrderByDescending(g => g.Name != null && g.Name.ToLower().StartsWith(searchQuery)) // Prioritize Name matches
+                .ThenBy(g => g.Name); // Then order by Name for secondary sorting
+        }
+        else
+            query = query.OrderBy(g => g.Name); // Default ordering when no search
+        if (offset.HasValue)
+        {
+            if (limit.HasValue)
+                query = query.Skip(offset.Value);
+            else
+            {
+                query = query.Skip(offset.Value).Take(10);
+                limit = 10;
+            }
+        }
+        if (limit.HasValue)
+            query = query.Take(limit.Value);
+
+
+        return await query.ToListAsync();
     }
 
     public async Task<Game?> GetGameById(int id)
     {
-        return await _context.Games.FindAsync(id);
+        return await _context.Games
+             .Include(g => g.Sequence)
+             .Include(g => g.Players)
+             .FirstOrDefaultAsync(g => g.Id == id);
     }
 
     public async Task<Game?> UpdateGame(Game game)
