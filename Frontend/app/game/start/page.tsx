@@ -18,6 +18,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Player } from "@/app/models/Player";
 import SelectPlayersModal from "@/app/components/selectPlayersModal";
+import { HomeIcon } from "lucide-react";
 
 export default function StartPage() {
   const router = useRouter();
@@ -124,6 +125,12 @@ export default function StartPage() {
           </Button>
         </CardFooter>
       </Card>
+      <div className="w-full max-w-lg flex flex-row gap-2">
+        <Button onPress={() => router.push("/")} variant="light">
+          <HomeIcon />
+          Strona główna
+        </Button>
+      </div>
       <SelectPlayersModal
         isOpen={showSelectPlayersModal}
         onClose={() => setShowSelectPlayersModal(false)}
