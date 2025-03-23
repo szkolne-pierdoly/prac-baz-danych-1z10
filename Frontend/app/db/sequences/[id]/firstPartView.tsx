@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardBody, Divider } from "@heroui/react";
-import SequenceQuestion from "@/app/models/SequenceQuestion";
+import { SequenceQuestion } from "@/app/models/SequenceQuestion";
 import { useCallback, useEffect, useState } from "react";
 import { getSequenceQuestionsPart } from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";

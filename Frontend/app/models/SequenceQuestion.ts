@@ -1,11 +1,12 @@
 import { Question } from "./Question";
 import { SequencePart } from "../enums/sequencePart";
 
-export default interface SequenceQuestion {
+export interface SequenceQuestion {
   id: number;
-  order: number;
-  questionId: number;
   sequenceId: number;
+  questionId: number;
+  order: number;
+  part: number;
   question: Question;
   sequencePart: SequencePart;
 }

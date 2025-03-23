@@ -6,7 +6,7 @@ import {
 } from "@/app/actions/sequence";
 import LoadingDialog from "@/app/components/loadingDialog";
 import QuestionDetailsModal from "@/app/components/questionDetailsModal";
-import SequenceQuestion from "@/app/models/SequenceQuestion";
+import { SequenceQuestion } from "@/app/models/SequenceQuestion";
 import { Button, Card, CardBody, Divider, Tooltip } from "@heroui/react";
 import { PlusIcon, SparklesIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";

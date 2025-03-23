@@ -1,5 +1,7 @@
 export interface Answer {
   id: number;
+  gameId: number;
   questionId: number;
-  points: number;
+  answerContent: string;
+  isCorrect: boolean;
 }

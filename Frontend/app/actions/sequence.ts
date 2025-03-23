@@ -1,7 +1,7 @@
 "use server";
 
 import { Sequence } from "../models/Sequence";
-import SequenceQuestion from "../models/SequenceQuestion";
+import { SequenceQuestion } from "../models/SequenceQuestion";
 
 export async function createSequence(
   name: string,

@@ -1,5 +1,5 @@
-import SequenceQuestion from "./SequenceQuestion";
 import { Game } from "./Game";
+import { SequenceQuestion } from "./SequenceQuestion";
 
 export interface Sequence {
   id: number;
