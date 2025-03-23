@@ -9,6 +9,7 @@ import {
   SelectItem,
   Select,
   SelectSection,
+  CardFooter,
 } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { getAllSequences } from "@/app/actions/sequence";
@@ -103,8 +104,17 @@ export default function StartPage() {
             </div>
           </div>
         </CardBody>
+        <Divider />
+        <CardFooter>
+          <Button
+            onPress={() => router.push("/game/play")}
+            color="primary"
+            fullWidth
+          >
+            Rozpocznij grę
+          </Button>
+        </CardFooter>
       </Card>
-      <Button onPress={() => router.push("/game/play")}>Rozpocznij grę</Button>
     </div>
   );
 }
