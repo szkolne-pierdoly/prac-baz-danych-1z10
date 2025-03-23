@@ -15,9 +15,11 @@ builder.Services.AddScoped<IApiService, ApiService>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<ISequenceRepository, SequenceRepository>();
 builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
+builder.Services.AddScoped<IGameRepository, GameRepository>();
 builder.Services.AddScoped<ISequenceService, SequenceService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
+builder.Services.AddScoped<IGameService, GameService>();
 
 string host = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "localhost";
 string port = Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? "5432";
