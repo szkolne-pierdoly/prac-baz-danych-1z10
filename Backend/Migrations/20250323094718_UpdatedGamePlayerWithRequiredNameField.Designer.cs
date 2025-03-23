@@ -3,6 +3,7 @@ using System;
 using Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250323094718_UpdatedGamePlayerWithRequiredNameField")]
+    partial class UpdatedGamePlayerWithRequiredNameField
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -249,7 +252,7 @@ namespace Backend.Migrations
             modelBuilder.Entity("Backend.Data.Models.Game", b =>
                 {
                     b.HasOne("Backend.Data.Models.Sequence", "Sequence")
-                        .WithMany()
+                        .WithMany("Games")
                         .HasForeignKey("SequenceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -284,11 +287,13 @@ namespace Backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Data.Models.Player", null)
+                    b.HasOne("Backend.Data.Models.Player", "Player")
                         .WithMany("Players")
                         .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Player");
                 });
 
             modelBuilder.Entity("Backend.Data.Models.SequenceQuestion", b =>
@@ -327,6 +332,8 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Data.Models.Sequence", b =>
                 {
+                    b.Navigation("Games");
+
                     b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618
