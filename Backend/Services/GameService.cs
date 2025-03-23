@@ -19,11 +19,11 @@ public class GameService : IGameService
         _playerRepository = playerRepository;
     }
 
-    public async Task<StartGameResult> CreateGame(StartGameRequest request)
+    public async Task<CreateGameResult> CreateGame(CreateGameRequest request)
     {
         try {
             if (request.PlayerIds.Count != 10) {
-                return new StartGameResult {
+                return new CreateGameResult {
                     IsSuccess = false,
                     Status = "ERROR",
                     Message = "To start the game, you need exactly 10 players"
@@ -32,7 +32,7 @@ public class GameService : IGameService
 
             var sequence = await _sequenceRepository.GetSequenceById(request.SequenceId);
             if (sequence == null) {
-                return new StartGameResult {
+                return new CreateGameResult {
                     IsSuccess = false,
                     Status = "ERROR",
                     Message = "Sequence with ID " + request.SequenceId + " not found"
@@ -49,7 +49,7 @@ public class GameService : IGameService
             foreach (var playerId in request.PlayerIds) {
                 var player = await _playerRepository.GetPlayerById(playerId);
                 if (player == null) {
-                    return new StartGameResult {
+                    return new CreateGameResult {
                         IsSuccess = false,
                         Status = "ERROR",
                         Message = "Player with ID " + playerId + " not found"
@@ -63,7 +63,7 @@ public class GameService : IGameService
             }
 
             if (gamePlayers.Count != 10) {
-                return new StartGameResult {
+                return new CreateGameResult {
                     IsSuccess = false,
                     Status = "ERROR",
                     Message = "To start the game, you need exactly 10 players"
@@ -74,13 +74,13 @@ public class GameService : IGameService
 
             var result = await _gameRepository.CreateGame(game);
 
-            return new StartGameResult {
+            return new CreateGameResult {
                 IsSuccess = true,
                 Status = "SUCCESS",
                 Game = result
             };
         } catch (Exception ex) {
-            return new StartGameResult {
+            return new CreateGameResult {
                 IsSuccess = false,
                 Status = "ERROR",
                 Message = ex.Message
