@@ -17,7 +17,7 @@ public class GameController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> StartGame([FromBody] StartGameRequest request)
+    public async Task<IActionResult> CreateGame([FromBody] CreateGameRequest request)
     {
         var result = await _gameService.CreateGame(request);
         if (!result.IsSuccess) {

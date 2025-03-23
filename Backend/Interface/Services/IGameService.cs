@@ -6,7 +6,7 @@ namespace Backend.Interface.Services;
 
 public interface IGameService
 {
-    Task<StartGameResult> CreateGame(StartGameRequest request);
+    Task<CreateGameResult> CreateGame(CreateGameRequest request);
     Task<GetAllGamesResult> GetAllGames();
     Task<GetGameByIdResult> GetGameById(int id);
     Task<UpdateGameResult> UpdateGame(int id, UpdateGameRequest request);
