@@ -405,7 +405,7 @@ public class SequenceService : ISequenceService
                 sequence.Questions.AddRangeExtension(newQuestions);
 
                 // Reorder questions
-                await ReorderQuestions(sequence);
+                ReorderQuestions(sequence);
             }
 
             await _sequenceRepository.UpdateSequence(sequence);
@@ -446,7 +446,7 @@ public class SequenceService : ISequenceService
         return questions;
     }
 
-    private async Task ReorderQuestions(Sequence sequence)
+    private void ReorderQuestions(Sequence sequence)
     {
         foreach (var part in new[] { SequencePart.Part1, SequencePart.Part2, SequencePart.Part3 })
         {
