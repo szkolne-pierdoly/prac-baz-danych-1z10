@@ -10,3 +10,4 @@ public class GamePlayer
     public int Lives { get; set; } = 3;
     public virtual ICollection<GameAction> Actions { get; set; } = new List<GameAction>();
     public virtual required Player Player { get; set; }
+}

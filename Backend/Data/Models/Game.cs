@@ -10,3 +10,4 @@ public class Game
     public virtual required Sequence Sequence { get; set; }
     public virtual required ICollection<GamePlayer> Players { get; set; }
     public virtual required ICollection<GameAction> Actions { get; set; }
+}
