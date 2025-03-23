@@ -17,9 +17,12 @@ import { Sequence } from "@/app/models/Sequence";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Player } from "@/app/models/Player";
+import SelectPlayersModal from "@/app/components/selectPlayersModal";
 
 export default function StartPage() {
   const router = useRouter();
+
+  const [showSelectPlayersModal, setShowSelectPlayersModal] = useState(false);
 
   const [sequences, setSequences] = useState<Sequence[]>([]);
   const [players, setPlayers] = useState<Player[]>([]);
@@ -98,7 +101,12 @@ export default function StartPage() {
               </div>
             </div>
             <div className="flex flex-row gap-2 w-full">
-              <Button color="secondary" variant="flat" fullWidth>
+              <Button
+                color="secondary"
+                variant="flat"
+                fullWidth
+                onPress={() => setShowSelectPlayersModal(true)}
+              >
                 Wybierz graczy
               </Button>
             </div>
@@ -115,6 +123,12 @@ export default function StartPage() {
           </Button>
         </CardFooter>
       </Card>
+      <SelectPlayersModal
+        isOpen={showSelectPlayersModal}
+        onClose={() => setShowSelectPlayersModal(false)}
+        onSuccess={(players) => setPlayers(players)}
+        alreadySelectedPlayers={players.map((player) => player.id)}
+      />
     </div>
   );
 }

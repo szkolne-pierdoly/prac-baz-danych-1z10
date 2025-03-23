@@ -1,7 +1,12 @@
 import * as React from "react";
 
-import { HeroUIProvider } from "@heroui/react";
+import { HeroUIProvider, ToastProvider } from "@heroui/react";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
-  return <HeroUIProvider>{children}</HeroUIProvider>;
+  return (
+    <HeroUIProvider>
+      <ToastProvider />
+      {children}
+    </HeroUIProvider>
+  );
 }
