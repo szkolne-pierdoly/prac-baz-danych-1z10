@@ -8,5 +8,5 @@ public class Game
     public DateTime? EndTime { get; set; }
     public int SequenceId { get; set; }
     public virtual required Sequence Sequence { get; set; }
-    public virtual required ICollection<Player> Players { get; set; }
-}
+    public virtual required ICollection<GamePlayer> Players { get; set; }
+    public virtual required ICollection<GameAction> Actions { get; set; }
