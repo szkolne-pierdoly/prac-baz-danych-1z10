@@ -4,10 +4,12 @@ import { Answer } from "./Answer";
 
 export interface Game {
   id: number;
-  name: string;
+  name?: string;
   sequenceId: number;
   playerId: number;
   answers: Answer[];
   sequence: Sequence;
   player: Player;
+  createdAt: Date;
+  updatedAt?: Date;
 }

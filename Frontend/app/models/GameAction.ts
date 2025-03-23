@@ -10,4 +10,5 @@ export interface GameAction {
   player?: Player;
   points?: number;
   answerCorrect?: boolean;
+  updatedAt?: Date;
 }
