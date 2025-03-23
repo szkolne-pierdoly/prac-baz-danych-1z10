@@ -70,7 +70,8 @@ export default function SelectPlayersModal({
           </div>
         )}
         <ModalHeader>Wybierz graczy</ModalHeader>
-        <ModalBody>
+        <Divider />
+        <ModalBody className="overflow-y-auto">
           <div className="flex flex-row gap-3 flex-wrap">
             {players.map((player) => (
               <Card
