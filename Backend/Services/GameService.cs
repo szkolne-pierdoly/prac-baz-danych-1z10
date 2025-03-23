@@ -19,7 +19,7 @@ public class GameService : IGameService
         _playerRepository = playerRepository;
     }
 
-    public async Task<StartGameResult> StartGame(StartGameRequest request)
+    public async Task<StartGameResult> CreateGame(StartGameRequest request)
     {
         try {
             if (request.PlayerIds.Count != 10) {
@@ -80,6 +80,113 @@ public class GameService : IGameService
             };
         } catch (Exception ex) {
             return new StartGameResult {
+                IsSuccess = false,
+                Status = "ERROR",
+                Message = ex.Message
+            };
+        }
+    }
+
+    public async Task<GetAllGamesResult> GetAllGames()
+    {
+        try {
+            var games = await _gameRepository.GetAllGames();
+            return new GetAllGamesResult {
+                IsSuccess = true,
+                Status = "SUCCESS",
+                Games = games
+            };
+        } catch (Exception ex) {
+            return new GetAllGamesResult {
+                IsSuccess = false,
+                Status = "ERROR",
+                Message = ex.Message
+            };
+        }
+    }
+
+    public async Task<GetGameByIdResult> GetGameById(int id)
+    {
+        try {
+            var game = await _gameRepository.GetGameById(id);
+            return new GetGameByIdResult {
+                IsSuccess = true,
+                Status = "SUCCESS",
+                Game = game
+            };
+        } catch (Exception ex) {
+            return new GetGameByIdResult {
+                IsSuccess = false,
+                Status = "ERROR",
+                Message = ex.Message
+            };
+        }
+    }
+
+    public async Task<UpdateGameResult> UpdateGame(int id, UpdateGameRequest request)
+    {
+        try {
+            if (request.PlayerIds != null && request.PlayerIds.Count != 10) {
+                return new UpdateGameResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "To update the game, you need exactly 10 players"
+                };
+            }
+
+            var game = await _gameRepository.GetGameById(id);
+            if (game == null) {
+                return new UpdateGameResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Game with ID " + id + " not found"
+                };
+            }
+
+            game.SequenceId = request.SequenceId ?? game.SequenceId;
+            game.Players = request.PlayerIds?.Select(playerId => new GamePlayer {
+                PlayerId = playerId,
+                GameId = game.Id,
+                Name = playerId.ToString()
+            }).ToList() ?? game.Players;
+
+            var result = await _gameRepository.UpdateGame(game);
+
+            return new UpdateGameResult {
+                IsSuccess = true,
+                Status = "SUCCESS",
+                Game = result
+            };
+        } catch (Exception ex) {
+            return new UpdateGameResult {
+                IsSuccess = false,
+                Status = "ERROR",
+                Message = ex.Message
+            };
+        }
+    }
+
+    public async Task<DeleteGameResult> DeleteGame(int id)
+    {
+        try {
+            var game = await _gameRepository.GetGameById(id);
+            if (game == null) {
+                return new DeleteGameResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Game with ID " + id + " not found"
+                };
+            }
+
+            var result = await _gameRepository.DeleteGame(id);
+
+            return new DeleteGameResult {
+                IsSuccess = true,
+                Status = "SUCCESS",
+                Game = result
+            };
+        } catch (Exception ex) {
+            return new DeleteGameResult {
                 IsSuccess = false,
                 Status = "ERROR",
                 Message = ex.Message
