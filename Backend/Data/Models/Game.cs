@@ -7,7 +7,7 @@ public class Game
     public string? Name { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime StartTime { get; set; } = DateTime.UtcNow;
+    public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
     public int SequenceId { get; set; }
     public virtual required Sequence Sequence { get; set; }
