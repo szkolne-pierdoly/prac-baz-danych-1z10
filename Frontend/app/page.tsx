@@ -70,7 +70,11 @@ export default function Home() {
                 </div>
               </CardBody>
             </Card>
-            <Card className="w-full max-w-[25%] min-w-[100px]" isPressable>
+            <Card
+              className="w-full max-w-[25%] min-w-[100px]"
+              isPressable
+              onPress={() => router.push("/db/games")}
+            >
               <CardBody>
                 <div className="text-2xl font-bold">
                   Gry: {stats?.totalGames ?? "-"}
