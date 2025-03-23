@@ -15,11 +15,13 @@ import { getAllSequences } from "@/app/actions/sequence";
 import { Sequence } from "@/app/models/Sequence";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Player } from "@/app/models/Player";
 
 export default function StartPage() {
   const router = useRouter();
 
   const [sequences, setSequences] = useState<Sequence[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
 
   const [selectedSequenceId, setSelectedSequenceId] = useState<number>(0);
 
@@ -70,14 +72,34 @@ export default function StartPage() {
                     href={`/db/sequences/${selectedSequenceId}`}
                     target="_blank"
                   >
-                    <Button>Zobacz sekwencje</Button>
+                    <Button variant="light">Zobacz sekwencje</Button>
                   </Link>
                 ) : (
                   <div>
-                    <Button isDisabled>Zobacz sekwencje</Button>
+                    <Button variant="light" isDisabled>
+                      Zobacz sekwencje
+                    </Button>
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        </CardBody>
+        <Divider />
+        <CardBody>
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-lg font-bold">
+                Wybrano: {players.length} graczy
+              </div>
+              <div className="text-sm text-gray-500">
+                Aby rozpocząć grę potrzeba dokładnie 10 graczy.
+              </div>
+            </div>
+            <div className="flex flex-row gap-2 w-full">
+              <Button color="secondary" variant="flat" fullWidth>
+                Wybierz graczy
+              </Button>
             </div>
           </div>
         </CardBody>
