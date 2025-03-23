@@ -118,6 +118,7 @@ export default function StartPage() {
             onPress={() => router.push("/game/play")}
             color="primary"
             fullWidth
+            isDisabled={players.length !== 10 || selectedSequenceId === 0}
           >
             Rozpocznij grę
           </Button>
