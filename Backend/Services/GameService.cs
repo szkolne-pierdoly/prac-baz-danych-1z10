@@ -39,6 +39,7 @@ public class GameService : IGameService
                 };
             }
             var game = new Game {
+                Name = request.Name,
                 Sequence = sequence,
                 Players = new List<GamePlayer>(),
                 Actions = new List<GameAction>(),
