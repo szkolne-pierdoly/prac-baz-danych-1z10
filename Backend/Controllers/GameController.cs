@@ -1,5 +1,6 @@
 using Backend.Data.Models;
 using Backend.Interface.Services;
+using Backend.Models.Contracts.Request;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
@@ -16,9 +17,12 @@ public class GameController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateGame([FromBody] Game game)
+    public async Task<IActionResult> StartGame([FromBody] StartGameRequest request)
     {
-        var result = await _gameService.CreateGame(game);
+        var result = await _gameService.StartGame(request);
+        if (!result.IsSuccess) {
+            return StatusCode(result.HttpStatusCode ?? 400, result);
+        }
         return Ok(result);
     }
 }
