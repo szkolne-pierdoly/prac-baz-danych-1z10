@@ -1,10 +1,13 @@
+/* eslint-disable prettier/prettier */
 "use client";
 
 import { Game } from "@/app/models/Game";
-import { Button, CardBody } from "@heroui/react";
+import { Button, CardBody, Divider, addToast } from "@heroui/react";
 import { Card } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { HomeIcon } from "lucide-react";
+import { getAllGames } from "@/app/actions/game";
+
 export default function GamesPage() {
   const [games, setGames] = useState<Game[]>([]);
 
@@ -14,7 +17,16 @@ export default function GamesPage() {
 
   const fetchGames = async () => {
     const result = await getAllGames();
-    setGames(result.games ?? []);
+    if (result.isSuccess && result.games) {
+      console.log(result.games);
+      setGames(result.games);
+    } else {
+      addToast({
+        title: "Błąd",
+        description: "Nie udało się pobrać gier",
+        color: "danger",
+      });
+    }
   };
 
   return (
@@ -33,15 +45,30 @@ export default function GamesPage() {
         </CardBody>
       </Card>
       <div className="w-full h-full max-w-4xl max-h-[calc(100vh-64px)]">
-        <div className="flex flex-wrap items-start justify-center w-full gap-4">
+        <div className="flex flex-col gap-2">
           {games.map((game) => (
             <Card
               key={game.id}
-              className="min-w-64 max-w-[33vw] p-2"
+              className="min-w-64 h-16 flex flex-row"
               isPressable
             >
-              <CardBody className="flex flex-col items-center justify-center">
+              <CardBody className="flex flex-col items-center justify-center w-fit h-full px-4">
                 <div className="text-2xl font-bold">{game.id}</div>
+              </CardBody>
+              <Divider orientation="vertical" />
+              <CardBody className="flex flex-col items-start justify-start w-full h-full overflow-hidden">
+                <div className="text-lg font-bold">
+                  {game.name ?? "Brak nazwy"}
+                </div>
+                <div className="text-sm text-gray-500">
+                  Utworzono: {game.createdAt
+                    ? new Date(game.createdAt).toLocaleString("pl-PL", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })
+                    : "Date not available"}
+                </div>
               </CardBody>
             </Card>
           ))}
