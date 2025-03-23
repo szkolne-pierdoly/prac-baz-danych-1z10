@@ -41,7 +41,8 @@ public class GameService : IGameService
             var game = new Game {
                 Sequence = sequence,
                 Players = new List<GamePlayer>(),
-                Actions = new List<GameAction>()
+                Actions = new List<GameAction>(),
+                CreatedAt = DateTime.UtcNow
             };
 
             List<GamePlayer> gamePlayers = new List<GamePlayer>();
