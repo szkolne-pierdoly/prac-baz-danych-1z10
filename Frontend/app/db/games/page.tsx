@@ -7,9 +7,12 @@ import { Card } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { HomeIcon } from "lucide-react";
 import { getAllGames } from "@/app/actions/game";
+import { useRouter } from "next/navigation";
 
 export default function GamesPage() {
   const [games, setGames] = useState<Game[]>([]);
+
+  const router = useRouter();
 
   useEffect(() => {
     fetchGames();
@@ -49,14 +52,15 @@ export default function GamesPage() {
           {games.map((game) => (
             <Card
               key={game.id}
-              className="min-w-64 h-16 flex flex-row"
+              className="min-w-64 flex flex-row h-16"
               isPressable
+              onPress={() => router.push(`/db/games/${game.id}`)}
             >
               <CardBody className="flex flex-col items-center justify-center w-fit h-full px-4">
                 <div className="text-2xl font-bold">{game.id}</div>
               </CardBody>
               <Divider orientation="vertical" />
-              <CardBody className="flex flex-col items-start justify-start w-full h-full overflow-hidden">
+              <CardBody className="flex flex-col items-start justify-center w-full h-full overflow-hidden py-0">
                 <div className="text-lg font-bold">
                   {game.name ?? "Brak nazwy"}
                 </div>
