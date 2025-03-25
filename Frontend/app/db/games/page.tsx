@@ -36,13 +36,13 @@ export default function GamesPage() {
     <div className="flex flex-col items-center justify-start h-screen py-4 gap-4 px-2 max-h-screen overflow-y-hidden">
       <Card className="w-full flex flex-row items-center justify-start max-w-5xl h-[64px] min-h-[64px] sticky top-0 z-10">
         <CardBody className="flex flex-row items-center justify-start gap-2">
-          <Button variant="flat" isIconOnly>
+          <Button variant="flat" isIconOnly onPress={() => router.push("/")}>
             <HomeIcon />
           </Button>
           <div className="text-2xl font-bold">Gry</div>
         </CardBody>
         <CardBody className="flex flex-row items-center justify-end gap-2">
-          <Button variant="flat" color="primary">
+          <Button variant="flat" color="primary" onPress={() => router.push("/db/games/create")}>
             Nowa gra
           </Button>
         </CardBody>
