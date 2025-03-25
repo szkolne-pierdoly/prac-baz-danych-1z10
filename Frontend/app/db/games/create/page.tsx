@@ -3,19 +3,8 @@
 import SelectSequenceModal from "@/app/components/selectSequenceModal";
 import { Player } from "@/app/models/Player";
 import { Sequence } from "@/app/models/Sequence";
-import {
-  Card,
-  CardBody,
-  Button,
-  Divider,
-  Tooltip,
-  Link,
-  Spacer,
-  Select,
-  SelectItem,
-  Input,
-} from "@heroui/react";
-import { ArrowUpDown, HomeIcon, PlusIcon } from "lucide-react";
+import { Card, CardBody, Button, Divider, Input } from "@heroui/react";
+import { ArrowUpDownIcon, HomeIcon, PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -32,8 +21,8 @@ export default function CreateGamePage() {
     router.push("/db/games");
   };
 
-  const handleSelectSequence = (sequence: string) => {
-    setName(sequence);
+  const handleSelectSequence = (sequence: Sequence) => {
+    setSequence(sequence);
     setShowSelectSequence(false);
   };
 
@@ -81,18 +70,18 @@ export default function CreateGamePage() {
                 <div className="text-white">Sekwencja:</div>
                 <Input
                   placeholder="Wybierz sekwencję"
-                  value={name}
+                  value={sequence?.name ?? ""}
                   isReadOnly
                   className="max-w-48"
                   onClick={() => setShowSelectSequence(true)}
                 />
                 <Button
                   variant="flat"
-                  color="primary"
+                  color={sequence ? "success" : "primary"}
                   isIconOnly
                   onPress={() => setShowSelectSequence(true)}
                 >
-                  <PlusIcon />
+                  {sequence ? <ArrowUpDownIcon /> : <PlusIcon />}
                 </Button>
               </div>
             </div>
@@ -112,7 +101,7 @@ export default function CreateGamePage() {
       <SelectSequenceModal
         isOpen={showSelectSequence}
         onClose={() => setShowSelectSequence(false)}
-        onSelect={handleSelectSequence}
+        onSelect={(sequence) => handleSelectSequence(sequence)}
       />
     </div>
   );

@@ -25,7 +25,7 @@ export default function SelectSequenceModal({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (sequence: string) => void;
+  onSelect: (sequence: Sequence) => void;
 }) {
   const [searchName, setSearchName] = useState("");
   const [sequences, setSequences] = useState<Sequence[]>([]);
@@ -99,6 +99,7 @@ export default function SelectSequenceModal({
                 key={sequence.id}
                 isPressable
                 isHoverable
+                onPress={() => onSelect(sequence)}
               >
                 <CardBody className="bg-white/5">
                   <div className="flex flex-col items-start justify-between">
