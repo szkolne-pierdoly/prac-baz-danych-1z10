@@ -15,7 +15,7 @@ export default function CreateGamePage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [sequence, setSequence] = useState<Sequence | null>(null);
 
-  const [showSelectSequence, setShowSelectSequence] = useState<boolean>(true); //TODO: Change to false after testing
+  const [showSelectSequence, setShowSelectSequence] = useState<boolean>(false);
 
   const handleGoGames = () => {
     router.push("/db/games");
@@ -66,14 +66,39 @@ export default function CreateGamePage() {
           <Divider />
           <CardBody>
             <div className="flex flex-row items-center justify-between">
-              <div className="text-2xl font-bold flex flex-row items-center gap-2 w-full">
-                <div className="text-white">Sekwencja:</div>
+              <div className="text-2xl flex flex-row items-center gap-2 w-full">
+                <div className="text-white font-bold">Nazwa gry:</div>
+                <Input
+                  placeholder="Wpisz nazwę gry"
+                  value={name}
+                  className="max-w-96 min-w-48"
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+            </div>
+          </CardBody>
+          <CardBody>
+            <div className="flex flex-row items-center justify-between">
+              <div className="text-2xl flex flex-row items-center gap-2 w-full">
+                <div className="text-white font-bold">Sekwencja:</div>
                 <Input
                   placeholder="Wybierz sekwencję"
                   value={sequence?.name ?? ""}
                   isReadOnly
-                  className="max-w-48"
+                  className="max-w-96 min-w-48"
                   onClick={() => setShowSelectSequence(true)}
+                  isInvalid={
+                    (sequence?.questions?.filter(
+                      (question) => question.sequencePart === 0,
+                    ).length ?? 0) < 20
+                  }
+                  errorMessage={
+                    (sequence?.questions?.filter(
+                      (question) => question.sequencePart === 0,
+                    ).length ?? 0) < 20
+                      ? "Ta sekwencja ma niej niz 20 pytań w pierwszej części, gry z nią nie będą mogły być wystartowane"
+                      : ""
+                  }
                 />
                 <Button
                   variant="flat"
@@ -86,7 +111,6 @@ export default function CreateGamePage() {
               </div>
             </div>
           </CardBody>
-          <Divider />
           <CardBody>
             <div className="flex flex-row items-center justify-between">
               <div className="text-2xl font-bold flex flex-row items-center gap-2">
