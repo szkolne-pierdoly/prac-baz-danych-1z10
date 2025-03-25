@@ -1,120 +1,120 @@
 "use client";
 
-import { GamePlayer } from "@/app/models/GamePlayer";
+import { Player } from "@/app/models/Player";
 import { Sequence } from "@/app/models/Sequence";
 import {
-  Button,
   Card,
   CardBody,
-  CardFooter,
-  CardHeader,
+  Button,
   Divider,
-  Input,
+  Tooltip,
+  Link,
+  Spacer,
 } from "@heroui/react";
-import { ListStartIcon, PlusIcon } from "lucide-react";
+import { ArrowUpDown, HomeIcon, PlusIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function CreateGame() {
-  const [gameName, setGameName] = useState<string>("");
-  const [gameSequence, setGameSequence] = useState<Sequence | null>(null);
-  const [gamePlayers, setGamePlayers] = useState<GamePlayer[]>([]);
+export default function CreateGamePage() {
+  const router = useRouter();
+
+  const [name, setName] = useState<string>("");
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [sequence, setSequence] = useState<Sequence | null>(null);
+
+  const handleGoGames = () => {
+    router.push("/db/games");
+  };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <div className="flex flex-col items-center justify-center gap-4 w-screen h-screen">
-        <h1 className="text-3xl font-bold text-center">Dodaj grę</h1>
-        <Divider />
-        <div className="flex flex-col items-center justify-start min-h-[60vh] w-screen gap-4">
-          <Card className="w-full max-w-xl">
-            <CardHeader className="text-2xl font-bold flex flex-row items-start">
-              Nazwij grę
-            </CardHeader>
-            <Divider />
-            <CardBody>
-              <div className="flex flex-col items-center justify-center">
-                <Input
-                  type="text"
-                  label="Nazwa gry"
-                  value={gameName}
-                  onChange={(e) => setGameName(e.target.value)}
-                />
-              </div>
-            </CardBody>
-          </Card>
-          <Card className="w-full max-w-xl">
-            <CardHeader className="text-2xl font-bold flex flex-row items-start">
-              Wybierz sekwencję
-            </CardHeader>
-            <Divider />
-            <CardBody>
-              <div className="flex flex-col items-center justify-center">
-                <div className="font-bold text-lg w-full text-left">
-                  Aktualana sekwencja: {gameSequence?.name ?? "nie wybrano"}
+    <div className="flex flex-col items-center justify-start h-screen w-screen py-4 gap-4 px-2 max-h-screen overflow-y-hidden">
+      <Card className="w-full flex flex-row items-start justify-start max-w-5xl h-[64px] min-h-[64px] sticky top-0 z-10">
+        <CardBody className="flex flex-row items-center justify-between gap-2">
+          <div className="flex flex-row items-center justify-center gap-2">
+            <Button
+              variant="flat"
+              color="default"
+              onPress={() => router.push("/")}
+              isIconOnly
+            >
+              <HomeIcon />
+            </Button>
+            <div
+              onClick={handleGoGames}
+              className="text-2xl font-bold cursor-pointer"
+            >
+              Gry
+            </div>
+            <span className="text-2xl font-bold text-gray-500">/ Nowa gra</span>
+          </div>
+          <div className="flex flex-row items-center justify-center gap-2">
+            <Button
+              variant="flat"
+              color="primary"
+              onPress={() => console.log("create")}
+            >
+              Dodaj sekwencję
+            </Button>
+          </div>
+        </CardBody>
+      </Card>
+      <div className="w-full flex flex-col items-start justify-start max-w-4xl max-h-[calc(100vh-96px)] overflow-y-scroll">
+        <Card className="w-full">
+          <CardBody>
+            <div className="text-2xl font-bold">Utwórz nową grę</div>
+          </CardBody>
+          <Divider />
+          <CardBody>
+            <div className="flex flex-row items-center justify-between">
+              <div className="text-2xl font-bold flex flex-col items-start gap-2">
+                <div className="text-white">Sekwencja:</div>
+                <div className="flex flex-row items-center gap-4">
+                  <Tooltip
+                    content="Przejdź do sekwencji"
+                    isDisabled={!sequence}
+                  >
+                    <Link
+                      href={`/db/sequences/${sequence?.id}`}
+                      className={`text-blue-500 hover:tsext-blue-600 text-2xl ${sequence ? "" : "text-white"}`}
+                      isDisabled={!sequence}
+                    >
+                      {(sequence && sequence?.name) ?? "Nie wybrano"}
+                    </Link>
+                  </Tooltip>
+                  {sequence ? (
+                    <Button
+                      variant="light"
+                      color="primary"
+                      onPress={() => console.log("create")}
+                      startContent={<ArrowUpDown />}
+                    >
+                      Zmień sekwencję
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="light"
+                      color="primary"
+                      onPress={() => console.log("create")}
+                      startContent={<PlusIcon />}
+                    >
+                      Wybierz sekwencję
+                    </Button>
+                  )}
                 </div>
-                <div className="flex flex-col items-center justify-center"></div>
               </div>
-            </CardBody>
-            <Divider />
-            <CardFooter className="flex flex-row items-center justify-center gap-2">
-              {gameSequence ? (
-                <Button
-                  color="secondary"
-                  onPress={() => {}}
-                  variant="flat"
-                  className="w-1/2"
-                >
-                  Edytuj sekwencję
-                </Button>
-              ) : (
-                <Button
-                  color="primary"
-                  onPress={() => {}}
-                  variant="flat"
-                  endContent={<ListStartIcon />}
-                  fullWidth
-                >
-                  Wybierz sekwencję
-                </Button>
-              )}
-            </CardFooter>
-          </Card>
-          <Card className="w-full max-w-xl">
-            <CardHeader className="text-2xl font-bold flex flex-row items-start">
-              Dodaj graczy
-            </CardHeader>
-            <Divider />
-            <CardBody className="max-h-96 min-h-32">
-              <div className="flex flex-col items-center justify-center w-full h-full">
-                {gamePlayers.map((player) => (
-                  <Card className="w-full" radius="md" key={player.id}>
-                    <CardBody className="bg-white/5">
-                      <div className="flex flex-col items-center justify-center">
-                        {player.name}
-                      </div>
-                    </CardBody>
-                  </Card>
-                ))}
-                {gamePlayers.length === 0 && (
-                  <div className="flex flex-col items-center justify-center h-full w-full text-2xl font-bold">
-                    <p>Nie ma graczy</p>
-                  </div>
-                )}
+            </div>
+          </CardBody>
+          <Divider />
+          <CardBody>
+            <div className="flex flex-row items-center justify-between">
+              <div className="text-2xl font-bold flex flex-row items-center gap-2">
+                <div className="flex flex-row items-center gap-2 mr-6">
+                  <span className="text-gray-400">Gracze:</span>{" "}
+                </div>
               </div>
-            </CardBody>
-            <Divider />
-            <CardFooter className="flex flex-row items-center justify-center gap-2">
-              <Button
-                color="primary"
-                onPress={() => {}}
-                variant="flat"
-                endContent={<PlusIcon />}
-                fullWidth
-              >
-                Dodaj gracza
-              </Button>
-            </CardFooter>
-          </Card>
-        </div>
+            </div>
+          </CardBody>
+        </Card>
       </div>
     </div>
   );
