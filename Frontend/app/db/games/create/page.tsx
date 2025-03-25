@@ -1,5 +1,6 @@
 "use client";
 
+import SelectSequenceModal from "@/app/components/selectSequenceModal";
 import { Player } from "@/app/models/Player";
 import { Sequence } from "@/app/models/Sequence";
 import {
@@ -10,6 +11,9 @@ import {
   Tooltip,
   Link,
   Spacer,
+  Select,
+  SelectItem,
+  Input,
 } from "@heroui/react";
 import { ArrowUpDown, HomeIcon, PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -22,8 +26,15 @@ export default function CreateGamePage() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [sequence, setSequence] = useState<Sequence | null>(null);
 
+  const [showSelectSequence, setShowSelectSequence] = useState<boolean>(false);
+
   const handleGoGames = () => {
     router.push("/db/games");
+  };
+
+  const handleSelectSequence = (sequence: string) => {
+    setName(sequence);
+    setShowSelectSequence(false);
   };
 
   return (
@@ -66,41 +77,23 @@ export default function CreateGamePage() {
           <Divider />
           <CardBody>
             <div className="flex flex-row items-center justify-between">
-              <div className="text-2xl font-bold flex flex-col items-start gap-2">
+              <div className="text-2xl font-bold flex flex-row items-center gap-2 w-full">
                 <div className="text-white">Sekwencja:</div>
-                <div className="flex flex-row items-center gap-4">
-                  <Tooltip
-                    content="Przejdź do sekwencji"
-                    isDisabled={!sequence}
-                  >
-                    <Link
-                      href={`/db/sequences/${sequence?.id}`}
-                      className={`text-blue-500 hover:tsext-blue-600 text-2xl ${sequence ? "" : "text-white"}`}
-                      isDisabled={!sequence}
-                    >
-                      {(sequence && sequence?.name) ?? "Nie wybrano"}
-                    </Link>
-                  </Tooltip>
-                  {sequence ? (
-                    <Button
-                      variant="light"
-                      color="primary"
-                      onPress={() => console.log("create")}
-                      startContent={<ArrowUpDown />}
-                    >
-                      Zmień sekwencję
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="light"
-                      color="primary"
-                      onPress={() => console.log("create")}
-                      startContent={<PlusIcon />}
-                    >
-                      Wybierz sekwencję
-                    </Button>
-                  )}
-                </div>
+                <Input
+                  placeholder="Wybierz sekwencję"
+                  value={name}
+                  isReadOnly
+                  className="max-w-48"
+                  onClick={() => setShowSelectSequence(true)}
+                />
+                <Button
+                  variant="flat"
+                  color="primary"
+                  isIconOnly
+                  onPress={() => setShowSelectSequence(true)}
+                >
+                  <PlusIcon />
+                </Button>
               </div>
             </div>
           </CardBody>
@@ -116,6 +109,11 @@ export default function CreateGamePage() {
           </CardBody>
         </Card>
       </div>
+      <SelectSequenceModal
+        isOpen={showSelectSequence}
+        onClose={() => setShowSelectSequence(false)}
+        onSelect={handleSelectSequence}
+      />
     </div>
   );
 }

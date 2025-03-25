@@ -8,9 +8,17 @@ import {
   Input,
 } from "@heroui/react";
 
-export default function SelectSequenceModal() {
+export default function SelectSequenceModal({
+  isOpen,
+  onClose,
+  onSelect,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  onSelect: (sequence: string) => void;
+}) {
   return (
-    <Modal>
+    <Modal isOpen={isOpen} onClose={onClose}>
       <ModalContent>
         <ModalHeader>Wybierz sekwencję</ModalHeader>
         <ModalBody>
