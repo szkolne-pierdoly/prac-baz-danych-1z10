@@ -9,4 +9,5 @@ public interface IGameRepository
     Task<Game?> GetGameById(int id);
     Task<Game?> UpdateGame(Game game);
     Task<Game?> DeleteGame(int id);
+    Task<int> GetTotalGames();
 }

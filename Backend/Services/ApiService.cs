@@ -10,12 +10,14 @@ public class ApiService : IApiService
     private readonly IQuestionRepository _questionRepository;
     private readonly ISequenceRepository _sequenceRepository;
     private readonly IPlayerRepository _playerRepository;
+    private readonly IGameRepository _gameRepository;
 
-    public ApiService(IQuestionRepository questionRepository, ISequenceRepository sequenceRepository, IPlayerRepository playerRepository)
+    public ApiService(IQuestionRepository questionRepository, ISequenceRepository sequenceRepository, IPlayerRepository playerRepository, IGameRepository gameRepository)
     {
         _questionRepository = questionRepository;
         _sequenceRepository = sequenceRepository;
         _playerRepository = playerRepository;
+        _gameRepository = gameRepository;
     }
 
     public async Task<GetStatsResult> GetStats()
@@ -24,7 +26,7 @@ public class ApiService : IApiService
             var totalQuestions = await _questionRepository.GetTotalQuestions();
             var totalSequences = await _sequenceRepository.GetTotalSequences();
             var totalPlayers = await _playerRepository.GetTotalPlayers();
-            var totalGames = 0; // TODO: Implement total games count
+            var totalGames = await _gameRepository.GetTotalGames();
 
             return new GetStatsResult
             {
