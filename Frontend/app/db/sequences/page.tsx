@@ -51,7 +51,7 @@ export default function SequencesPage() {
           </div>
         </CardBody>
       </Card>
-      <div className="w-full h-full flex flex-col items-center justify-start max-h-[calc(100vh-96px)] overflow-y-scroll">
+      <div className="w-full h-full flex flex-col items-center justify-start overflow-y-auto">
         <div className="w-full flex flex-col items-start justify-start max-w-4xl gap-2">
           {sequences.map((sequence) => (
             <Card

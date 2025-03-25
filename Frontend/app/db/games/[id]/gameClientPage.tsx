@@ -52,7 +52,7 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
             </div>
             {pageGameId && (
               <span className="text-2xl font-bold text-gray-500">
-                / {game?.name ?? "-"}
+                / {game?.name ?? "Brak nazwy"}
               </span>
             )}
           </div>

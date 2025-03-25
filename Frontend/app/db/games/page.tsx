@@ -47,7 +47,7 @@ export default function GamesPage() {
           </Button>
         </CardBody>
       </Card>
-      <div className="w-full h-full max-w-4xl max-h-[calc(100vh-64px)]">
+      <div className="w-full h-full max-w-4xl overflow-y-auto">
         <div className="flex flex-col gap-2">
           {games.map((game) => (
             <Card
