@@ -28,7 +28,7 @@ public class SequenceRepository : ISequenceRepository
             .FirstOrDefaultAsync(s => s.Id == id);
     }
 
-    public async Task<IEnumerable<Sequence>> GetAllSequences(bool includeQuestions, string? search = null, int? page = null, int? pageSize = null)
+    public async Task<IEnumerable<Sequence>> GetSequences(bool includeQuestions, string? search = null, int? page = null, int? pageSize = null)
     {
         var query = _context.Sequences.AsQueryable();
 

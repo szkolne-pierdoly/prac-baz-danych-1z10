@@ -40,9 +40,9 @@ public class SequenceController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllSequences([FromQuery] bool? includeQuestions, [FromQuery] string? search = null, [FromQuery] int? page = null, [FromQuery] int? pageSize = null)
+    public async Task<IActionResult> GetSequences([FromQuery] bool? includeQuestions, [FromQuery] string? search = null, [FromQuery] int? page = null, [FromQuery] int? pageSize = null)
     {
-        var result = await _sequenceService.GetAllSequences(includeQuestions ?? true, search, page, pageSize);
+        var result = await _sequenceService.GetSequences(includeQuestions ?? true, search, page, pageSize);
 
         if (result.IsSuccess)
         {
@@ -50,7 +50,8 @@ public class SequenceController : ControllerBase
             {
                 Status = result.Status,
                 Message = result.Message ?? "Sequences fetched successfully",
-                Sequences = result.Sequences
+                Sequences = result.Sequences,
+                TotalItems = result.TotalItems
             });
         }
         else

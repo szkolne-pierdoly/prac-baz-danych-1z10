@@ -6,7 +6,7 @@ namespace Backend.Interface.Services;
 public interface ISequenceService
 {
     Task<CreateSequenceResult> CreateSequence(CreateSequenceRequest request);
-    Task<GetAllSequencesResult> GetAllSequences(bool includeQuestions, string? search = null, int? page = null, int? pageSize = null);
+    Task<GetSequencesResult> GetSequences(bool includeQuestions, string? search = null, int? page = null, int? pageSize = null);
     Task<GetSequenceResult> GetSequence(int id);
     Task<GetSequenceQuestionsResult> GetSequenceQuestions(int id);
     Task<GetSequencePartQuestionResult> GetSequenceQuestionsPart(int id, int part);

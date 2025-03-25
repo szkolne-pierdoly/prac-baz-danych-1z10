@@ -37,16 +37,17 @@ public class SequenceService : ISequenceService
         }
     }
 
-    public async Task<GetAllSequencesResult> GetAllSequences(bool includeQuestions, string? search = null, int? page = null, int? pageSize = null)
+    public async Task<GetSequencesResult> GetSequences(bool includeQuestions, string? search = null, int? page = null, int? pageSize = null)
     {
         try
         {
-            var sequences = await _sequenceRepository.GetAllSequences(includeQuestions, search, page, pageSize);
-            return new GetAllSequencesResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequences retrieved successfully", Sequences = sequences };
+            var sequences = await _sequenceRepository.GetSequences(includeQuestions, search, page, pageSize);
+            var totalItems = await _sequenceRepository.GetTotalSequences();
+            return new GetSequencesResult { IsSuccess = true, Status = "SUCCESS", Message = "Sequences retrieved successfully", Sequences = sequences, TotalItems = totalItems };
         }
         catch (Exception ex)
         {
-            return new GetAllSequencesResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
+            return new GetSequencesResult { IsSuccess = false, Status = "ERROR", Message = ex.Message };
         }
     }
 
