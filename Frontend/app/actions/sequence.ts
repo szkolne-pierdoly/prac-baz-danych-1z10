@@ -37,6 +37,59 @@ export async function createSequence(
   };
 }
 
+export async function getSequences(
+  includeQuestions?: boolean,
+  search?: string,
+  page?: number,
+  pageSize?: number,
+): Promise<{
+  isSuccess: boolean;
+  message: string;
+  sequences?: Sequence[];
+  totalItems?: number;
+}> {
+  let url = `${process.env.NEXT_PUBLIC_API_URL}/api/sequences`;
+  const params = new URLSearchParams();
+
+  if (includeQuestions !== undefined) {
+    params.append("includeQuestions", String(includeQuestions));
+  }
+  if (search) {
+    params.append("search", search);
+  }
+  if (page !== undefined) {
+    params.append("page", String(page));
+  }
+  if (pageSize !== undefined) {
+    params.append("pageSize", String(pageSize));
+  }
+
+  const queryString = params.toString();
+  if (queryString) {
+    url += `?${queryString}`;
+  }
+
+  const res = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    return { isSuccess: false, message: "Failed to get sequences" };
+  }
+
+  const data = await res.json();
+
+  return {
+    isSuccess: true,
+    message: "Sequences fetched successfully",
+    sequences: data.sequences,
+    totalItems: data.totalItems,
+  };
+}
+
 export async function getAllSequences(includeQuestions?: boolean): Promise<{
   isSuccess: boolean;
   message: string;
