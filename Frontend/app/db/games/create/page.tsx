@@ -1,5 +1,6 @@
 "use client";
 
+import AddPlayerToGameModal from "@/app/components/addPlayerToGameModal";
 import SelectSequenceModal from "@/app/components/selectSequenceModal";
 import { Player } from "@/app/models/Player";
 import { Sequence } from "@/app/models/Sequence";
@@ -16,6 +17,8 @@ export default function CreateGamePage() {
   const [sequence, setSequence] = useState<Sequence | null>(null);
 
   const [showSelectSequence, setShowSelectSequence] = useState<boolean>(false);
+  const [showAddPlayerToGame, setShowAddPlayerToGame] =
+    useState<boolean>(false);
 
   const handleGoGames = () => {
     router.push("/db/games");
@@ -24,6 +27,11 @@ export default function CreateGamePage() {
   const handleSelectSequence = (sequence: Sequence) => {
     setSequence(sequence);
     setShowSelectSequence(false);
+  };
+
+  const handleAddPlayer = (player: Player) => {
+    setPlayers([...players, player]);
+    setShowAddPlayerToGame(false);
   };
 
   return (
@@ -123,16 +131,11 @@ export default function CreateGamePage() {
                     className="basis-[calc(33.333%-1rem)] aspect-square"
                     isPressable
                     isHoverable
-                    onPress={() => {
-                      setPlayers([
-                        ...players,
-                        { id: players.length + 1, name: "", color: "default" },
-                      ]);
-                    }}
+                    onPress={() => setShowAddPlayerToGame(true)}
                   >
-                    <CardBody className="flex items-center justify-center">
-                      <PlusIcon className="text-white" size="30%" />
-                      <div className="text-white">Dodaj gracza</div>
+                    <CardBody className="flex items-center justify-center bg-white/5 text-primary">
+                      <PlusIcon size="30%" />
+                      <div>Dodaj gracza</div>
                     </CardBody>
                   </Card>
                   {players.map((player) => (
@@ -140,7 +143,7 @@ export default function CreateGamePage() {
                       key={player.id}
                       className="basis-[calc(33.333%-1rem)] aspect-square"
                     >
-                      <CardBody className="flex items-center justify-center">
+                      <CardBody className="flex items-center justify-center bg-white/5">
                         <div className="text-white">{player.name}</div>
                       </CardBody>
                     </Card>
@@ -155,6 +158,11 @@ export default function CreateGamePage() {
         isOpen={showSelectSequence}
         onClose={() => setShowSelectSequence(false)}
         onSelect={(sequence) => handleSelectSequence(sequence)}
+      />
+      <AddPlayerToGameModal
+        isOpen={showAddPlayerToGame}
+        onClose={() => setShowAddPlayerToGame(false)}
+        onSelect={(player) => handleAddPlayer(player)}
       />
     </div>
   );
