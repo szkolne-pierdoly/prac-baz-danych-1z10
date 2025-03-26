@@ -17,8 +17,7 @@ export default function CreateGamePage() {
   const [sequence, setSequence] = useState<Sequence | null>(null);
 
   const [showSelectSequence, setShowSelectSequence] = useState<boolean>(false);
-  const [showAddPlayerToGame, setShowAddPlayerToGame] =
-    useState<boolean>(false);
+  const [showAddPlayerToGame, setShowAddPlayerToGame] = useState<boolean>(true); // todo: change to false after testing
 
   const handleGoGames = () => {
     router.push("/db/games");
