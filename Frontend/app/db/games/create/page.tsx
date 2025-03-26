@@ -28,8 +28,8 @@ export default function CreateGamePage() {
     setShowSelectSequence(false);
   };
 
-  const handleAddPlayer = (player: Player) => {
-    setPlayers([...players, player]);
+  const handleSelectPlayers = (newPlayers: Player[]) => {
+    setPlayers(newPlayers);
     setShowAddPlayerToGame(false);
   };
 
@@ -97,7 +97,7 @@ export default function CreateGamePage() {
                   isInvalid={
                     (sequence?.questions?.filter(
                       (question) => question.sequencePart === 0,
-                    ).length ?? 0) < 20
+                    ).length ?? 0) < 20 && sequence !== null
                   }
                   errorMessage={
                     (sequence?.questions?.filter(
@@ -128,9 +128,12 @@ export default function CreateGamePage() {
                 <div className="flex flex-row items-center gap-4 flex-wrap w-full min-h-4">
                   <Card
                     className="basis-[calc(33.333%-1rem)] aspect-square"
-                    isPressable
-                    isHoverable
-                    onPress={() => setShowAddPlayerToGame(true)}
+                    isPressable={players.length < 10}
+                    isHoverable={players.length < 10}
+                    isDisabled={players.length >= 10}
+                    onPress={() =>
+                      players.length < 10 && setShowAddPlayerToGame(true)
+                    }
                   >
                     <CardBody className="flex items-center justify-center bg-white/5 text-primary">
                       <PlusIcon size="30%" />
@@ -161,7 +164,8 @@ export default function CreateGamePage() {
       <AddPlayerToGameModal
         isOpen={showAddPlayerToGame}
         onClose={() => setShowAddPlayerToGame(false)}
-        onSelect={(player) => handleAddPlayer(player)}
+        onSelect={(player) => handleSelectPlayers(player)}
+        selectedPlayersIds={players.map((player) => player.id)}
       />
     </div>
   );
