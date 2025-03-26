@@ -3,14 +3,12 @@
 import {
   addToast,
   Avatar,
-  Button,
   Card,
   CardBody,
   Divider,
   Modal,
   ModalBody,
   ModalContent,
-  ModalFooter,
   ModalHeader,
 } from "@heroui/react";
 import { Player } from "../models/Player";
@@ -24,18 +22,15 @@ export default function AddPlayerToGameModal({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (players: Player[]) => void;
+  onSelect: (player: Player) => void;
   selectedPlayersIds: number[] | null;
 }) {
   const [players, setPlayers] = useState<Player[]>([]);
-  const [selectedPlayers, setSelectedPlayers] = useState<number[]>([]);
 
   const handleFetchPlayers = async () => {
     const result = await getPlayers();
     if (result.isSuccess && result.players) {
       setPlayers(result.players);
-      setSelectedPlayers(selectedPlayersIds ?? []);
-      console.log(selectedPlayers);
     } else {
       addToast({
         title: "Error",
@@ -46,15 +41,8 @@ export default function AddPlayerToGameModal({
   };
 
   useEffect(() => {
-    handleFetchPlayers();
-  }, []);
-
-  useEffect(() => {
     console.log("selected", selectedPlayersIds);
-    if (!isOpen) {
-      setSelectedPlayers([]);
-      setPlayers([]);
-    } else {
+    if (isOpen) {
       handleFetchPlayers();
     }
   }, [isOpen]);
@@ -69,30 +57,14 @@ export default function AddPlayerToGameModal({
             {players.map((player) => (
               <Card
                 key={player.id}
-                className={`flex flex-row gap-2 ${
-                  selectedPlayers.includes(player.id)
-                    ? "outline outline-2 outline-primary outline-offset-2"
-                    : ""
-                }`}
+                className="flex flex-row gap-2"
                 isPressable
                 isHoverable
                 onPress={() => {
-                  if (selectedPlayers.includes(player.id)) {
-                    setSelectedPlayers(
-                      selectedPlayers.filter((p) => p !== player.id),
-                    );
-                  } else {
-                    setSelectedPlayers([...selectedPlayers, player.id]);
-                  }
+                  onSelect(player);
                 }}
               >
-                <CardBody
-                  className={`flex flex-row gap-2 items-center justify-start ${
-                    selectedPlayers.includes(player.id)
-                      ? "bg-white/15"
-                      : "bg-white/5"
-                  }`}
-                >
+                <CardBody className="flex flex-row gap-2 items-center justify-start bg-white/5">
                   <Avatar
                     style={{ backgroundColor: player.color }}
                     name={player.name.charAt(0).toUpperCase()}
@@ -108,33 +80,6 @@ export default function AddPlayerToGameModal({
             ))}
           </div>
         </ModalBody>
-        <Divider />
-        <ModalFooter className="flex flex-row items-center gap-4">
-          <Button variant="flat" onPress={onClose}>
-            Anuluj
-          </Button>
-          <Button
-            variant="solid"
-            color="primary"
-            fullWidth
-            isDisabled={
-              selectedPlayers === null ||
-              selectedPlayers.length === 0 ||
-              selectedPlayers.length > 10
-            }
-            onPress={() => {
-              if (selectedPlayers) {
-                onSelect(
-                  players.filter((player) =>
-                    selectedPlayers.includes(player.id),
-                  ),
-                );
-              }
-            }}
-          >
-            Dodaj
-          </Button>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );

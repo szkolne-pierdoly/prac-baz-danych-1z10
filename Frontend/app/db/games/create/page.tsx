@@ -4,8 +4,25 @@ import AddPlayerToGameModal from "@/app/components/addPlayerToGameModal";
 import SelectSequenceModal from "@/app/components/selectSequenceModal";
 import { Player } from "@/app/models/Player";
 import { Sequence } from "@/app/models/Sequence";
-import { Card, CardBody, Button, Divider, Input } from "@heroui/react";
-import { ArrowUpDownIcon, HomeIcon, PlusIcon } from "lucide-react";
+import {
+  Card,
+  CardBody,
+  Button,
+  Divider,
+  Input,
+  Avatar,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+} from "@heroui/react";
+import {
+  ArrowUpDownIcon,
+  EllipsisVerticalIcon,
+  HomeIcon,
+  PlusIcon,
+  XIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -28,9 +45,13 @@ export default function CreateGamePage() {
     setShowSelectSequence(false);
   };
 
-  const handleSelectPlayers = (newPlayers: Player[]) => {
-    setPlayers(newPlayers);
+  const handleAddPlayer = (newPlayer: Player) => {
+    setPlayers([...players, newPlayer]);
     setShowAddPlayerToGame(false);
+  };
+
+  const handleRemovePlayer = (playerId: number) => {
+    setPlayers(players.filter((player) => player.id !== playerId));
   };
 
   return (
@@ -125,9 +146,9 @@ export default function CreateGamePage() {
                 <div className="flex flex-row items-start gap-2 w-full">
                   <span className="text-white font-bold">Gracze:</span>{" "}
                 </div>
-                <div className="flex flex-row items-center gap-4 flex-wrap w-full min-h-4">
+                <div className="flex flex-col items-center gap-4 flex-wrap w-full min-h-4">
                   <Card
-                    className="basis-[calc(33.333%-1rem)] aspect-square"
+                    className="w-full"
                     isPressable={players.length < 10}
                     isHoverable={players.length < 10}
                     isDisabled={players.length >= 10}
@@ -135,21 +156,50 @@ export default function CreateGamePage() {
                       players.length < 10 && setShowAddPlayerToGame(true)
                     }
                   >
-                    <CardBody className="flex items-center justify-center bg-white/5 text-primary">
-                      <PlusIcon size="30%" />
+                    <CardBody className="flex flex-row items-center justify-center gap-2 bg-white/5 text-primary">
+                      <PlusIcon size="36px" />
                       <div>Dodaj gracza</div>
                     </CardBody>
                   </Card>
+                  <Divider />
                   {players.map((player) => (
-                    <Card
-                      key={player.id}
-                      className="basis-[calc(33.333%-1rem)] aspect-square"
-                    >
-                      <CardBody className="flex items-center justify-center bg-white/5">
-                        <div className="text-white">{player.name}</div>
+                    <Card key={player.id} className="w-full">
+                      <CardBody className="flex flex-row items-center justify-center bg-white/5">
+                        <div className="flex flex-row items-center justify-start gap-4 w-full">
+                          <Avatar
+                            name={player.name.charAt(0).toUpperCase()}
+                            style={{ backgroundColor: player.color }}
+                          />
+                          <div className="text-white">{player.name}</div>
+                        </div>
+                        <Dropdown>
+                          <DropdownTrigger>
+                            <Button
+                              variant="light"
+                              color="default"
+                              isIconOnly
+                              onPress={() => handleRemovePlayer(player.id)}
+                            >
+                              <EllipsisVerticalIcon />
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu>
+                            <DropdownItem key="change-position">
+                              Zmień stanowisko
+                            </DropdownItem>
+                            <DropdownItem key="remove-player" color="danger">
+                              Usuń gracza
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
                       </CardBody>
                     </Card>
                   ))}
+                  {players.length === 0 && (
+                    <div className="text-white">
+                      Nie dodano graczy do tej gry.
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -164,7 +214,7 @@ export default function CreateGamePage() {
       <AddPlayerToGameModal
         isOpen={showAddPlayerToGame}
         onClose={() => setShowAddPlayerToGame(false)}
-        onSelect={(player) => handleSelectPlayers(player)}
+        onSelect={(player) => handleAddPlayer(player)}
         selectedPlayersIds={players.map((player) => player.id)}
       />
     </div>
