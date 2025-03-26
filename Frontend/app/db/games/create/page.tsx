@@ -111,11 +111,40 @@ export default function CreateGamePage() {
               </div>
             </div>
           </CardBody>
-          <CardBody>
-            <div className="flex flex-row items-center justify-between">
-              <div className="text-2xl font-bold flex flex-row items-center gap-2">
-                <div className="flex flex-row items-center gap-2 mr-6">
-                  <span className="text-gray-400">Gracze:</span>{" "}
+          <Divider />
+          <CardBody className="w-full">
+            <div className="flex flex-row items-center justify-between w-full">
+              <div className="text-2xl flex flex-col items-center gap-2 w-full">
+                <div className="flex flex-row items-start gap-2 w-full">
+                  <span className="text-white font-bold">Gracze:</span>{" "}
+                </div>
+                <div className="flex flex-row items-center gap-4 flex-wrap w-full min-h-4">
+                  <Card
+                    className="basis-[calc(33.333%-1rem)] aspect-square"
+                    isPressable
+                    isHoverable
+                    onPress={() => {
+                      setPlayers([
+                        ...players,
+                        { id: players.length + 1, name: "", color: "default" },
+                      ]);
+                    }}
+                  >
+                    <CardBody className="flex items-center justify-center">
+                      <PlusIcon className="text-white" size="30%" />
+                      <div className="text-white">Dodaj gracza</div>
+                    </CardBody>
+                  </Card>
+                  {players.map((player) => (
+                    <Card
+                      key={player.id}
+                      className="basis-[calc(33.333%-1rem)] aspect-square"
+                    >
+                      <CardBody className="flex items-center justify-center">
+                        <div className="text-white">{player.name}</div>
+                      </CardBody>
+                    </Card>
+                  ))}
                 </div>
               </div>
             </div>
