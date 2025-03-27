@@ -5,7 +5,9 @@ export interface GamePlayer {
   gameId: number;
   playerId: number;
   name: string;
+  color: string;
   points: number;
   lives: number;
+  seat: number;
   actions: GameAction[];
 }
