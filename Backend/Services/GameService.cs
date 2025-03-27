@@ -22,7 +22,7 @@ public class GameService : IGameService
     public async Task<CreateGameResult> CreateGame(CreateGameRequest request)
     {
         try {
-            if (request.PlayerIds.Count != 10) {
+            if (request.Players.Count != 10) {
                 return new CreateGameResult {
                     IsSuccess = false,
                     Status = "ERROR",
@@ -47,19 +47,20 @@ public class GameService : IGameService
             };
 
             List<GamePlayer> gamePlayers = new List<GamePlayer>();
-            foreach (var playerId in request.PlayerIds) {
-                var player = await _playerRepository.GetPlayerById(playerId);
+            foreach (var playerRequest in request.Players) {
+                var player = await _playerRepository.GetPlayerById(playerRequest.PlayerId);
                 if (player == null) {
                     return new CreateGameResult {
                         IsSuccess = false,
                         Status = "ERROR",
-                        Message = "Player with ID " + playerId + " not found"
+                        Message = "Player with ID " + playerRequest.PlayerId + " not found"
                     };
                 }
                 gamePlayers.Add(new GamePlayer {
-                    PlayerId = playerId,
+                    PlayerId = player.Id,
                     GameId = game.Id,
-                    Name = player.Name
+                    Name = player.Name,
+                    Seat = playerRequest.Seat
                 });
             }
 
