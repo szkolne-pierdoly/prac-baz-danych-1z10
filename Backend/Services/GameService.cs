@@ -60,6 +60,7 @@ public class GameService : IGameService
                     PlayerId = player.Id,
                     GameId = game.Id,
                     Name = player.Name,
+                    Color = player.Color,
                     Seat = playerRequest.Seat
                 });
             }
@@ -150,7 +151,8 @@ public class GameService : IGameService
             game.Players = request.PlayerIds?.Select(playerId => new GamePlayer {
                 PlayerId = playerId,
                 GameId = game.Id,
-                Name = playerId.ToString()
+                Name = playerId.ToString(),
+                Color = game.Players.FirstOrDefault(p => p.PlayerId == playerId)?.Color ?? "#000000"
             }).ToList() ?? game.Players;
 
             var result = await _gameRepository.UpdateGame(game);

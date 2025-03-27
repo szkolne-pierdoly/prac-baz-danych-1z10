@@ -6,6 +6,7 @@ public class GamePlayer
     public int GameId { get; set; }
     public int PlayerId { get; set; }
     public required string Name { get; set; }
+    public required string Color { get; set; }
     public int Points { get; set; } = 0;
     public int Lives { get; set; } = 3;
     public int Seat { get; set; } = 0;
