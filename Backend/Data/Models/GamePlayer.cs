@@ -8,5 +8,6 @@ public class GamePlayer
     public required string Name { get; set; }
     public int Points { get; set; } = 0;
     public int Lives { get; set; } = 3;
+    public int Seat { get; set; } = 0;
     public virtual ICollection<GameAction> Actions { get; set; } = new List<GameAction>();
 }
