@@ -2,9 +2,10 @@
 
 import { Game } from "../models/Game";
 
-export async function startGame(
+export async function createGame(
+  name: string,
   sequenceId: number,
-  playerIds: number[],
+  players: { playerId: number; seat: number }[],
 ): Promise<{
   isSuccess: boolean;
   message: string;
@@ -15,18 +16,22 @@ export async function startGame(
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ sequenceId: sequenceId, playerIds: playerIds }),
+    body: JSON.stringify({
+      name: name,
+      sequenceId: sequenceId,
+      players: players,
+    }),
   });
 
   if (!res.ok) {
-    return { isSuccess: false, message: "Failed to start game" };
+    return { isSuccess: false, message: "Failed to create game" };
   }
 
   const data = await res.json();
 
   return {
     isSuccess: true,
-    message: "Game started successfully",
+    message: "Game created successfully",
     game: data.game,
   };
 }
