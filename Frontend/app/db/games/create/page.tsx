@@ -1,6 +1,7 @@
 "use client";
 
 import AddPlayerToGameModal from "@/app/components/addPlayerToGameModal";
+import SelectPlayerSeatModal from "@/app/components/selectPlayerSeatModal";
 import SelectSequenceModal from "@/app/components/selectSequenceModal";
 import { Player } from "@/app/models/Player";
 import { Sequence } from "@/app/models/Sequence";
@@ -15,13 +16,13 @@ import {
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
+  addToast,
 } from "@heroui/react";
 import {
   ArrowUpDownIcon,
   EllipsisVerticalIcon,
   HomeIcon,
   PlusIcon,
-  XIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -30,11 +31,17 @@ export default function CreateGamePage() {
   const router = useRouter();
 
   const [name, setName] = useState<string>("");
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [players, setPlayers] = useState<{ player: Player; seat: number }[]>(
+    [],
+  );
   const [sequence, setSequence] = useState<Sequence | null>(null);
 
   const [showSelectSequence, setShowSelectSequence] = useState<boolean>(false);
-  const [showAddPlayerToGame, setShowAddPlayerToGame] = useState<boolean>(true); // todo: change to false after testing
+  const [showAddPlayerToGame, setShowAddPlayerToGame] =
+    useState<boolean>(false);
+  const [showSelectPlayerSeat, setShowSelectPlayerSeat] =
+    useState<boolean>(false);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
   const handleGoGames = () => {
     router.push("/db/games");
@@ -45,13 +52,38 @@ export default function CreateGamePage() {
     setShowSelectSequence(false);
   };
 
-  const handleAddPlayer = (newPlayer: Player) => {
-    setPlayers([...players, newPlayer]);
-    setShowAddPlayerToGame(false);
+  const handleRemovePlayer = (playerId: number) => {
+    setPlayers(players.filter((player) => player.player.id !== playerId));
   };
 
-  const handleRemovePlayer = (playerId: number) => {
-    setPlayers(players.filter((player) => player.id !== playerId));
+  const handleAddPlayer = (player: Player, seat: number) => {
+    setShowAddPlayerToGame(false);
+    if (players.find((p) => p.player.id === player.id)) {
+      addToast({
+        title: "Błąd",
+        description: "Gracz już jest w tej grze",
+        color: "danger",
+      });
+    }
+    setPlayers([...players, { player, seat }]);
+  };
+
+  const handleUpdatePlayerSeat = (seat: number) => {
+    setShowSelectPlayerSeat(false);
+    if (selectedPlayer == null) {
+      addToast({
+        title: "Błąd",
+        description: "Nie wybrano gracza",
+        color: "danger",
+      });
+    } else {
+      setPlayers(
+        players.map((player) =>
+          player.player.id === selectedPlayer.id ? { ...player, seat } : player,
+        ),
+      );
+      setSelectedPlayer(null);
+    }
   };
 
   return (
@@ -162,39 +194,59 @@ export default function CreateGamePage() {
                     </CardBody>
                   </Card>
                   <Divider />
-                  {players.map((player) => (
-                    <Card key={player.id} className="w-full">
-                      <CardBody className="flex flex-row items-center justify-center bg-white/5">
-                        <div className="flex flex-row items-center justify-start gap-4 w-full">
-                          <Avatar
-                            name={player.name.charAt(0).toUpperCase()}
-                            style={{ backgroundColor: player.color }}
-                          />
-                          <div className="text-white">{player.name}</div>
-                        </div>
-                        <Dropdown>
-                          <DropdownTrigger>
-                            <Button
-                              variant="light"
-                              color="default"
-                              isIconOnly
-                              onPress={() => handleRemovePlayer(player.id)}
-                            >
-                              <EllipsisVerticalIcon />
-                            </Button>
-                          </DropdownTrigger>
-                          <DropdownMenu>
-                            <DropdownItem key="change-position">
-                              Zmień stanowisko
-                            </DropdownItem>
-                            <DropdownItem key="remove-player" color="danger">
-                              Usuń gracza
-                            </DropdownItem>
-                          </DropdownMenu>
-                        </Dropdown>
-                      </CardBody>
-                    </Card>
-                  ))}
+                  {Array.from({ length: 10 }).map((_, index) => {
+                    const player = players.find((p) => p.seat === index + 1);
+                    if (!player) return null;
+
+                    return (
+                      <Card key={player.player.id} className="w-full">
+                        <CardBody className="flex flex-row items-center justify-center bg-white/5">
+                          <div className="flex flex-row items-center justify-start gap-4 w-full">
+                            <Avatar
+                              name={player.player.name.charAt(0).toUpperCase()}
+                              style={{ backgroundColor: player.player.color }}
+                            />
+                            <div className="flex flex-col items-start justify-start gap-1">
+                              <div className="text-white">
+                                {player.player.name}
+                              </div>
+                              <div className="text-gray-500 text-sm">
+                                Pozycja: {player.seat}
+                              </div>
+                            </div>
+                          </div>
+                          <Dropdown>
+                            <DropdownTrigger>
+                              <Button
+                                variant="light"
+                                color="default"
+                                isIconOnly
+                                onPress={() =>
+                                  handleRemovePlayer(player.player.id)
+                                }
+                              >
+                                <EllipsisVerticalIcon />
+                              </Button>
+                            </DropdownTrigger>
+                            <DropdownMenu>
+                              <DropdownItem
+                                key="change-position"
+                                onPress={() => {
+                                  setSelectedPlayer(player.player);
+                                  setShowSelectPlayerSeat(true);
+                                }}
+                              >
+                                Zmień stanowisko
+                              </DropdownItem>
+                              <DropdownItem key="remove-player" color="danger">
+                                Usuń gracza
+                              </DropdownItem>
+                            </DropdownMenu>
+                          </Dropdown>
+                        </CardBody>
+                      </Card>
+                    );
+                  })}
                   {players.length === 0 && (
                     <div className="text-white">
                       Nie dodano graczy do tej gry.
@@ -214,8 +266,25 @@ export default function CreateGamePage() {
       <AddPlayerToGameModal
         isOpen={showAddPlayerToGame}
         onClose={() => setShowAddPlayerToGame(false)}
-        onSelect={(player) => handleAddPlayer(player)}
-        selectedPlayersIds={players.map((player) => player.id)}
+        onSelect={(player, seat) => handleAddPlayer(player, seat)}
+        assignedPlayers={players.map((player) => ({
+          seat: player.seat,
+          player: player.player.name,
+        }))}
+      />
+      <SelectPlayerSeatModal
+        isOpen={showSelectPlayerSeat}
+        onClose={() => setShowSelectPlayerSeat(false)}
+        onSelect={(seat) => {
+          if (selectedPlayer) {
+            handleUpdatePlayerSeat(seat);
+          }
+        }}
+        assignedPlayers={players.map((player) => ({
+          seat: player.seat,
+          player: player.player.name,
+        }))}
+        selectedPlayer={selectedPlayer}
       />
     </div>
   );
