@@ -91,6 +91,43 @@ public class GameService : IGameService
         }
     }
 
+    public async Task<DuplicateGameResult> DuplicateGame(int id)
+    {
+        try {
+            var game = await _gameRepository.GetGameById(id);
+            if (game == null) {
+                return new DuplicateGameResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Game with ID " + id + " not found",
+                    HttpStatusCode = 404
+                };
+            }
+
+            var duplicateGame = new Game {
+                Name = game.Name + " (Copy)",
+                Sequence = game.Sequence,
+                Players = game.Players,
+                Actions = game.Actions,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            var result = await _gameRepository.CreateGame(duplicateGame);
+
+            return new DuplicateGameResult {
+                IsSuccess = true,
+                Status = "SUCCESS",
+                GameId = result.Id
+            };
+        } catch (Exception ex) {
+            return new DuplicateGameResult {
+                IsSuccess = false,
+                Status = "ERROR",
+                Message = ex.Message
+            };
+        }
+    }
+
     public async Task<GetAllGamesResult> GetAllGames(bool includePlayers = false, bool includeActions = false, bool includeSequence = false, int? limit = null, int? offset = null, string? search = null)
     {
         try {

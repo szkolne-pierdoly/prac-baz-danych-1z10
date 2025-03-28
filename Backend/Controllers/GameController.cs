@@ -21,10 +21,35 @@ public class GameController : ControllerBase
     {
         var result = await _gameService.CreateGame(request);
         if (!result.IsSuccess) {
-            return StatusCode(result.HttpStatusCode ?? 400, result);
+            return StatusCode(result.HttpStatusCode ?? 400, new {
+                status = result.Status,
+                message = result.Message ?? "Internal server error"
+            });
         }
-        return Ok(result);
+        return Ok(new {
+            status = result.Status,
+            message = result.Message ?? "Game created successfully",
+            newGame = result.Game
+        });
     }
+
+    [HttpPost("{id}/duplicate")]
+    public async Task<IActionResult> DuplicateGame(int id)
+    {
+        var result = await _gameService.DuplicateGame(id);
+        if (!result.IsSuccess) {
+            return StatusCode(result.HttpStatusCode ?? 400, new {
+                status = result.Status,
+                message = result.Message ?? "Internal server error"
+            });
+        }
+        return Ok(new {
+            status = result.Status,
+            message = result.Message ?? "Game duplicated successfully",
+            newGameId = result.GameId
+        });
+    }
+
 
     [HttpGet]
     public async Task<IActionResult> GetAllGames([FromQuery] bool includePlayers = false, [FromQuery] bool includeActions = false, [FromQuery] bool includeSequence = false, [FromQuery] int? limit = null, [FromQuery] int? offset = null, [FromQuery] string? search = null)
