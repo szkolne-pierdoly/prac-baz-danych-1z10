@@ -6,7 +6,7 @@ import { Button, CardBody, Divider, addToast } from "@heroui/react";
 import { Card } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { HomeIcon } from "lucide-react";
-import { getAllGames } from "@/app/actions/game";
+import { getGames } from "@/app/actions/game";
 import { useRouter } from "next/navigation";
 
 export default function GamesPage() {
@@ -19,7 +19,7 @@ export default function GamesPage() {
   }, []);
 
   const fetchGames = async () => {
-    const result = await getAllGames();
+    const result = await getGames();
     if (result.isSuccess && result.games) {
       console.log(result.games);
       setGames(result.games);
