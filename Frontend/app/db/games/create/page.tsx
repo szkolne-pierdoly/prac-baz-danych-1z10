@@ -25,7 +25,7 @@ import {
   PlusIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function CreateGamePage() {
   const router = useRouter();
@@ -42,6 +42,10 @@ export default function CreateGamePage() {
   const [showSelectPlayerSeat, setShowSelectPlayerSeat] =
     useState<boolean>(false);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+
+  useEffect(() => {
+    console.log(players);
+  }, [players]);
 
   const handleGoGames = () => {
     router.push("/db/games");
@@ -172,7 +176,7 @@ export default function CreateGamePage() {
             </div>
           </CardBody>
           <Divider />
-          <CardBody className="w-full">
+          <CardBody className="w-full max-h-[50vh]">
             <div className="flex flex-row items-center justify-between w-full">
               <div className="text-2xl flex flex-col items-center gap-2 w-full">
                 <div className="flex flex-row items-start gap-2 w-full">
@@ -238,7 +242,13 @@ export default function CreateGamePage() {
                               >
                                 Zmień stanowisko
                               </DropdownItem>
-                              <DropdownItem key="remove-player" color="danger">
+                              <DropdownItem
+                                key="remove-player"
+                                color="danger"
+                                onPress={() =>
+                                  handleRemovePlayer(player.player.id)
+                                }
+                              >
                                 Usuń gracza
                               </DropdownItem>
                             </DropdownMenu>
@@ -255,6 +265,16 @@ export default function CreateGamePage() {
                 </div>
               </div>
             </div>
+          </CardBody>
+          <Divider />
+          <CardBody>
+            <Button
+              color="primary"
+              onPress={() => console.log("create")}
+              isDisabled={players.length !== 10}
+            >
+              Utwórz grę
+            </Button>
           </CardBody>
         </Card>
       </div>
