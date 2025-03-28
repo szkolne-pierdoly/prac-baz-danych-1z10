@@ -6,10 +6,9 @@ export interface Game {
   id: number;
   name?: string;
   sequenceId: number;
-  playerId: number;
+  players: Player[];
   answers: Answer[];
   sequence: Sequence;
-  player: Player;
   createdAt: Date;
   updatedAt?: Date;
 }
