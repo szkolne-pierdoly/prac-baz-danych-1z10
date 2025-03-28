@@ -1,5 +1,6 @@
 "use client";
 
+import { createGame } from "@/app/actions/game";
 import AddPlayerToGameModal from "@/app/components/addPlayerToGameModal";
 import SelectPlayerSeatModal from "@/app/components/selectPlayerSeatModal";
 import SelectSequenceModal from "@/app/components/selectSequenceModal";
@@ -87,6 +88,60 @@ export default function CreateGamePage() {
         ),
       );
       setSelectedPlayer(null);
+    }
+  };
+
+  const handleCreateGame = async () => {
+    if (players.length !== 10) {
+      addToast({
+        title: "Błąd",
+        description: "Musisz dodać 10 graczy do gry",
+        color: "danger",
+      });
+      return;
+    }
+
+    if (sequence == null) {
+      addToast({
+        title: "Błąd",
+        description: "Musisz wybrać sekwencję",
+        color: "danger",
+      });
+    }
+
+    if (players.some((player) => player.seat === 0)) {
+      addToast({
+        title: "Błąd",
+        description: "Gracz niepoprawnie przypisany do stanowiska 0",
+        color: "danger",
+      });
+      return;
+    }
+
+    if (players.some((player) => player.seat > 10)) {
+      addToast({
+        title: "Błąd",
+        description: "Niepoprawne przypisanie gracza do stanowiska",
+        color: "danger",
+      });
+      return;
+    }
+    const result = await createGame(
+      name,
+      sequence?.id ?? 0,
+      players.map((player) => ({
+        playerId: player.player.id,
+        seat: player.seat,
+      })),
+    );
+    if (result.isSuccess) {
+      router.push(`/db/games/${result.game?.id}`);
+    } else {
+      addToast({
+        title: "Błąd",
+        description: result.message,
+        color: "danger",
+      });
     }
   };
 
@@ -270,7 +325,7 @@ export default function CreateGamePage() {
           <CardBody>
             <Button
               color="primary"
-              onPress={() => console.log("create")}
+              onPress={handleCreateGame}
               isDisabled={players.length !== 10}
             >
               Utwórz grę
