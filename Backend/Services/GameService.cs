@@ -107,10 +107,20 @@ public class GameService : IGameService
             var duplicateGame = new Game {
                 Name = game.Name + " (Copy)",
                 Sequence = game.Sequence,
-                Players = game.Players,
-                Actions = game.Actions,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                Actions = new List<GameAction>(),
+                Players = new List<GamePlayer>()
             };
+
+            // Create new GamePlayer objects for the duplicate game
+            duplicateGame.Players = game.Players.Select(p => new GamePlayer {
+                PlayerId = p.PlayerId,
+                Name = p.Name,
+                Color = p.Color,
+                Points = p.Points,
+                Lives = p.Lives,
+                Seat = p.Seat
+            }).ToList();
 
             var result = await _gameRepository.CreateGame(duplicateGame);
 
