@@ -36,12 +36,27 @@ export async function createGame(
   };
 }
 
-export async function getAllGames(): Promise<{
+export async function getGames(
+  limit?: number,
+  offset?: number,
+  search?: string,
+): Promise<{
   isSuccess: boolean;
   message: string;
   games?: Game[];
 }> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/games`, {
+  const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/api/games`);
+  if (limit) {
+    url.searchParams.append("limit", limit.toString());
+  }
+  if (offset) {
+    url.searchParams.append("offset", offset.toString());
+  }
+  if (search) {
+    url.searchParams.append("search", search);
+  }
+
+  const res = await fetch(url.toString(), {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -49,7 +64,7 @@ export async function getAllGames(): Promise<{
   });
 
   if (!res.ok) {
-    return { isSuccess: false, message: "Failed to get all games" };
+    return { isSuccess: false, message: "Failed to get games" };
   }
 
   const data = await res.json();
