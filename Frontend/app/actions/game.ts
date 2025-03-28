@@ -36,6 +36,34 @@ export async function createGame(
   };
 }
 
+export async function duplicateGame(id: number): Promise<{
+  isSuccess: boolean;
+  message: string;
+  gameId?: number;
+}> {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/games/${id}/duplicate`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  if (!res.ok) {
+    return { isSuccess: false, message: "Failed to duplicate game" };
+  }
+
+  const data = await res.json();
+
+  return {
+    isSuccess: true,
+    message: "Game duplicated successfully",
+    gameId: data.newGameId,
+  };
+}
+
 export async function getGames(
   limit?: number,
   offset?: number,
