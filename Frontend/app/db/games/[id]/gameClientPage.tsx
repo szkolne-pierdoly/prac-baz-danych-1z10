@@ -3,27 +3,34 @@
 import { getGameById } from "@/app/actions/game";
 import { SequencePart } from "@/app/enums/sequencePart";
 import { Game } from "@/app/models/Game";
-import { Card, CardBody, Button, Divider, Tooltip, Link } from "@heroui/react";
+import {
+  Card,
+  CardBody,
+  Button,
+  Divider,
+  Tooltip,
+  Link,
+  Avatar,
+} from "@heroui/react";
 import { HomeIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export default function GameClientPage({ gameId }: { gameId: number }) {
   const router = useRouter();
 
   const [game, setGame] = useState<Game | null>(null);
 
-  const getGame = async () => {
+  const handleFetchGame = useCallback(async () => {
     const result = await getGameById(gameId);
     if (result.isSuccess && result.game) {
-      console.log(result.game);
       setGame(result.game);
     }
-  };
+  }, [gameId]);
 
   useEffect(() => {
-    getGame();
-  }, []);
+    handleFetchGame();
+  }, [handleFetchGame]);
 
   const handleGoGames = () => {
     router.push("/db/games");
@@ -69,8 +76,8 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
           </div>
         </CardBody>
       </Card>
-      <div className="w-full flex flex-col items-start justify-start max-w-4xl max-h-[calc(100vh-96px)] overflow-y-scroll">
-        <Card className="w-full">
+      <div className="w-full flex flex-col items-start justify-start max-w-4xl max-h-[calc(100vh-96px)] overflow-y-scroll gap-4">
+        <Card className="w-full min-h-[128px]">
           <CardBody>
             <div className="text-2xl font-bold">Sekwencja</div>
           </CardBody>
@@ -119,6 +126,38 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
                 }{" "}
                 pytań
               </div>
+            </div>
+          </CardBody>
+        </Card>
+        <Card className="w-full">
+          <CardBody className="h-20">
+            <div className="text-2xl font-bold">Gracze</div>
+          </CardBody>
+          <Divider />
+          <CardBody className="overflow-y-auto">
+            <div className="flex flex-col items-center justify-center gap-2">
+              {game?.players
+                .sort((a, b) => a.seat - b.seat)
+                .map((player) => (
+                  <Card key={player.id} className="w-full">
+                    <CardBody className="h-auto bg-white/5">
+                      <div className="flex flex- items-center justify-start gap-2">
+                        <Avatar
+                          style={{ backgroundColor: player.color }}
+                          name={player.name.charAt(0)}
+                        />
+                        <div className="flex flex-col items-start justify-center">
+                          <div className="text-2xl font-bold">
+                            {player.name}
+                          </div>
+                          <div className="text-gray-400">
+                            Stanowisko: {player.seat}
+                          </div>
+                        </div>
+                      </div>
+                    </CardBody>
+                  </Card>
+                ))}
             </div>
           </CardBody>
         </Card>
