@@ -97,7 +97,7 @@ export default function StartGamePage() {
           </Button>
         </CardFooter>
       </Card>
-      <Link href="/db/games" color="danger">
+      <Link href="/" color="danger">
         Powrót do strony głównej
       </Link>
       <SelectGameModal
