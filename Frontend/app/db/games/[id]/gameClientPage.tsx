@@ -1,6 +1,6 @@
 "use client";
 
-import { getGameById, updateGame } from "@/app/actions/game";
+import { deleteGame, getGameById, updateGame } from "@/app/actions/game";
 import AddPlayerToGameModal from "@/app/components/addPlayerToGameModal";
 import LoadingDialog from "@/app/components/loadingDialog";
 import SelectPlayerSeatModal from "@/app/components/selectPlayerSeatModal";
@@ -27,11 +27,15 @@ import {
   ModalHeader,
   ModalBody,
   addToast,
+  Input,
+  ModalFooter,
 } from "@heroui/react";
 import {
   ArrowLeftRight,
   ArrowUp10,
   EllipsisIcon,
+  EllipsisVerticalIcon,
+  PencilLineIcon,
   HomeIcon,
   TrashIcon,
 } from "lucide-react";
@@ -46,6 +50,7 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
   const [originalGame, setOriginalGame] = useState<Game | null>(null);
   const [game, setGame] = useState<Game | null>(null);
   const [hasBeenChanged, setHasBeenChanged] = useState(false);
+  const [renameGameName, setRenameGameName] = useState("");
 
   const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
   const [handleDeletePlayerId, setHandleDeletePlayerId] = useState<
@@ -56,7 +61,7 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
   const [showAddPlayerToGameModal, setShowAddPlayerToGameModal] =
     useState(false);
   const [showSelectSequenceModal, setShowSelectSequenceModal] = useState(false);
-
+  const [showRenameGameModal, setShowRenameGameModal] = useState(false);
   const handleFetchGame = useCallback(async () => {
     setIsLoading(true);
     const result = await getGameById(gameId);
@@ -193,6 +198,37 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
     await handleFetchGame();
   };
 
+  const handleDeleteGame = async () => {
+    setIsLoading(true);
+    const result = await deleteGame(gameId);
+    if (!result.isSuccess) {
+      addToast({
+        title: "Błąd",
+        description: result.message,
+        color: "danger",
+      });
+    }
+    router.push("/db/games");
+  };
+
+  const handleShowRename = () => {
+    setShowRenameGameModal(true);
+    setRenameGameName(game?.name ?? "");
+  };
+
+  const handleRenameGame = async () => {
+    setIsLoading(true);
+    setGame((prev) => {
+      if (prev === null) {
+        return null;
+      }
+      return { ...prev, name: renameGameName };
+    });
+    setIsLoading(false);
+    setShowRenameGameModal(false);
+    setRenameGameName("");
+  };
+
   const pageGameId = gameId;
 
   return (
@@ -221,15 +257,43 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
             )}
           </div>
           <div className="flex flex-row items-center justify-center gap-2">
-            {pageGameId === null && (
-              <Button
-                variant="flat"
-                color="primary"
-                onPress={() => console.log("create")}
-              >
-                Dodaj sekwencję
-              </Button>
-            )}
+            <Dropdown>
+              <DropdownTrigger>
+                <Button
+                  variant="light"
+                  color="default"
+                  onPress={handleShowRename}
+                  isIconOnly
+                >
+                  <EllipsisVerticalIcon />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu>
+                <DropdownItem
+                  key="renameGame"
+                  onPress={handleShowRename}
+                  startContent={<PencilLineIcon />}
+                >
+                  Zmień nazwę
+                </DropdownItem>
+                <DropdownItem
+                  key="swapSequence"
+                  onPress={() => setShowSelectSequenceModal(true)}
+                  startContent={<ArrowLeftRight />}
+                  showDivider
+                >
+                  Zamień sekwencję
+                </DropdownItem>
+                <DropdownItem
+                  key="delete"
+                  startContent={<TrashIcon />}
+                  color="danger"
+                  onPress={handleDeleteGame}
+                >
+                  Usuń grę
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
           </div>
         </CardBody>
       </Card>
@@ -250,16 +314,6 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
                   >
                     {game?.sequence.name ?? "-"}
                   </Link>
-                </Tooltip>
-                <Tooltip content="Zamien sekwencje">
-                  <Button
-                    variant="flat"
-                    color="primary"
-                    onPress={() => setShowSelectSequenceModal(true)}
-                    isIconOnly
-                  >
-                    <ArrowLeftRight />
-                  </Button>
                 </Tooltip>
               </div>
             </div>
@@ -461,6 +515,39 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
         onClose={() => setShowSelectSequenceModal(false)}
         onSelect={handleSwapSequence}
       />
+      <Modal
+        isOpen={showRenameGameModal}
+        onClose={() => setShowRenameGameModal(false)}
+      >
+        <ModalContent>
+          <ModalHeader>Zmień nazwę gry</ModalHeader>
+          <ModalBody>
+            <Input
+              value={renameGameName}
+              onChange={(e) => setRenameGameName(e.target.value)}
+            />
+          </ModalBody>
+          <Divider />
+          <ModalFooter className="flex flex-row items-center justify-stretch gap-2">
+            <Button
+              variant="flat"
+              color="primary"
+              onPress={() => setShowRenameGameModal(false)}
+              fullWidth
+            >
+              Anuluj
+            </Button>
+            <Button
+              variant="flat"
+              color="success"
+              onPress={handleRenameGame}
+              fullWidth
+            >
+              Zmień nazwę
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

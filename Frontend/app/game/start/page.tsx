@@ -20,7 +20,7 @@ import {
 import { PencilLineIcon } from "lucide-react";
 import SelectGameModal from "@/app/components/selectGameModal";
 import LoadingDialog from "@/app/components/loadingDialog";
-import { duplicateGame } from "@/app/actions/game";
+import { deleteGame, duplicateGame } from "@/app/actions/game";
 
 export default function StartGamePage() {
   const [game, setGame] = useState<Game | null>(null);
@@ -50,7 +50,7 @@ export default function StartGamePage() {
   };
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center">
+    <div className="w-screen h-screen flex justify-center items-center flex-col gap-4">
       <Card className="w-96">
         <CardHeader>Rozpocznij grę</CardHeader>
         <Divider />
@@ -90,12 +90,16 @@ export default function StartGamePage() {
             </div>
           )}
         </CardBody>
+        <Divider />
         <CardFooter>
-          <Button fullWidth color="primary">
+          <Button fullWidth color="primary" isDisabled={game === null}>
             Rozpocznij grę
           </Button>
         </CardFooter>
       </Card>
+      <Link href="/db/games" color="danger">
+        Powrót do strony głównej
+      </Link>
       <SelectGameModal
         isOpen={showsSelectGameModal}
         onClose={() => setShowsSelectGameModal(false)}

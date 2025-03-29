@@ -153,6 +153,7 @@ export async function updateGame(
   );
 
   if (!res.ok) {
+    console.log(await res.json());
     return { isSuccess: false, message: "Failed to update game" };
   }
 
