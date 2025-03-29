@@ -1,7 +1,9 @@
+using Backend.Models.DTOs;
+
 namespace Backend.Models.Contracts.Request;
 
 public class UpdateGameRequest
 {
-    public List<int>? PlayerIds { get; set; }
+    public required List<CreateGamePlayerDTO> Players { get; set; }
     public int? SequenceId { get; set; }
 }

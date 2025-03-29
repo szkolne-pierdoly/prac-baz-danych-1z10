@@ -177,7 +177,7 @@ public class GameService : IGameService
     public async Task<UpdateGameResult> UpdateGame(int id, UpdateGameRequest request)
     {
         try {
-            if (request.PlayerIds != null && request.PlayerIds.Count != 10) {
+            if (request.Players.Count != 10) {
                 return new UpdateGameResult {
                     IsSuccess = false,
                     Status = "ERROR",
@@ -194,13 +194,64 @@ public class GameService : IGameService
                 };
             }
 
-            game.SequenceId = request.SequenceId ?? game.SequenceId;
-            game.Players = request.PlayerIds?.Select(playerId => new GamePlayer {
-                PlayerId = playerId,
-                GameId = game.Id,
-                Name = playerId.ToString(),
-                Color = game.Players.FirstOrDefault(p => p.PlayerId == playerId)?.Color ?? "#000000"
-            }).ToList() ?? game.Players;
+            var seatSet = new HashSet<int>();
+            foreach (var playerRequest in request.Players) {
+                if (seatSet.Contains(playerRequest.Seat)) {
+                    return new UpdateGameResult {
+                        IsSuccess = false,
+                        Status = "ERROR",
+                        Message = "Each player must have a unique seat number"
+                    };
+                }
+                seatSet.Add(playerRequest.Seat);
+            }
+
+            var playerSet = new HashSet<int>();
+            foreach (var playerRequest in request.Players) {
+                if (playerSet.Contains(playerRequest.PlayerId)) {
+                    return new UpdateGameResult {
+                        IsSuccess = false,
+                        Status = "ERROR",
+                        Message = "Each player can only appear once in the game"
+                    };
+                }
+                playerSet.Add(playerRequest.PlayerId);
+            }
+
+            if (request.SequenceId != null) {
+                var sequence = await _sequenceRepository.GetSequenceById(request.SequenceId.Value);
+                if (sequence == null) {
+                    return new UpdateGameResult {
+                        IsSuccess = false,
+                        Status = "ERROR",
+                        Message = "Sequence with ID " + request.SequenceId + " not found"
+                    };
+                }
+                game.Sequence = sequence;
+            }
+
+            if (request.Players != null && request.Players.Count > 0) {
+                var gamePlayers = new List<GamePlayer>();
+                foreach (var playerObj in request.Players) {
+                    var player = await _playerRepository.GetPlayerById(playerObj.PlayerId);
+                    if (player == null) {
+                        return new UpdateGameResult {
+                            IsSuccess = false,
+                            Status = "ERROR",
+                            Message = "Player with ID " + playerObj.PlayerId + " not found"
+                        };
+                    }
+                    var newGamePlayer = new GamePlayer {
+                        PlayerId = player.Id,
+                        GameId = game.Id,
+                        Name = player.Name,
+                        Color = player.Color,
+                        Seat = playerObj.Seat
+                    };
+                    gamePlayers.Add(newGamePlayer);
+                }
+                game.Players = gamePlayers;
+            }
 
             var result = await _gameRepository.UpdateGame(game);
 
