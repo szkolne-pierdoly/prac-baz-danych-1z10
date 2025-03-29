@@ -1,6 +1,7 @@
 "use client";
 
 import { getGameById } from "@/app/actions/game";
+import SelectPlayerSeatModal from "@/app/components/selectPlayerSeatModal";
 import { SequencePart } from "@/app/enums/sequencePart";
 import { Game } from "@/app/models/Game";
 import {
@@ -11,21 +12,43 @@ import {
   Tooltip,
   Link,
   Avatar,
+  Dropdown,
+  DropdownTrigger,
+  DropdownItem,
+  DropdownMenu,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
 } from "@heroui/react";
-import { HomeIcon } from "lucide-react";
+import { ArrowUp10, EllipsisIcon, HomeIcon, TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 export default function GameClientPage({ gameId }: { gameId: number }) {
   const router = useRouter();
 
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [originalGame, setOriginalGame] = useState<Game | null>(null);
   const [game, setGame] = useState<Game | null>(null);
+  const [hasBeenChanged, setHasBeenChanged] = useState(false);
+
+  const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
+  const [handleDeletePlayerId, setHandleDeletePlayerId] = useState<
+    number | null
+  >(null);
+
+  const [showDiscardChangesModal, setShowDiscardChangesModal] = useState(false);
 
   const handleFetchGame = useCallback(async () => {
+    setIsLoading(true);
     const result = await getGameById(gameId);
     if (result.isSuccess && result.game) {
       setGame(result.game);
+      setOriginalGame(result.game);
     }
+    setIsLoading(false);
   }, [gameId]);
 
   useEffect(() => {
@@ -34,6 +57,53 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
 
   const handleGoGames = () => {
     router.push("/db/games");
+  };
+
+  const handleChangePlayerSeat = (newSeat: number) => {
+    setHasBeenChanged(true);
+    if (selectedPlayerId === null) {
+      return;
+    }
+
+    setHasBeenChanged(true);
+    setGame((prev) => {
+      if (prev === null) {
+        return null;
+      }
+
+      return {
+        ...prev,
+        players: prev.players.map((p) =>
+          p.id === selectedPlayerId ? { ...p, seat: newSeat } : p,
+        ),
+      };
+    });
+    setSelectedPlayerId(null);
+  };
+
+  const handleDeletePlayer = (playerId: number) => {
+    setHasBeenChanged(true);
+    setHandleDeletePlayerId(null);
+    setGame((prev) => {
+      if (prev === null) {
+        return null;
+      }
+
+      return {
+        ...prev,
+        players: prev.players.filter((p) => p.id !== playerId),
+      };
+    });
+  };
+
+  const handleDiscardChanges = () => {
+    setGame(originalGame);
+    setHasBeenChanged(false);
+  };
+
+  const handleSaveChanges = () => {
+    setGame(originalGame);
+    setHasBeenChanged(false);
   };
 
   const pageGameId = gameId;
@@ -140,7 +210,7 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
                 .sort((a, b) => a.seat - b.seat)
                 .map((player) => (
                   <Card key={player.id} className="w-full">
-                    <CardBody className="h-auto bg-white/5">
+                    <CardBody className="h-auto bg-white/5 flex flex-row items-center justify-between">
                       <div className="flex flex- items-center justify-start gap-2">
                         <Avatar
                           style={{ backgroundColor: player.color }}
@@ -155,6 +225,33 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
                           </div>
                         </div>
                       </div>
+                      <div className="flex flex-row items-center justify-center gap-2">
+                        <Dropdown>
+                          <DropdownTrigger>
+                            <Button variant="light" isIconOnly>
+                              <EllipsisIcon />
+                            </Button>
+                          </DropdownTrigger>
+                          <DropdownMenu>
+                            <DropdownItem
+                              key="edit"
+                              startContent={<ArrowUp10 />}
+                              showDivider
+                              onPress={() => setSelectedPlayerId(player.id)}
+                            >
+                              Zmień stanowisko
+                            </DropdownItem>
+                            <DropdownItem
+                              key="delete"
+                              startContent={<TrashIcon />}
+                              color="danger"
+                              onPress={() => setHandleDeletePlayerId(player.id)}
+                            >
+                              Usuń z gry
+                            </DropdownItem>
+                          </DropdownMenu>
+                        </Dropdown>
+                      </div>
                     </CardBody>
                   </Card>
                 ))}
@@ -162,6 +259,75 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
           </CardBody>
         </Card>
       </div>
+      <SelectPlayerSeatModal
+        isOpen={selectedPlayerId !== null}
+        onClose={() => setSelectedPlayerId(null)}
+        onSelect={handleChangePlayerSeat}
+        assignedPlayers={
+          game?.players.map((p) => ({
+            seat: p.seat,
+            player: p.name,
+          })) ?? []
+        }
+        selectedPlayer={
+          game?.players.find((p) => p.id === selectedPlayerId) ?? null
+        }
+      />
+      <Modal
+        isOpen={handleDeletePlayerId !== null}
+        onClose={() => setHandleDeletePlayerId(null)}
+      >
+        <ModalContent>
+          <ModalHeader>Czy napewno chcesz usunąć gracza z gry?</ModalHeader>
+          <ModalBody>
+            <Button
+              onPress={() => setHandleDeletePlayerId(null)}
+              color="primary"
+            >
+              Anuluj
+            </Button>
+            <Button
+              color="danger"
+              onPress={() => handleDeletePlayer(handleDeletePlayerId ?? 0)}
+            >
+              Usuń
+            </Button>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+      {hasBeenChanged && (
+        <Card className="fixed bottom-4">
+          <CardBody className="flex flex-row items-center justify-center gap-2">
+            Zostały wprowadzone zmiany, czy chcesz je zapisać?
+            <Button
+              variant="flat"
+              color="warning"
+              onPress={() => setShowDiscardChangesModal(true)}
+            >
+              Przywróć
+            </Button>
+            <Button variant="flat" color="success">
+              Zapisz
+            </Button>
+          </CardBody>
+        </Card>
+      )}
+      <Modal
+        isOpen={showDiscardChangesModal}
+        onClose={() => setShowDiscardChangesModal(false)}
+      >
+        <ModalContent>
+          <ModalHeader>Czy napewno chcesz porzucić zmiany?</ModalHeader>
+          <ModalBody>
+            <Button variant="flat" color="danger">
+              Porzuc zmiany
+            </Button>
+            <Button variant="flat" color="primary">
+              Anuluj
+            </Button>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </div>
   );
 }
