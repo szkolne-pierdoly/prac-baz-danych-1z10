@@ -4,10 +4,12 @@ import { getGameById, updateGame } from "@/app/actions/game";
 import AddPlayerToGameModal from "@/app/components/addPlayerToGameModal";
 import LoadingDialog from "@/app/components/loadingDialog";
 import SelectPlayerSeatModal from "@/app/components/selectPlayerSeatModal";
+import SelectSequenceModal from "@/app/components/selectSequenceModal";
 import { SequencePart } from "@/app/enums/sequencePart";
 import { Game } from "@/app/models/Game";
 import { GamePlayer } from "@/app/models/GamePlayer";
 import { Player } from "@/app/models/Player";
+import { Sequence } from "@/app/models/Sequence";
 import {
   Card,
   CardBody,
@@ -26,7 +28,13 @@ import {
   ModalBody,
   addToast,
 } from "@heroui/react";
-import { ArrowUp10, EllipsisIcon, HomeIcon, TrashIcon } from "lucide-react";
+import {
+  ArrowLeftRight,
+  ArrowUp10,
+  EllipsisIcon,
+  HomeIcon,
+  TrashIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
@@ -47,6 +55,7 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
   const [showDiscardChangesModal, setShowDiscardChangesModal] = useState(false);
   const [showAddPlayerToGameModal, setShowAddPlayerToGameModal] =
     useState(false);
+  const [showSelectSequenceModal, setShowSelectSequenceModal] = useState(false);
 
   const handleFetchGame = useCallback(async () => {
     setIsLoading(true);
@@ -141,6 +150,17 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
     setShowDiscardChangesModal(false);
   };
 
+  const handleSwapSequence = (sequence: Sequence) => {
+    setShowSelectSequenceModal(false);
+    setHasBeenChanged(true);
+    setGame((prev) => {
+      if (prev === null) {
+        return null;
+      }
+      return { ...prev, sequence: sequence, sequenceId: sequence.id };
+    });
+  };
+
   const handleSaveChanges = async () => {
     const players = game?.players.map((p) => ({
       playerId: p.playerId,
@@ -230,6 +250,16 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
                   >
                     {game?.sequence.name ?? "-"}
                   </Link>
+                </Tooltip>
+                <Tooltip content="Zamien sekwencje">
+                  <Button
+                    variant="flat"
+                    color="primary"
+                    onPress={() => setShowSelectSequenceModal(true)}
+                    isIconOnly
+                  >
+                    <ArrowLeftRight />
+                  </Button>
                 </Tooltip>
               </div>
             </div>
@@ -426,6 +456,11 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
         }
       />
       <LoadingDialog isLoading={isLoading} />
+      <SelectSequenceModal
+        isOpen={showSelectSequenceModal}
+        onClose={() => setShowSelectSequenceModal(false)}
+        onSelect={handleSwapSequence}
+      />
     </div>
   );
 }
