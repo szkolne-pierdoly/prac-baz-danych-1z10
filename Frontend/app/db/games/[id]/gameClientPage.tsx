@@ -1,9 +1,13 @@
 "use client";
 
-import { getGameById } from "@/app/actions/game";
+import { getGameById, updateGame } from "@/app/actions/game";
+import AddPlayerToGameModal from "@/app/components/addPlayerToGameModal";
+import LoadingDialog from "@/app/components/loadingDialog";
 import SelectPlayerSeatModal from "@/app/components/selectPlayerSeatModal";
 import { SequencePart } from "@/app/enums/sequencePart";
 import { Game } from "@/app/models/Game";
+import { GamePlayer } from "@/app/models/GamePlayer";
+import { Player } from "@/app/models/Player";
 import {
   Card,
   CardBody,
@@ -20,6 +24,7 @@ import {
   ModalContent,
   ModalHeader,
   ModalBody,
+  addToast,
 } from "@heroui/react";
 import { ArrowUp10, EllipsisIcon, HomeIcon, TrashIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -40,6 +45,8 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
   >(null);
 
   const [showDiscardChangesModal, setShowDiscardChangesModal] = useState(false);
+  const [showAddPlayerToGameModal, setShowAddPlayerToGameModal] =
+    useState(false);
 
   const handleFetchGame = useCallback(async () => {
     setIsLoading(true);
@@ -81,6 +88,38 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
     setSelectedPlayerId(null);
   };
 
+  const handleAddPlayerToGame = (player: Player, seat: number) => {
+    setHasBeenChanged(true);
+    if (game?.players.find((p) => p.id === player.id)) {
+      addToast({
+        title: "Błąd",
+        description: "Gracz już istnieje w grze",
+        color: "danger",
+      });
+      return;
+    }
+    setGame((prev) => {
+      if (prev === null) {
+        return null;
+      }
+
+      const newPlayer: GamePlayer = {
+        ...player,
+        seat,
+        gameId: prev.id,
+        playerId: player.id,
+        points: 0,
+        lives: 3,
+        actions: [],
+      };
+
+      return {
+        ...prev,
+        players: [...prev.players, newPlayer],
+      };
+    });
+  };
+
   const handleDeletePlayer = (playerId: number) => {
     setHasBeenChanged(true);
     setHandleDeletePlayerId(null);
@@ -99,11 +138,39 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
   const handleDiscardChanges = () => {
     setGame(originalGame);
     setHasBeenChanged(false);
+    setShowDiscardChangesModal(false);
   };
 
-  const handleSaveChanges = () => {
-    setGame(originalGame);
+  const handleSaveChanges = async () => {
+    const players = game?.players.map((p) => ({
+      playerId: p.playerId,
+      seat: p.seat,
+    }));
+    if (players === null) {
+      return;
+    }
+    setIsLoading(true);
+    const result = await updateGame(gameId, game?.sequence.id, players);
+    console.log(result);
+    if (!result.isSuccess) {
+      addToast({
+        title: "Błąd",
+        description: result.message,
+        color: "danger",
+      });
+      setHasBeenChanged(false);
+      setShowDiscardChangesModal(false);
+    } else {
+      addToast({
+        title: "Sukces",
+        description: "Zmiany zapisane",
+        color: "success",
+      });
+    }
+    setIsLoading(false);
+    setShowAddPlayerToGameModal(false);
     setHasBeenChanged(false);
+    await handleFetchGame();
   };
 
   const pageGameId = gameId;
@@ -200,8 +267,18 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
           </CardBody>
         </Card>
         <Card className="w-full">
-          <CardBody className="h-20">
+          <CardBody className="h-20 flex flex-row items-center justify-between">
             <div className="text-2xl font-bold">Gracze</div>
+            <div className="flex flex-row items-center justify-end">
+              <Button
+                variant="flat"
+                color="primary"
+                onPress={() => setShowAddPlayerToGameModal(true)}
+                isDisabled={(game?.players.length ?? 0) >= 10}
+              >
+                Dodaj gracza
+              </Button>
+            </div>
           </CardBody>
           <Divider />
           <CardBody className="overflow-y-auto">
@@ -218,7 +295,7 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
                         />
                         <div className="flex flex-col items-start justify-center">
                           <div className="text-2xl font-bold">
-                            {player.name}
+                            {player.name} {player.playerId}
                           </div>
                           <div className="text-gray-400">
                             Stanowisko: {player.seat}
@@ -306,7 +383,12 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
             >
               Przywróć
             </Button>
-            <Button variant="flat" color="success">
+            <Button
+              variant="flat"
+              color="success"
+              onPress={handleSaveChanges}
+              isDisabled={game?.players.length !== 10}
+            >
               Zapisz
             </Button>
           </CardBody>
@@ -319,7 +401,11 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
         <ModalContent>
           <ModalHeader>Czy napewno chcesz porzucić zmiany?</ModalHeader>
           <ModalBody>
-            <Button variant="flat" color="danger">
+            <Button
+              variant="flat"
+              color="danger"
+              onPress={handleDiscardChanges}
+            >
               Porzuc zmiany
             </Button>
             <Button variant="flat" color="primary">
@@ -328,6 +414,18 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
           </ModalBody>
         </ModalContent>
       </Modal>
+      <AddPlayerToGameModal
+        isOpen={showAddPlayerToGameModal}
+        onClose={() => setShowAddPlayerToGameModal(false)}
+        onSelect={handleAddPlayerToGame}
+        assignedPlayers={
+          game?.players.map((p) => ({
+            seat: p.seat,
+            player: p.name,
+          })) ?? []
+        }
+      />
+      <LoadingDialog isLoading={isLoading} />
     </div>
   );
 }

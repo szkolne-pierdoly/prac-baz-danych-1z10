@@ -135,7 +135,7 @@ export async function getGameById(id: number): Promise<{
 export async function updateGame(
   id: number,
   sequenceId?: number,
-  playerIds?: number[],
+  players?: { playerId: number; seat: number }[],
 ): Promise<{
   isSuccess: boolean;
   message: string;
@@ -148,7 +148,7 @@ export async function updateGame(
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ sequenceId: sequenceId, playerIds: playerIds }),
+      body: JSON.stringify({ sequenceId: sequenceId, players: players }),
     },
   );
 
