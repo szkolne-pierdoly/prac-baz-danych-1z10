@@ -107,12 +107,12 @@ export default function QuestionDetailsModal({
               </div>
               <Divider />
               <div>
-                <div className="text-gray-500 text-sm">Podpowiedź: </div>
+                <div className="text-gray-500 text-sm">Wariant 2:</div>
                 <div>{focusedQuestion.variant2}</div>
               </div>
               <Divider />
               <div>
-                <div className="text-gray-500 text-sm">Podpowiedź 2:</div>
+                <div className="text-gray-500 text-sm">Wariant 3:</div>
                 <div>{focusedQuestion.variant3 ?? "-"}</div>
               </div>
             </div>

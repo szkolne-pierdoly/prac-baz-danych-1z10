@@ -12,18 +12,18 @@ export default function XmlExamplePage() {
             {`<Questions>
   <Question>
     <Content>What is the capital of France?</Content>
-    <Hint>It's a famous European city.</Hint>
+    <Variant2>It's a famous European city.</Variant2>
     <CorrectAnswer>Paris</CorrectAnswer>
   </Question>
   <Question>
     <Content>What is the highest mountain in the world?</Content>
-    <Hint>Located in the Himalayas.</Hint>
+    <Variant2>Located in the Himalayas.</Variant2>
     <CorrectAnswer>Mount Everest</CorrectAnswer>
-    <Hint2>Also known as Sagarmatha in Nepal.</Hint2>
+    <Variant3>Also known as Sagarmatha in Nepal.</Variant3>
   </Question>
   <Question>
     <Content>What is the chemical symbol for water?</Content>
-    <Hint>It's essential for life.</Hint>
+    <Variant2>It's essential for life.</Variant2>
     <CorrectAnswer>H2O</CorrectAnswer>
   </Question>
 </Questions>`}

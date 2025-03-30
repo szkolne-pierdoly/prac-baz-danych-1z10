@@ -154,8 +154,8 @@ export default function QuestionsPage() {
           <TableHeader>
             <TableColumn>ID</TableColumn>
             <TableColumn>Treść</TableColumn>
-            <TableColumn>Podpowiedź</TableColumn>
-            <TableColumn>Podpowiedź 2</TableColumn>
+            <TableColumn>Wariant 2</TableColumn>
+            <TableColumn>Wariant 3</TableColumn>
             <TableColumn>Poprawna Odpowiedź</TableColumn>
           </TableHeader>
           <TableBody>
