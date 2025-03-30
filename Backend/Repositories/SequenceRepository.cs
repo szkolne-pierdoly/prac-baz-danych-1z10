@@ -45,9 +45,9 @@ public class SequenceRepository : ISequenceRepository
                 s.Name.ToLower().Contains(searchLower) ||
                 (includeQuestions && s.Questions.Any(sq =>
                     sq.Question.Content.ToLower().Contains(searchLower) ||
-                    sq.Question.Hint.ToLower().Contains(searchLower) ||
+                    sq.Question.Variant2.ToLower().Contains(searchLower) ||
                     sq.Question.CorrectAnswer.ToLower().Contains(searchLower) ||
-                    (sq.Question.Hint2 != null && sq.Question.Hint2.ToLower().Contains(searchLower))
+                    (sq.Question.Variant3 != null && sq.Question.Variant3.ToLower().Contains(searchLower))
                 ))
             );
 

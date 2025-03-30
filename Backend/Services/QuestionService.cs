@@ -22,8 +22,8 @@ public class QuestionService : IQuestionService
             var question = new Question
             {
                 Content = request.Content,
-                Hint = request.Hint,
-                Hint2 = request.Hint2,
+                Variant2 = request.Variant2,
+                Variant3 = request.Variant3,
                 CorrectAnswer = request.CorrectAnswer,
             };
 
@@ -154,7 +154,7 @@ public class QuestionService : IQuestionService
     {
         try
         {
-            if (request.Content == null && request.Hint == null && request.Hint2 == null && request.CorrectAnswer == null)
+            if (request.Content == null && request.Variant2 == null && request.Variant3 == null && request.CorrectAnswer == null)
             {
                 return new UpdateQuestionResult
                 {
@@ -175,7 +175,7 @@ public class QuestionService : IQuestionService
                     Message = "Question not found"
                 };
             }
-            else if (question.Content == request.Content && question.Hint == request.Hint && question.Hint2 == request.Hint2 && question.CorrectAnswer == request.CorrectAnswer)
+            else if (question.Content == request.Content && question.Variant2 == request.Variant2 && question.Variant3 == request.Variant3 && question.CorrectAnswer == request.CorrectAnswer)
             {
                 return new UpdateQuestionResult
                 {
@@ -185,8 +185,8 @@ public class QuestionService : IQuestionService
                 };
             }
             question.Content = request.Content ?? question.Content;
-            question.Hint = request.Hint ?? question.Hint;
-            question.Hint2 = request.Hint2 ?? question.Hint2;
+            question.Variant2 = request.Variant2 ?? question.Variant2;
+            question.Variant3 = request.Variant3 ?? question.Variant3;
             question.CorrectAnswer = request.CorrectAnswer ?? question.CorrectAnswer;
 
             await _questionRepository.UpdateQuestion(question);
