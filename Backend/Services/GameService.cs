@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+using System.Text;
 using Backend.Data.Models;
 using Backend.Interface.Repositories;
 using Backend.Interface.Services;
@@ -131,6 +133,57 @@ public class GameService : IGameService
             };
         } catch (Exception ex) {
             return new DuplicateGameResult {
+                IsSuccess = false,
+                Status = "ERROR",
+                Message = ex.Message
+            };
+        }
+    }
+
+    public async Task<StartGameResult> StartGame(int id)
+    {
+        try {
+            var game = await _gameRepository.GetGameById(id);
+            if (game == null) {
+                return new StartGameResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Game with ID " + id + " not found"
+                };
+            }
+            if (game.Players.Count != 10) {
+                return new StartGameResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Game with ID " + id + " has less than 10 players"
+                };
+            }
+            if (game.StartTime != null) {
+                return new StartGameResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Game with ID " + id + " has already started, please duplicate it to start a new game with it"
+                };
+            }
+
+            var gameToken = Guid.NewGuid().ToString();
+            var gameTokenHash = SHA256.HashData(Encoding.UTF8.GetBytes(gameToken));
+            var gameTokenHashString = Convert.ToBase64String(gameTokenHash);
+
+            game.GameToken = gameTokenHashString;
+            game.StartTime = DateTime.UtcNow;
+            game.EndTime = null;
+            game.Actions = new List<GameAction>();
+
+            var result = await _gameRepository.UpdateGame(game);
+
+            return new StartGameResult {
+                IsSuccess = true,
+                Status = "SUCCESS",
+                GameToken = gameToken
+            };
+        } catch (Exception ex) {
+            return new StartGameResult {
                 IsSuccess = false,
                 Status = "ERROR",
                 Message = ex.Message

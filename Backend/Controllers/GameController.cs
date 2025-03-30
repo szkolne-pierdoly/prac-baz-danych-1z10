@@ -50,6 +50,22 @@ public class GameController : ControllerBase
         });
     }
 
+    [HttpPost("{id}/start")]
+    public async Task<IActionResult> StartGame(int id)
+    {
+        var result = await _gameService.StartGame(id);
+        if (!result.IsSuccess) {
+            return StatusCode(result.HttpStatusCode ?? 400, new {
+                status = result.Status,
+                message = result.Message ?? "Internal server error"
+            });
+        }
+        return Ok(new {
+            status = result.Status,
+            message = result.Message ?? "Game started successfully",
+            gameToken = result.GameToken
+        });
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetAllGames([FromQuery] bool includePlayers = false, [FromQuery] bool includeActions = false, [FromQuery] bool includeSequence = false, [FromQuery] int? limit = null, [FromQuery] int? offset = null, [FromQuery] string? search = null)

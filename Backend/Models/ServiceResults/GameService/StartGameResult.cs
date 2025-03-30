@@ -4,5 +4,5 @@ namespace Backend.Models.ServiceResults.GameService;
 
 public class StartGameResult : BaseResult
 {
-    public Game? Game { get; set; }
+    public string? GameToken { get; set; }
 }
