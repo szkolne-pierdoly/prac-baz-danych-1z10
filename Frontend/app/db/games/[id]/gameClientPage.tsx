@@ -175,7 +175,12 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
       return;
     }
     setIsLoading(true);
-    const result = await updateGame(gameId, game?.sequence.id, players);
+    const result = await updateGame(
+      gameId,
+      game?.sequence.id,
+      renameGameName,
+      players,
+    );
     console.log(result);
     if (!result.isSuccess) {
       addToast({
@@ -217,15 +222,14 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
   };
 
   const handleRenameGame = async () => {
-    setIsLoading(true);
     setGame((prev) => {
       if (prev === null) {
         return null;
       }
       return { ...prev, name: renameGameName };
     });
-    setIsLoading(false);
     setShowRenameGameModal(false);
+    setHasBeenChanged(true);
     setRenameGameName("");
   };
 
