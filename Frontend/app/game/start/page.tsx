@@ -55,52 +55,11 @@ export default function StartGamePage() {
   };
 
   const handleStartGame = () => {
-    console.log(game);
-    if (game === null) {
+    if (!isGameValid) {
       addToast({
-        title: "Nie wybrano gry",
-        description: "Wybierz grę, którą chcesz rozpocząć",
-        color: "danger",
-      });
-      return;
-    }
-    if (game.players.length !== 10) {
-      addToast({
-        title: "Niepoprawna ilość graczy",
-        description: "W grze musi być dokładnie 10 graczy",
-        color: "danger",
-      });
-      return;
-    }
-    if (
-      game.players.some((player) => player.seat < 1 || player.seat > 10) ||
-      new Set(game.players.map((player) => player.seat)).size !== 10
-    ) {
-      addToast({
-        title: "Gracze niepoprawnie przypisani do monitorów",
+        title: "Nie można rozpocząć gry",
         description:
-          "Sprawdź, czy każdy gracz ma przypisany dokładnie jeden monitor oraz czy wszystkie monitory są zajęte",
-        color: "danger",
-      });
-      return;
-    }
-    if (game.sequence === null) {
-      addToast({
-        title: "Nie wybrano sekwencji",
-        description: "Wybierz sekwencję, którą chcesz rozpocząć",
-        color: "danger",
-      });
-      return;
-    }
-    if (
-      game.sequence.questions.filter((q) => q.part == 0).length !== 20 ||
-      game.sequence.questions.filter((q) => q.part == 1).length === 0 ||
-      game.sequence.questions.filter((q) => q.part == 2).length === 0
-    ) {
-      addToast({
-        title: "Niepoprawna ilość pytań",
-        description:
-          "Pierwsza część musi zawierać dokładnie 20 pytań, druga i trzecia sekwencja nie może być pusta",
+          "Wybrana gra jest niepoprawna, wszystkie informacje znajdują się w głównym kontenerze",
         color: "danger",
       });
       return;
