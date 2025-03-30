@@ -29,13 +29,7 @@ export default function SelectGameModal({
   const [search, setSearch] = useState("");
 
   const handleFetchGames = useCallback(async () => {
-    const limit = 10;
-    const offset = games.length;
-    const result = await getGames(
-      search ? limit : undefined,
-      search ? offset : undefined,
-      search || undefined,
-    );
+    const result = await getGames(undefined, undefined, search || undefined);
     if (result.isSuccess) {
       setGames(result.games ?? []);
     } else {
@@ -45,15 +39,16 @@ export default function SelectGameModal({
         color: "danger",
       });
     }
-  }, [search, games.length]);
+  }, [search]);
 
   useEffect(() => {
     if (isOpen) {
       handleFetchGames();
     } else {
       setGames([]);
+      setSearch("");
     }
-  }, [isOpen, search, handleFetchGames]);
+  }, [isOpen, handleFetchGames]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
@@ -71,6 +66,7 @@ export default function SelectGameModal({
         </ModalHeader>
         <Divider />
         <ModalBody className="max-h-[70vh] overflow-y-auto">
+          <div className="text-lg font-bold">Dostępne gry</div>
           <div className="flex flex-col gap-2">
             {games
               .filter((game) => game.startTime === null)
