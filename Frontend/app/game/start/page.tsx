@@ -17,10 +17,11 @@ import {
   ModalBody,
   Link,
 } from "@heroui/react";
-import { PencilLineIcon } from "lucide-react";
+import { CopyPlus, PencilLineIcon } from "lucide-react";
 import SelectGameModal from "@/app/components/selectGameModal";
 import LoadingDialog from "@/app/components/loadingDialog";
 import { duplicateGame, getGameById } from "@/app/actions/game";
+import { useRouter } from "next/navigation";
 
 export default function StartGamePage() {
   const [game, setGame] = useState<Game | null>(null);
@@ -35,6 +36,8 @@ export default function StartGamePage() {
   const [gameValidationMessages, setGameValidationMessages] = useState<
     string[]
   >([]);
+
+  const router = useRouter();
 
   const handleDuplicateGame = async (id: number) => {
     setIsLoading(true);
@@ -52,6 +55,10 @@ export default function StartGamePage() {
     setDuplicatedGameId(result.gameId);
     setShowDuplicatedSuccessModal(true);
     setIsLoading(false);
+  };
+
+  const handleEditGame = async (id: number) => {
+    router.push(`/db/games/${id}`);
   };
 
   const handleStartGame = () => {
@@ -186,16 +193,29 @@ export default function StartGamePage() {
               >
                 Zmień grę
               </Button>
-              <Tooltip content="Duplikuj i edytuj">
-                <Button
-                  color="default"
-                  variant="flat"
-                  isIconOnly
-                  onPress={() => handleDuplicateGame(game.id)}
-                >
-                  <PencilLineIcon />
-                </Button>
-              </Tooltip>
+              {game && isGameValid ? (
+                <Tooltip content="Duplikuj i edytuj">
+                  <Button
+                    color="default"
+                    variant="flat"
+                    isIconOnly
+                    onPress={() => handleDuplicateGame(game.id)}
+                  >
+                    <CopyPlus />
+                  </Button>
+                </Tooltip>
+              ) : (
+                <Tooltip content="edytuj">
+                  <Button
+                    color="default"
+                    variant="flat"
+                    isIconOnly
+                    onPress={() => handleEditGame(game.id)}
+                  >
+                    <PencilLineIcon />
+                  </Button>
+                </Tooltip>
+              )}
             </div>
           )}
         </CardBody>

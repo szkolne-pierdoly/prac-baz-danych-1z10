@@ -1,6 +1,11 @@
 "use client";
 
-import { deleteGame, getGameById, updateGame } from "@/app/actions/game";
+import {
+  deleteGame,
+  duplicateGame,
+  getGameById,
+  updateGame,
+} from "@/app/actions/game";
 import AddPlayerToGameModal from "@/app/components/addPlayerToGameModal";
 import LoadingDialog from "@/app/components/loadingDialog";
 import SelectPlayerSeatModal from "@/app/components/selectPlayerSeatModal";
@@ -38,6 +43,7 @@ import {
   PencilLineIcon,
   HomeIcon,
   TrashIcon,
+  CopyIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -242,6 +248,20 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
     setRenameGameName("");
   };
 
+  const handleDuplicateGame = async () => {
+    setIsLoading(true);
+    const result = await duplicateGame(gameId);
+    if (!result.isSuccess) {
+      addToast({
+        title: "Błąd kopiowania gry",
+        description: result.message,
+        color: "danger",
+      });
+    }
+    router.push(`/db/games/${result.gameId}`);
+    setIsLoading(false);
+  };
+
   const pageGameId = gameId;
 
   return (
@@ -293,9 +313,16 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
                   key="swapSequence"
                   onPress={() => setShowSelectSequenceModal(true)}
                   startContent={<ArrowLeftRight />}
-                  showDivider
                 >
                   Zamień sekwencję
+                </DropdownItem>
+                <DropdownItem
+                  key="startGame"
+                  onPress={handleDuplicateGame}
+                  startContent={<CopyIcon />}
+                  showDivider
+                >
+                  Duplikuj grę
                 </DropdownItem>
                 <DropdownItem
                   key="delete"
