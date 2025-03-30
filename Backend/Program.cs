@@ -20,6 +20,7 @@ builder.Services.AddScoped<ISequenceService, SequenceService>();
 builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IPlayerService, PlayerService>();
 builder.Services.AddScoped<IGameService, GameService>();
+builder.Services.AddScoped<IGameplayService, GameplayService>();
 
 string host = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "localhost";
 string port = Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? "5432";
