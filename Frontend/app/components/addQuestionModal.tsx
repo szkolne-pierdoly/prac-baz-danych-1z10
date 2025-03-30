@@ -107,8 +107,8 @@ export default function AddQuestionModal({
                         Poprawna odpowiedź: {question.correctAnswer}
                       </p>
                       <p className="text-sm text-white/50">
-                        Podpowiedź: {question.hint}, Podpowiedź 2:{" "}
-                        {question.hint2 ?? "Brak"}
+                        Podpowiedź: {question.variant2}, Podpowiedź 2:{" "}
+                        {question.variant3 ?? "Brak"}
                       </p>
                     </div>
                   </div>

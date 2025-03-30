@@ -47,19 +47,19 @@ export async function getQuestions(
 }
 
 export async function createQuestion(
-  name: string,
-  hint: string,
+  content: string,
+  variant2: string,
   answer: string,
-  hint2?: string,
+  variant3?: string,
 ): Promise<{
   isSuccess: boolean;
   message: string;
   question?: Question;
 }> {
   const body = JSON.stringify({
-    content: name,
-    hint: hint,
-    hint2: hint2,
+    content: content,
+    variant2: variant2,
+    variant3: variant3,
     correctAnswer: answer,
   });
 

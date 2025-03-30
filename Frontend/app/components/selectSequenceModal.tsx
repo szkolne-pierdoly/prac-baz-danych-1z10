@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import {
   Modal,
   ModalContent,
@@ -33,7 +33,7 @@ export default function SelectSequenceModal({
   const [isLoading, setIsLoading] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
 
-  const handleFetchSequences = async () => {
+  const handleFetchSequences = useCallback(async () => {
     setIsLoading(true);
     const result = await getSequences(true, searchName, 1, 10);
     setIsLoading(false);
@@ -48,7 +48,7 @@ export default function SelectSequenceModal({
         color: "danger",
       });
     }
-  };
+  }, [searchName]);
 
   const handleLoadMoreSequences = async () => {
     if (sequences.length >= totalItems) {
@@ -75,7 +75,7 @@ export default function SelectSequenceModal({
 
   useEffect(() => {
     handleFetchSequences();
-  }, [searchName]);
+  }, [searchName, handleFetchSequences]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl">

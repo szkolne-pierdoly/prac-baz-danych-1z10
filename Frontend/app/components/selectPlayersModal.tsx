@@ -54,7 +54,7 @@ export default function SelectPlayersModal({
       setPlayers([]);
       setSelectedPlayers([]);
     }
-  }, [isOpen]);
+  }, [alreadySelectedPlayers, isOpen]);
 
   const handleSave = () => {
     onSuccess(players.filter((player) => selectedPlayers.includes(player.id)));

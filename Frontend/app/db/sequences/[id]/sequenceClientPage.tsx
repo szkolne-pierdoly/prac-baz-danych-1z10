@@ -19,7 +19,7 @@ import {
   Modal,
   Input,
 } from "@heroui/react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   PencilIcon,
   TrashIcon,
@@ -56,15 +56,7 @@ export default function SequenceClientPage({
   const router = useRouter();
   const pathname = usePathname();
 
-  useEffect(() => {
-    getSequence();
-  }, []);
-
-  useEffect(() => {
-    setRenameSequenceName(sequence?.name ?? null);
-  }, [sequence]);
-
-  const getSequence = async () => {
+  const getSequence = useCallback(async () => {
     if (sequenceId) {
       setIsLoading(true);
       const result = await getSequenceAction(sequenceId);
@@ -73,7 +65,15 @@ export default function SequenceClientPage({
       }
       setIsLoading(false);
     }
-  };
+  }, [sequenceId]);
+
+  useEffect(() => {
+    getSequence();
+  }, [getSequence]);
+
+  useEffect(() => {
+    setRenameSequenceName(sequence?.name ?? null);
+  }, [sequence]);
 
   useEffect(() => {
     const pathParts = pathname.split("/");

@@ -14,7 +14,7 @@ import {
 import { ModalContent } from "@heroui/react";
 
 import { Modal } from "@heroui/react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Question } from "../models/Question";
 import { getQuestions } from "../actions/question";
 
@@ -31,30 +31,39 @@ export default function SelectQuestionModal({
   const [totalItems, setTotalItems] = useState(0);
   const [searchName, setSearchName] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
+  const currentPageRef = useRef(1);
 
-  const fetchQuestions = useCallback(async () => {
-    setIsLoading(true);
-    const currentPage = Math.floor(questions.length / 10) + 1;
-    const result = await getQuestions(currentPage, undefined, searchName);
-    if (result.isSuccess) {
-      setQuestions((prevQuestions) => [
-        ...prevQuestions,
-        ...(result.questions ?? []),
-      ]);
-      setTotalItems(result.totalItems ?? 0);
-    }
-    setIsLoading(false);
-  }, [questions, searchName]);
+  const fetchQuestions = useCallback(
+    async (page: number = 1) => {
+      setIsLoading(true);
+      const result = await getQuestions(page, undefined, searchName);
+      if (result.isSuccess) {
+        if (page === 1) {
+          setQuestions(result.questions ?? []);
+        } else {
+          setQuestions((prevQuestions) => [
+            ...prevQuestions,
+            ...(result.questions ?? []),
+          ]);
+        }
+        setTotalItems(result.totalItems ?? 0);
+        currentPageRef.current = page;
+      }
+      setIsLoading(false);
+    },
+    [searchName],
+  );
 
   useEffect(() => {
     if (isOpen) {
-      fetchQuestions();
+      currentPageRef.current = 1;
+      fetchQuestions(1);
     } else {
       setQuestions([]);
       setSearchName("");
       setTotalItems(0);
     }
-  }, [isOpen]);
+  }, [isOpen, fetchQuestions]);
 
   const handleSelect = (question: Question) => {
     onSuccess(question);
@@ -72,7 +81,7 @@ export default function SelectQuestionModal({
             onChange={(e) => {
               setSearchName(e.target.value);
               setQuestions([]);
-              fetchQuestions();
+              fetchQuestions(1);
             }}
           />
         </ModalHeader>
@@ -97,10 +106,10 @@ export default function SelectQuestionModal({
                     {question.id}. {question.content}
                   </div>
                   <div className="text-sm text-gray-500">
-                    Podpowiedź: {question.hint}
+                    Podpowiedź: {question.variant2}
                   </div>
                   <div className="text-sm text-gray-500">
-                    Podpowiedź 2: {question.hint2 ?? "Brak"}
+                    Podpowiedź 2: {question.variant3 ?? "Brak"}
                   </div>
                   <div className="text-sm text-gray-500">
                     Odpowiedź: {question.correctAnswer}
@@ -115,7 +124,7 @@ export default function SelectQuestionModal({
                   color="primary"
                   isLoading={isLoading}
                   onPress={() => {
-                    fetchQuestions();
+                    fetchQuestions(currentPageRef.current + 1);
                   }}
                 >
                   Załaduj więcej

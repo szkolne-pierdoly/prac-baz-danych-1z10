@@ -82,22 +82,22 @@ export default function EditQuestionModal({
               <Input
                 label="Podpowiedź"
                 isRequired
-                value={editedQuestion.hint ?? ""}
+                value={editedQuestion.variant2 ?? ""}
                 onChange={(e) =>
                   setEditedQuestion({
                     ...editedQuestion,
-                    hint: e.target.value,
+                    variant2: e.target.value,
                   } as Question)
                 }
               />
               <Input
                 label="Podpowiedź 2"
                 isRequired
-                value={editedQuestion.hint2 ?? ""}
+                value={editedQuestion.variant3 ?? ""}
                 onChange={(e) =>
                   setEditedQuestion({
                     ...editedQuestion,
-                    hint2: e.target.value,
+                    variant3: e.target.value,
                   } as Question)
                 }
               />

@@ -168,8 +168,8 @@ export default function QuestionsPage() {
               >
                 <TableCell>{question.id}</TableCell>
                 <TableCell>{question.content}</TableCell>
-                <TableCell>{question.hint}</TableCell>
-                <TableCell>{question.hint2 ?? "-"}</TableCell>
+                <TableCell>{question.variant2}</TableCell>
+                <TableCell>{question.variant3 ?? "-"}</TableCell>
                 <TableCell>{question.correctAnswer}</TableCell>
               </TableRow>
             ))}
