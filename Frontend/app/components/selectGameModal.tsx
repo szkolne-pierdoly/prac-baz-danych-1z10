@@ -15,6 +15,7 @@ import { Game } from "../models/Game";
 import { SearchIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { getGames } from "../actions/game";
+
 export default function SelectGameModal({
   isOpen,
   onClose,
@@ -71,28 +72,58 @@ export default function SelectGameModal({
         <Divider />
         <ModalBody className="max-h-[70vh] overflow-y-auto">
           <div className="flex flex-col gap-2">
-            {games.map((game) => (
-              <Card
-                key={game.id}
-                isHoverable
-                isPressable
-                onPress={() => onSelect(game)}
-              >
-                <CardBody className="font-bold bg-white/5">
-                  {game.name ?? "Gra bez nazwy"}
-                  <div className="text-sm text-gray-500">
-                    Sekwencja: {game.sequence.name}, Utworzona:{" "}
-                    {new Date(game.createdAt).toLocaleDateString("pl-PL", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </div>
-                </CardBody>
-              </Card>
-            ))}
+            {games
+              .filter((game) => game.startTime === null)
+              .map((game) => (
+                <Card
+                  key={game.id}
+                  isHoverable
+                  isPressable
+                  onPress={() => onSelect(game)}
+                >
+                  <CardBody className="font-bold bg-white/5">
+                    {game.name ?? "Gra bez nazwy"}
+                    <div className="text-sm text-gray-500">
+                      Sekwencja: {game.sequence.name}, Utworzona:{" "}
+                      {new Date(game.createdAt).toLocaleDateString("pl-PL", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </div>
+                  </CardBody>
+                </Card>
+              ))}
+          </div>
+          <Divider />
+          <div className="flex flex-col gap-0">
+            <div className="text-lg font-bold">Wcześniej zakończone gry</div>
+            <div className="text-sm text-gray-500">
+              Również wlicza gry dalej trwające
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            {games
+              .filter((game) => game.startTime !== null)
+              .map((game) => (
+                <Card key={game.id} isDisabled>
+                  <CardBody className="font-bold bg-white/5">
+                    {game.name ?? "Gra bez nazwy"}
+                    <div className="text-sm text-gray-500">
+                      Sekwencja: {game.sequence.name}, Utworzona:{" "}
+                      {new Date(game.createdAt).toLocaleDateString("pl-PL", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </div>
+                  </CardBody>
+                </Card>
+              ))}
           </div>
         </ModalBody>
       </ModalContent>
