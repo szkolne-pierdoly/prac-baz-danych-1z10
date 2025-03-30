@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using Backend.Data.Enum;
 using Backend.Data.Models;
 using Backend.Interface.Repositories;
 using Backend.Interface.Services;
@@ -171,9 +172,16 @@ public class GameService : IGameService
             var gameTokenHashString = Convert.ToBase64String(gameTokenHash);
 
             game.GameToken = gameTokenHashString;
-            game.StartTime = DateTime.UtcNow;
+
+            var startAction = new GameAction {
+                GameId = game.Id,
+                Type = GameActionType.Start,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            game.StartTime = startAction.CreatedAt;
             game.EndTime = null;
-            game.Actions = new List<GameAction>();
+            game.Actions = [startAction];
 
             var result = await _gameRepository.UpdateGame(game);
 
