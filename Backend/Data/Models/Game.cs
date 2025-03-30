@@ -9,6 +9,7 @@ public class Game
     public DateTime? UpdatedAt { get; set; }
     public DateTime? StartTime { get; set; }
     public DateTime? EndTime { get; set; }
+    public string? GameToken { get; set; }
     public int SequenceId { get; set; }
     public virtual required Sequence Sequence { get; set; }
     public virtual required ICollection<GamePlayer> Players { get; set; }
