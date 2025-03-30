@@ -177,14 +177,6 @@ public class GameService : IGameService
     public async Task<UpdateGameResult> UpdateGame(int id, UpdateGameRequest request)
     {
         try {
-            if (request.Players.Count != 10) {
-                return new UpdateGameResult {
-                    IsSuccess = false,
-                    Status = "ERROR",
-                    Message = "To update the game, you need exactly 10 players"
-                };
-            }
-
             var game = await _gameRepository.GetGameById(id);
             if (game == null) {
                 return new UpdateGameResult {
@@ -193,29 +185,36 @@ public class GameService : IGameService
                     Message = "Game with ID " + id + " not found"
                 };
             }
-
-            var seatSet = new HashSet<int>();
-            foreach (var playerRequest in request.Players) {
-                if (seatSet.Contains(playerRequest.Seat)) {
+            if (request.Players != null && request.Players.Count() > 0) {
+                if (request.Players.Count() != 10) {
                     return new UpdateGameResult {
                         IsSuccess = false,
                         Status = "ERROR",
-                        Message = "Each player must have a unique seat number"
+                        Message = "To update the game, you need exactly 10 players"
                     };
                 }
-                seatSet.Add(playerRequest.Seat);
-            }
-
-            var playerSet = new HashSet<int>();
-            foreach (var playerRequest in request.Players) {
-                if (playerSet.Contains(playerRequest.PlayerId)) {
-                    return new UpdateGameResult {
-                        IsSuccess = false,
-                        Status = "ERROR",
-                        Message = "Each player can only appear once in the game"
-                    };
+                var seatSet = new HashSet<int>();
+                foreach (var playerRequest in request.Players) {
+                    if (seatSet.Contains(playerRequest.Seat)) {
+                        return new UpdateGameResult {
+                            IsSuccess = false,
+                            Status = "ERROR",
+                            Message = "Each player must have a unique seat number"
+                        };
+                    }
+                    seatSet.Add(playerRequest.Seat);
                 }
-                playerSet.Add(playerRequest.PlayerId);
+                var playerSet = new HashSet<int>();
+                foreach (var playerRequest in request.Players) {
+                    if (playerSet.Contains(playerRequest.PlayerId)) {
+                        return new UpdateGameResult {
+                            IsSuccess = false,
+                            Status = "ERROR",
+                            Message = "Each player can only appear once in the game"
+                        };
+                    }
+                    playerSet.Add(playerRequest.PlayerId);
+                }
             }
 
             if (request.SequenceId != null) {
@@ -251,6 +250,10 @@ public class GameService : IGameService
                     gamePlayers.Add(newGamePlayer);
                 }
                 game.Players = gamePlayers;
+            }
+
+            if (request.Name != null) {
+                game.Name = request.Name;
             }
 
             var result = await _gameRepository.UpdateGame(game);
