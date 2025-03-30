@@ -61,13 +61,13 @@ export default function ImportQuestionsModal({
           }
 
           const contentElement = questionElement.querySelector("Content");
-          const hintElement = questionElement.querySelector("Hint");
+          const variant2Element = questionElement.querySelector("Variant2");
           const correctAnswerElement =
             questionElement.querySelector("CorrectAnswer");
 
-          if (!contentElement || !hintElement || !correctAnswerElement) {
+          if (!contentElement || !variant2Element || !correctAnswerElement) {
             setError(
-              "Nieprawidłowy format pliku XML. Element Question powinien zawierać Content, Hint i CorrectAnswer oraz opcjonalnie Hint2.",
+              "Nieprawidłowy format pliku XML. Element Question powinien zawierać Content, Variant2 i CorrectAnswer oraz opcjonalnie Variant3.",
             );
             setFile(null);
             return;
