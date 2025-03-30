@@ -20,7 +20,7 @@ import {
 import { CopyPlus, PencilLineIcon } from "lucide-react";
 import SelectGameModal from "@/app/components/selectGameModal";
 import LoadingDialog from "@/app/components/loadingDialog";
-import { duplicateGame, getGameById } from "@/app/actions/game";
+import { duplicateGame, getGameById, startGame } from "@/app/actions/game";
 import { useRouter } from "next/navigation";
 
 export default function StartGamePage() {
@@ -59,24 +59,6 @@ export default function StartGamePage() {
 
   const handleEditGame = async (id: number) => {
     router.push(`/db/games/${id}`);
-  };
-
-  const handleStartGame = () => {
-    if (!isGameValid) {
-      addToast({
-        title: "Nie można rozpocząć gry",
-        description:
-          "Wybrana gra jest niepoprawna, wszystkie informacje znajdują się w głównym kontenerze",
-        color: "danger",
-      });
-      return;
-    }
-
-    addToast({
-      title: "Gratulacje!",
-      description: "Gry można rozpocząć",
-      color: "success",
-    });
   };
 
   const handleGetGame = async (id: number) => {
@@ -157,6 +139,46 @@ export default function StartGamePage() {
     setGameValidationMessages([]);
     validateGame();
   }, [game]);
+
+  const handleStartGame = async () => {
+    if (!game) {
+      addToast({
+        title: "Nie wybrano gry",
+        description: "Wybierz grę, którą chcesz rozpocząć",
+        color: "danger",
+      });
+      return;
+    }
+    if (!isGameValid) {
+      addToast({
+        title: "Nie można rozpocząć gry",
+        description:
+          "Wybrana gra jest niepoprawna, wszystkie informacje znajdują się w głównym kontenerze",
+        color: "danger",
+      });
+      return;
+    }
+
+    const result = await startGame(game.id);
+    if (!result.isSuccess) {
+      addToast({
+        title: "Coś poszło nie tak...",
+        description: result.message,
+        color: "danger",
+      });
+      return;
+    } else if (!result.gameToken) {
+      addToast({
+        title: "Coś poszło nie tak...",
+        description: "Gra została rozpoczęta ale serwer nie zwrócił tokenu.",
+        color: "danger",
+      });
+      return;
+    }
+
+    localStorage.setItem("gameToken", result.gameToken);
+    router.push(`/game/gameplay`);
+  };
 
   return (
     <div className="w-screen h-screen flex justify-center items-center flex-col gap-4">
