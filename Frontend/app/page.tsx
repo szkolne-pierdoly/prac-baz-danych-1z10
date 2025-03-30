@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardBody, Divider } from "@heroui/react";
+import { Button, Card, CardBody, Divider } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getStats } from "./actions/other";
@@ -94,6 +94,10 @@ export default function Home() {
               <div className="text-2xl font-bold">Rozpocznij grę!</div>
             </CardBody>
           </Card>
+          <Button onPress={() => router.push("/game/gameplay")}>
+            {/* TODO: Remove after testing */}
+            Game page
+          </Button>
         </div>
       </div>
     </div>
