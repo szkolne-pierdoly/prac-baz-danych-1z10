@@ -26,6 +26,7 @@ public class GameplayService : IGameplayService
             {
                 return new ValidateGameTokenResult {
                     IsSuccess = false,
+                    IsValid = false,
                     Status = "ERROR",
                     Message = "Invalid game token"
                 };
@@ -35,6 +36,7 @@ public class GameplayService : IGameplayService
             {
                 return new ValidateGameTokenResult {
                     IsSuccess = false,
+                    IsValid = false,
                     Status = "ERROR",
                     Message = "Game has not started yet"
                 };
@@ -44,6 +46,7 @@ public class GameplayService : IGameplayService
             {
                 return new ValidateGameTokenResult {
                     IsSuccess = false,
+                    IsValid = false,
                     Status = "ERROR",
                     Message = "Game has ended"
                 };
@@ -51,6 +54,7 @@ public class GameplayService : IGameplayService
 
             return new ValidateGameTokenResult {
                 IsSuccess = true,
+                IsValid = true,
                 Status = "GAME_IN_PROGRESS",
                 GameId = game.Id,
                 GameStatus = "GAME_IN_PROGRESS"
@@ -60,6 +64,7 @@ public class GameplayService : IGameplayService
         {
             return new ValidateGameTokenResult {
                 IsSuccess = false,
+                IsValid = false,
                 Status = "ERROR",
                 Message = ex.Message
             };
