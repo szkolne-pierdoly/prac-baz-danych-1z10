@@ -202,3 +202,31 @@ export async function deleteGame(id: number): Promise<{
     game: data.game,
   };
 }
+
+export async function startGame(id: number): Promise<{
+  isSuccess: boolean;
+  message: string;
+  gameToken?: string;
+}> {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/games/${id}/start`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  if (!res.ok) {
+    return { isSuccess: false, message: "Failed to start game" };
+  }
+
+  const data = await res.json();
+
+  return {
+    isSuccess: true,
+    message: "Game started successfully",
+    gameToken: data.gameToken,
+  };
+}
