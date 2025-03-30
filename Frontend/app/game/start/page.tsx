@@ -124,6 +124,7 @@ export default function StartGamePage() {
       return;
     }
     setGame(result.game);
+    console.log(result.game);
   };
 
   useEffect(() => {
@@ -161,13 +162,13 @@ export default function StartGamePage() {
         messages.push("Nie wybrano sekwencji.");
       } else {
         const part0Questions = game.sequence.questions.filter(
-          (q) => q.part === 0,
+          (q) => q.sequencePart === 0,
         ).length;
         const part1Questions = game.sequence.questions.filter(
-          (q) => q.part === 1,
+          (q) => q.sequencePart === 1,
         ).length;
         const part2Questions = game.sequence.questions.filter(
-          (q) => q.part === 2,
+          (q) => q.sequencePart === 2,
         ).length;
 
         if (part0Questions !== 20) {
@@ -259,7 +260,7 @@ export default function StartGamePage() {
           <Button
             fullWidth
             color="primary"
-            isDisabled={game === null}
+            isDisabled={game === null || !isGameValid}
             onPress={handleStartGame}
           >
             Rozpocznij grę

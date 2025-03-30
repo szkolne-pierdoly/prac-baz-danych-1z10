@@ -142,6 +142,9 @@ export async function updateGame(
   message: string;
   game?: Game;
 }> {
+  console.log("sequenceIdw", sequenceId);
+  console.log("name", name);
+  console.log("players", players);
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/api/games/${id}`,
     {
@@ -150,9 +153,9 @@ export async function updateGame(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        sequenceId: sequenceId,
-        players: players,
-        name: name,
+        sequenceId: sequenceId ?? undefined,
+        players: players ?? undefined,
+        name: name ?? undefined,
       }),
     },
   );
@@ -163,6 +166,7 @@ export async function updateGame(
   }
 
   const data = await res.json();
+  // console.log(data);
 
   return {
     isSuccess: true,

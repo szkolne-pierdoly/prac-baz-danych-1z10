@@ -62,6 +62,7 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
     useState(false);
   const [showSelectSequenceModal, setShowSelectSequenceModal] = useState(false);
   const [showRenameGameModal, setShowRenameGameModal] = useState(false);
+
   const handleFetchGame = useCallback(async () => {
     setIsLoading(true);
     const result = await getGameById(gameId);
@@ -177,9 +178,9 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
     setIsLoading(true);
     const result = await updateGame(
       gameId,
-      game?.sequence.id,
-      renameGameName,
-      players,
+      game?.sequenceId ?? undefined,
+      game?.name ?? undefined,
+      players ?? undefined,
     );
     console.log(result);
     if (!result.isSuccess) {
@@ -222,6 +223,14 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
   };
 
   const handleRenameGame = async () => {
+    if (renameGameName === "") {
+      addToast({
+        title: "Błąd",
+        description: "Nazwa gry nie może być pusta",
+        color: "danger",
+      });
+      return;
+    }
     setGame((prev) => {
       if (prev === null) {
         return null;
@@ -529,6 +538,7 @@ export default function GameClientPage({ gameId }: { gameId: number }) {
             <Input
               value={renameGameName}
               onChange={(e) => setRenameGameName(e.target.value)}
+              placeholder="Nazwa gry"
             />
           </ModalBody>
           <Divider />
