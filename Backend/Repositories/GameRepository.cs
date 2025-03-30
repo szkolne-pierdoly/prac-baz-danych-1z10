@@ -70,7 +70,18 @@ public class GameRepository : IGameRepository
              .Include(g => g.Sequence)
              .ThenInclude(s => s.Questions)
              .Include(g => g.Players)
+             .Include(g => g.Actions)
              .FirstOrDefaultAsync(g => g.Id == id);
+    }
+
+    public async Task<Game?> GetGameByTokenHash(string tokenHash)
+    {
+        return await _context.Games
+            .Include(g => g.Sequence)
+            .ThenInclude(s => s.Questions)
+            .Include(g => g.Players)
+            .Include(g => g.Actions)
+            .FirstOrDefaultAsync(g => g.GameToken == tokenHash);
     }
 
     public async Task<Game?> UpdateGame(Game game)
