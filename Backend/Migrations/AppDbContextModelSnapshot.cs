@@ -99,10 +99,10 @@ namespace Backend.Migrations
                     b.Property<int?>("GamePlayerId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("Points")
+                    b.Property<int?>("PointsGained")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("QuestionId")
+                    b.Property<int?>("SequencesQuestionId")
                         .HasColumnType("integer");
 
                     b.Property<int>("Type")
@@ -114,7 +114,7 @@ namespace Backend.Migrations
 
                     b.HasIndex("GamePlayerId");
 
-                    b.HasIndex("QuestionId");
+                    b.HasIndex("SequencesQuestionId");
 
                     b.ToTable("GameAction");
                 });
@@ -294,16 +294,16 @@ namespace Backend.Migrations
                         .HasForeignKey("GamePlayerId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("Backend.Data.Models.Question", "Question")
+                    b.HasOne("Backend.Data.Models.SequenceQuestion", "SequencesQuestion")
                         .WithMany()
-                        .HasForeignKey("QuestionId")
+                        .HasForeignKey("SequencesQuestionId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Game");
 
                     b.Navigation("GamePlayer");
 
-                    b.Navigation("Question");
+                    b.Navigation("SequencesQuestion");
                 });
 
             modelBuilder.Entity("Backend.Data.Models.GamePlayer", b =>
