@@ -3,6 +3,7 @@ using System;
 using Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Backend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250331071958_UpdatedGameActionRelations")]
+    partial class UpdatedGameActionRelations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -96,7 +99,10 @@ namespace Backend.Migrations
                     b.Property<int>("GameId")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("GamePlayerId")
+                    b.Property<int>("GameId1")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PlayerId")
                         .HasColumnType("integer");
 
                     b.Property<int?>("Points")
@@ -112,7 +118,9 @@ namespace Backend.Migrations
 
                     b.HasIndex("GameId");
 
-                    b.HasIndex("GamePlayerId");
+                    b.HasIndex("GameId1");
+
+                    b.HasIndex("PlayerId");
 
                     b.HasIndex("QuestionId");
 
@@ -283,15 +291,25 @@ namespace Backend.Migrations
 
             modelBuilder.Entity("Backend.Data.Models.GameAction", b =>
                 {
-                    b.HasOne("Backend.Data.Models.Game", "Game")
+                    b.HasOne("Backend.Data.Models.Game", null)
                         .WithMany("Actions")
                         .HasForeignKey("GameId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Backend.Data.Models.GamePlayer", "GamePlayer")
+                    b.HasOne("Backend.Data.Models.Game", "Game")
+                        .WithMany()
+                        .HasForeignKey("GameId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Backend.Data.Models.GamePlayer", null)
                         .WithMany("Actions")
-                        .HasForeignKey("GamePlayerId")
+                        .HasForeignKey("PlayerId");
+
+                    b.HasOne("Backend.Data.Models.Player", "Player")
+                        .WithMany()
+                        .HasForeignKey("PlayerId")
                         .OnDelete(DeleteBehavior.SetNull);
 
                     b.HasOne("Backend.Data.Models.Question", "Question")
@@ -301,7 +319,7 @@ namespace Backend.Migrations
 
                     b.Navigation("Game");
 
-                    b.Navigation("GamePlayer");
+                    b.Navigation("Player");
 
                     b.Navigation("Question");
                 });
