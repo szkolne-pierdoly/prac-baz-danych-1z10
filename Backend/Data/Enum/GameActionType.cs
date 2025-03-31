@@ -4,7 +4,7 @@ public enum GameActionType
 {
     Start,
     End,
-    Answer,
+    AnswerQuestion,
     PickPlayer,
     NextPart,
 }

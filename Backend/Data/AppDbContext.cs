@@ -77,9 +77,9 @@ public class AppDbContext : DbContext
             .HasForeignKey(p => p.PlayerId);
 
         modelBuilder.Entity<GameAction>()
-            .HasOne(a => a.Question)
+            .HasOne(a => a.SequencesQuestion)
             .WithMany()
-            .HasForeignKey(a => a.QuestionId)
+            .HasForeignKey(a => a.SequencesQuestionId)
             .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<GameAction>()
