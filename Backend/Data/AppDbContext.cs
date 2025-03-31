@@ -61,17 +61,31 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Game>()
             .HasMany(g => g.Actions)
-            .WithOne()
-            .HasForeignKey(a => a.GameId);
+            .WithOne(a => a.Game)
+            .HasForeignKey(a => a.GameId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<GameAction>()
-            .HasOne(a => a.Player)
-            .WithMany()
-            .HasForeignKey(a => a.PlayerId);
+            .HasOne(a => a.GamePlayer)
+            .WithMany(p => p.Actions)
+            .HasForeignKey(a => a.GamePlayerId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<GamePlayer>()
             .HasOne(p => p.Player)
             .WithMany()
             .HasForeignKey(p => p.PlayerId);
+
+        modelBuilder.Entity<GameAction>()
+            .HasOne(a => a.Question)
+            .WithMany()
+            .HasForeignKey(a => a.QuestionId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        modelBuilder.Entity<GameAction>()
+            .HasOne(a => a.Game)
+            .WithMany(g => g.Actions)
+            .HasForeignKey(a => a.GameId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
