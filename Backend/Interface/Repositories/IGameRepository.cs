@@ -10,5 +10,6 @@ public interface IGameRepository
     Task<Game?> GetGameByTokenHash(string tokenHash);
     Task<Game?> UpdateGame(Game game);
     Task<Game?> DeleteGame(int id);
+    Task<GameAction?> GetGameActionById(int id);
     Task<int> GetTotalGames();
 }
