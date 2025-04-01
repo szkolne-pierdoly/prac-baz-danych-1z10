@@ -69,7 +69,9 @@ public class GameRepository : IGameRepository
         return await _context.Games
              .Include(g => g.Sequence)
              .ThenInclude(s => s.Questions)
+             .ThenInclude(q => q.Question)
              .Include(g => g.Players)
+             .ThenInclude(p => p.Player)
              .Include(g => g.Actions)
              .FirstOrDefaultAsync(g => g.Id == id);
     }
@@ -81,6 +83,7 @@ public class GameRepository : IGameRepository
             .ThenInclude(s => s.Questions)
             .ThenInclude(q => q.Question)
             .Include(g => g.Players)
+            .ThenInclude(p => p.Player)
             .Include(g => g.Actions)
             .FirstOrDefaultAsync(g => g.GameToken == tokenHash);
     }
