@@ -29,15 +29,15 @@ public class AppDbContext : DbContext
     public DbSet<Sequence> Sequences { get; set; }
     public DbSet<Player> Players { get; set; }
     public DbSet<Game> Games { get; set; }
-    public DbSet<Answer> Answers { get; set; }
     public DbSet<SequenceQuestion> SequenceQuestions { get; set; }
+    public DbSet<GameAction> GameActions { get; set; }
+    public DbSet<GamePlayer> GamePlayers { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Question>().HasKey(q => q.Id);
         modelBuilder.Entity<Sequence>().HasKey(s => s.Id);
         modelBuilder.Entity<Player>().HasKey(p => p.Id);
         modelBuilder.Entity<Game>().HasKey(g => g.Id);
-        modelBuilder.Entity<Answer>().HasKey(a => a.Id);
         modelBuilder.Entity<SequenceQuestion>().HasKey(sq => sq.Id);
 
         modelBuilder.Entity<SequenceQuestion>()
