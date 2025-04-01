@@ -110,7 +110,16 @@ public class GameplayService : IGameplayService
             var sequence = game.Sequence;
 
             var latestAction = actions.OrderByDescending(a => a.CreatedAt).FirstOrDefault();
-            SequencePart? currentSequencePart = latestAction?.SequencesQuestion?.SequencePart;
+
+            if (latestAction == null) {
+                return new GetAllDataResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "No actions found"
+                };
+            }
+            
+            SequencePart? currentSequencePart = latestAction.SequencesQuestion?.SequencePart;
             Question? currentQuestion;
             GamePlayer? currentPlayer;
 
@@ -119,8 +128,8 @@ public class GameplayService : IGameplayService
                 currentPlayer = players.FirstOrDefault();
                 Console.WriteLine("first question");
             } else {
-                currentQuestion = latestAction?.SequencesQuestion?.Question;
-                currentPlayer = latestAction?.GamePlayer;
+                currentQuestion = latestAction.SequencesQuestion?.Question;
+                currentPlayer = latestAction.GamePlayer;
                 Console.WriteLine("latest question");
             }
 
@@ -142,7 +151,7 @@ public class GameplayService : IGameplayService
                     CurrentPlayer = currentPlayer,
                     CurrentSequencePart = currentSequencePart,
                     CreatedAt = game.CreatedAt,
-                    UpdatedAt = game.UpdatedAt,
+                    UpdatedAt = latestAction?.CreatedAt,
                     StartTime = game.StartTime
                 };
             }
@@ -157,7 +166,10 @@ public class GameplayService : IGameplayService
                 Sequence = sequence,
                 CurrentQuestion = currentQuestion,
                 CurrentPlayer = currentPlayer,
-                CurrentSequencePart = currentSequencePart
+                CurrentSequencePart = currentSequencePart,
+                CreatedAt = game.CreatedAt,
+                UpdatedAt = latestAction.CreatedAt,
+                StartTime = game.StartTime
             };
 
             return result;
