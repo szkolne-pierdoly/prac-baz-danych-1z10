@@ -76,23 +76,9 @@ public class GameplayController : ControllerBase
                 message = "Stats retrieved successfully",
                 stats = new {
                     name = result.Name,
-                    players = result.Players?.Select(p => new {
-                        id = p.Id,
-                        name = p.Name,
-                        color = p.Color,
-                        points = p.Points,
-                        lives = p.Lives,
-                        seat = p.Seat
-                    }).ToList(),
-                    sequence = result.Sequence,
-                    startTime = result.StartTime,
-                    endTime = result.EndTime,
-                    createdAt = result.CreatedAt,
-                    updatedAt = result.UpdatedAt,
                     currentQuestion = result.CurrentQuestion,
                     currentPlayer = result.CurrentPlayer,
                     currentSequencePart = result.CurrentSequencePart,
-                    totalPlayers = result.TotalPlayers,
                 }
             });
         }

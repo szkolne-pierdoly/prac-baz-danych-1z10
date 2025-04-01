@@ -185,16 +185,9 @@ public class GameplayService : IGameplayService
                 Status = "SUCCESS",
                 Message = "Stats retrieved successfully",
                 Name = game.Name,
-                Players = game.Players.ToList(),
-                Sequence = game.Sequence,
-                StartTime = game.StartTime,
-                EndTime = game.EndTime,
-                CreatedAt = game.CreatedAt,
-                UpdatedAt = game.UpdatedAt,
                 CurrentQuestion = game.Actions.OrderByDescending(a => a.CreatedAt).FirstOrDefault(a => a.Type == GameActionType.Start)?.SequencesQuestion?.Question,
                 CurrentPlayer = game.Actions.OrderByDescending(a => a.CreatedAt).FirstOrDefault(a => a.Type == GameActionType.Start)?.GamePlayer?.Player,
                 CurrentSequencePart = game.Actions.OrderByDescending(a => a.CreatedAt).FirstOrDefault(a => a.Type == GameActionType.Start)?.SequencesQuestion?.SequencePart,
-                TotalPlayers = game.Players.Count,
             };
 
             return stats;
