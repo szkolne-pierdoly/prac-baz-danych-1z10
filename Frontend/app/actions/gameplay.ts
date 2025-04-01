@@ -49,7 +49,6 @@ export async function getAllData(gameToken: string): Promise<{
     createdAt: string;
     updatedAt: string;
     startTime: string;
-    endTime: string;
   };
 }> {
   const res = await fetch(
