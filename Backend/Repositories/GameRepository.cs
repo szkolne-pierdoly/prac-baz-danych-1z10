@@ -73,18 +73,28 @@ public class GameRepository : IGameRepository
              .Include(g => g.Players)
              .ThenInclude(p => p.Player)
              .Include(g => g.Actions)
+             .ThenInclude(a => a.GamePlayer)
+             .ThenInclude(gp => gp!.Player)
+             .Include(g => g.Actions)
+             .ThenInclude(a => a.SequencesQuestion)
+             .ThenInclude(sq => sq!.Question)
              .FirstOrDefaultAsync(g => g.Id == id);
     }
 
     public async Task<Game?> GetGameByTokenHash(string tokenHash)
     {
-        return await _context.Games
+           return await _context.Games
             .Include(g => g.Sequence)
             .ThenInclude(s => s.Questions)
             .ThenInclude(q => q.Question)
             .Include(g => g.Players)
             .ThenInclude(p => p.Player)
             .Include(g => g.Actions)
+            .ThenInclude(a => a.GamePlayer)
+            .ThenInclude(gp => gp!.Player)
+            .Include(g => g.Actions)
+            .ThenInclude(a => a.SequencesQuestion)
+            .ThenInclude(sq => sq!.Question)
             .FirstOrDefaultAsync(g => g.GameToken == tokenHash);
     }
 
@@ -105,6 +115,15 @@ public class GameRepository : IGameRepository
         _context.Games.Remove(game);
         await _context.SaveChangesAsync();
         return game;
+    }
+
+    public async Task<GameAction?> GetGameActionById(int id)
+    {
+        return await _context.GameActions
+            .Include(ga => ga.GamePlayer)
+            .Include(ga => ga.SequencesQuestion)
+            .ThenInclude(sq => sq!.Question)
+            .FirstOrDefaultAsync(ga => ga.Id == id);
     }
 
     public async Task<int> GetTotalGames()

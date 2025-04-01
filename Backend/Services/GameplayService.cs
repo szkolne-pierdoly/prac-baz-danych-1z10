@@ -110,7 +110,6 @@ public class GameplayService : IGameplayService
             var sequence = game.Sequence;
 
             var latestAction = actions.OrderByDescending(a => a.CreatedAt).FirstOrDefault();
-
             if (latestAction == null) {
                 return new GetAllDataResult {
                     IsSuccess = false,
@@ -119,9 +118,9 @@ public class GameplayService : IGameplayService
                 };
             }
             
-            SequencePart? currentSequencePart = latestAction.SequencesQuestion?.SequencePart;
-            Question? currentQuestion;
-            GamePlayer? currentPlayer;
+            SequencePart? currentSequencePart = game.Sequence.Questions.FirstOrDefault(q => q.Id == latestAction.SequencesQuestionId)?.SequencePart;
+            Question? currentQuestion = latestAction.SequencesQuestion?.Question;
+            GamePlayer? currentPlayer = latestAction.GamePlayer;
 
             if (game.Actions.Count == 1) {
                 currentQuestion = game.Sequence.Questions.First(q => q.Order == 1).Question;
@@ -132,11 +131,6 @@ public class GameplayService : IGameplayService
                 currentPlayer = latestAction.GamePlayer;
                 Console.WriteLine("latest question");
             }
-
-            Console.WriteLine(JsonSerializer.Serialize(game.Sequence.Questions.First(q => q.Order == 1)));
-            Console.WriteLine(JsonSerializer.Serialize(currentPlayer));
-            Console.WriteLine(JsonSerializer.Serialize(currentSequencePart));
-            Console.WriteLine(JsonSerializer.Serialize(game.Sequence.Questions));
 
             if (players == null || players.Count != 10 || actions == null || actions.Count == 0 || sequence == null || latestAction == null || currentQuestion == null || currentPlayer == null || currentSequencePart == null) {
                 return new GetAllDataResult {
