@@ -140,7 +140,10 @@ public class GameplayService : IGameplayService
                     Sequence = sequence,
                     CurrentQuestion = currentQuestion,
                     CurrentPlayer = currentPlayer,
-                    CurrentSequencePart = currentSequencePart
+                    CurrentSequencePart = currentSequencePart,
+                    CreatedAt = game.CreatedAt,
+                    UpdatedAt = game.UpdatedAt,
+                    StartTime = game.StartTime
                 };
             }
 

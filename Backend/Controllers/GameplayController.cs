@@ -59,8 +59,7 @@ public class GameplayController : ControllerBase
                 currentSequencePart = result.CurrentSequencePart,
                 createdAt = result.CreatedAt,
                 updatedAt = result.UpdatedAt,
-                startTime = result.StartTime,
-                endTime = result.EndTime,
+                startTime = result.StartTime
             }
         });
     }

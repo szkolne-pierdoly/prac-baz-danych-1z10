@@ -10,7 +10,6 @@ public class GetAllDataResult : BaseResult
     public List<GameAction>? Actions { get; set; }
     public Sequence? Sequence { get; set; }
     public DateTime? StartTime { get; set; }
-    public DateTime? EndTime { get; set; }
     public DateTime? CreatedAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public Question? CurrentQuestion { get; set; }
