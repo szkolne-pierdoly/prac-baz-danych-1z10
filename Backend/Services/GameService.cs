@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using Backend.Data.Enum;
 using Backend.Data.Models;
 using Backend.Interface.Repositories;
@@ -173,11 +174,39 @@ public class GameService : IGameService
 
             game.GameToken = gameTokenHashString;
 
+            var fisrtPlayer = game.Players.FirstOrDefault(p => p.Seat == 1);
+            if (fisrtPlayer == null) {
+                return new StartGameResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Unable to find first player"
+                };
+            }
+
+            var firstQuestion = game.Sequence.Questions.FirstOrDefault(q => q.Order == 1 && q.SequencePart == SequencePart.Part1);
+            if (firstQuestion == null) {
+                return new StartGameResult {
+                    IsSuccess = false,
+                    Status = "ERROR",
+                    Message = "Unable to find first question"
+                };
+            }
+
+            Console.WriteLine("first question: " + JsonSerializer.Serialize(firstQuestion));
+            Console.WriteLine("first player: " + JsonSerializer.Serialize(fisrtPlayer));
+
             var startAction = new GameAction {
                 GameId = game.Id,
                 Type = GameActionType.Start,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                SequencesQuestion = firstQuestion,
+                GamePlayer = fisrtPlayer,
             };
+
+            Console.WriteLine("player: " + JsonSerializer.Serialize(fisrtPlayer));
+            Console.WriteLine("question: " + JsonSerializer.Serialize(firstQuestion));
+
+            game.Actions.Add(startAction);
 
             game.StartTime = startAction.CreatedAt;
             game.EndTime = null;
